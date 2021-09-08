@@ -1,7 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, Image, Text, ScrollView} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import {SliderBox} from 'react-native-image-slider-box';
-
+import {Rating, AirbnbRating} from 'react-native-ratings';
 import {FONTS, COLORS, IMAGES} from '../constants/index';
 
 // Icons
@@ -10,25 +18,39 @@ import topSellingIcon from '../assets/icons/topSellingIcon.png';
 import topRatedIcon from '../assets/icons/topRatedIcon.png';
 import newAddedIcon from '../assets/icons/newAddedIcon.png';
 import cheapIcon from '../assets/icons/cheapIcon.png';
-
 import techIcon from '../assets/icons/techIcon.png';
 import musicDevicesIcon from '../assets/icons/musicDevicesIcon.png';
 import fashionIcon from '../assets/icons/fashionIcon.png';
 import sportsIcon from '../assets/icons/sportsIcon.png';
 import homeAppliencesIcon from '../assets/icons/homeAppliencesIcon.png';
+import addIcon from '../assets/icons/addIcon.png';
 
 // product image
 import laptopImage from '../assets/images/laptop-image.png';
+import banner2 from '../assets/images/banner2.png';
+
+// Calculate margin for product cards
+function ApplyMargin(index) {
+  let margin = {marginRight: 0, marginBottom: 0};
+  margin =
+    index % 2 === 0
+      ? {marginRight: 5, marginBottom: 10}
+      : {marginLeft: 5, marginBottom: 10};
+  return margin;
+}
 
 const Homepage = () => {
+  const {width, height} = Dimensions.get('window');
+
   const [BannerImages, setBannerImages] = useState([]);
 
-  const [ProductList, setProductList] = useState([
+  const [ProductList] = useState([
     {
       id: 1,
-      name: 'HP Laptop',
+      name: 'HP Laptop 15',
       price: '100',
       colors: '2 Colors',
+      ratings: 4.6,
       image: require('../assets/images/laptop-image.png'),
     },
     {
@@ -36,6 +58,7 @@ const Homepage = () => {
       name: 'HP Laptop',
       price: '230',
       colors: '5 Colors',
+      ratings: 2,
       image: require('../assets/images/laptop-image.png'),
     },
     {
@@ -43,6 +66,7 @@ const Homepage = () => {
       name: 'HP Laptop',
       price: '340',
       colors: '12 Colors',
+      ratings: 5,
       image: require('../assets/images/laptop-image.png'),
     },
     {
@@ -50,6 +74,7 @@ const Homepage = () => {
       name: 'HP Laptop',
       price: '500',
       colors: '9 Colors',
+      ratings: 4,
       image: require('../assets/images/laptop-image.png'),
     },
     {
@@ -57,6 +82,15 @@ const Homepage = () => {
       name: 'HP Laptop',
       price: '6000',
       colors: '4 Colors',
+      ratings: 3.5,
+      image: require('../assets/images/laptop-image.png'),
+    },
+    {
+      id: 6,
+      name: 'HP Laptop',
+      price: '2300',
+      colors: '12 Colors',
+      ratings: 2,
       image: require('../assets/images/laptop-image.png'),
     },
   ]);
@@ -67,13 +101,17 @@ const Homepage = () => {
       'https://source.unsplash.com/1024x768/?mobile',
       'https://source.unsplash.com/1024x768/?tech',
       'https://source.unsplash.com/1024x768/?technology',
+      'https://source.unsplash.com/1024x768/?macbook',
+      'https://source.unsplash.com/1024x768/?engineer',
+      'https://source.unsplash.com/1024x768/?science',
+      'https://source.unsplash.com/1024x768/?ecommerce',
     ];
 
     setBannerImages(images);
   }, []);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {/* Image Slider */}
       <View>
         <SliderBox
@@ -230,7 +268,7 @@ const Homepage = () => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Image source={techIcon} style={{width: 60, height: 60}} />
+            <Image source={techIcon} style={{width: 45, height: 45}} />
           </View>
           <Text
             style={{
@@ -239,7 +277,7 @@ const Homepage = () => {
               color: 'grey',
               marginTop: 2,
             }}>
-            Technology
+            Tech
           </Text>
         </View>
 
@@ -252,7 +290,7 @@ const Homepage = () => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Image source={musicDevicesIcon} style={{width: 60, height: 60}} />
+            <Image source={musicDevicesIcon} style={{width: 45, height: 45}} />
           </View>
           <Text
             style={{
@@ -270,11 +308,14 @@ const Homepage = () => {
             style={{
               width: 60,
               height: 60,
-              borderRadius: 30,
+              borderRadius: 40,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Image source={sportsIcon} style={{width: 60, height: 60}} />
+            <Image
+              source={homeAppliencesIcon}
+              style={{width: 45, height: 45}}
+            />
           </View>
           <Text
             style={{
@@ -283,7 +324,7 @@ const Homepage = () => {
               color: 'grey',
               marginTop: 2,
             }}>
-            Sports
+            Households
           </Text>
         </View>
 
@@ -296,7 +337,7 @@ const Homepage = () => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Image source={fashionIcon} style={{width: 60, height: 60}} />
+            <Image source={fashionIcon} style={{width: 45, height: 45}} />
           </View>
           <Text
             style={{
@@ -314,14 +355,11 @@ const Homepage = () => {
             style={{
               width: 60,
               height: 60,
-              borderRadius: 40,
+              borderRadius: 30,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Image
-              source={homeAppliencesIcon}
-              style={{width: 60, height: 60}}
-            />
+            <Image source={sportsIcon} style={{width: 45, height: 45}} />
           </View>
           <Text
             style={{
@@ -330,7 +368,7 @@ const Homepage = () => {
               color: 'grey',
               marginTop: 2,
             }}>
-            Appliances
+            Sports
           </Text>
         </View>
       </View>
@@ -361,6 +399,7 @@ const Homepage = () => {
           </Text>
         </View>
 
+        {/* Product List */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -380,29 +419,135 @@ const Homepage = () => {
               <Text style={styles.productName}>{el.name}</Text>
               <View
                 style={{
-                  backgroundColor: '#407BFF',
-                  width: 50,
-                  paddingHorizontal: 6,
-                  paddingVertical: 3,
-                  borderRadius: 2,
+                  alignItems: 'center',
+                  flexDirection: 'row',
                 }}>
-                <Text style={styles.productColors}>{el.colors}</Text>
+                <Rating
+                  readonly={true}
+                  ratingColor="#3498db"
+                  ratingBackgroundColor="#c8c7c8"
+                  startingValue={el.ratings}
+                  imageSize={12}
+                />
+                <Text
+                  style={{
+                    fontFamily: FONTS.Poppins,
+                    fontSize: 10,
+                    marginLeft: 4,
+                  }}>
+                  {'(' + el.ratings + ')'}
+                </Text>
               </View>
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginTop: 5,
+                  paddingBottom: 10,
                 }}>
                 <Text style={styles.productPrice}>{'Rs. ' + el.price}</Text>
-                <Text style={styles.addBtn}>+</Text>
+                <TouchableOpacity>
+                  <Image
+                    source={addIcon}
+                    style={{width: 30, height: 30, tintColor: '#407BFF'}}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           ))}
         </ScrollView>
       </View>
-    </View>
+
+      {/* Image Banner */}
+      <View
+        style={{
+          paddingHorizontal: 20,
+        }}>
+        <Image
+          source={banner2}
+          style={{
+            width: width - 40,
+            height: (width * 377) / 870,
+            borderRadius: 10,
+          }}
+          resizeMode="contain"
+        />
+      </View>
+
+      {/* PRODUCTS DEALS  */}
+      <View>
+        <View
+          style={{
+            marginTop: 10,
+            marginBottom: 10,
+            paddingHorizontal: 20,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={{fontFamily: FONTS.PoppinsBold, fontSize: 20}}>
+            Newly Added
+          </Text>
+        </View>
+
+        {/* Newly Added Product List */}
+        <ScrollView
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{paddingHorizontal: 20}}>
+          <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+            {ProductList.map((el, index) => (
+              <View
+                key={index}
+                style={[styles.productCard, ApplyMargin(index)]}>
+                <View style={{alignItems: 'center'}}>
+                  <Image
+                    source={laptopImage}
+                    style={{width: 110, height: 110}}
+                  />
+                </View>
+                <Text style={styles.productName}>{el.name}</Text>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                  }}>
+                  <Rating
+                    readonly={true}
+                    ratingColor="#3498db"
+                    ratingBackgroundColor="#c8c7c8"
+                    startingValue={el.ratings}
+                    imageSize={12}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: FONTS.Poppins,
+                      fontSize: 10,
+                      marginLeft: 4,
+                    }}>
+                    {'(' + el.ratings + ')'}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    paddingBottom: 10,
+                  }}>
+                  <Text style={styles.productPrice}>{'Rs. ' + el.price}</Text>
+                  <TouchableOpacity>
+                    <Image
+                      source={addIcon}
+                      style={{width: 30, height: 30, tintColor: '#407BFF'}}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -412,10 +557,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   productCard: {
-    width: 160,
+    width: 155,
+    // width: 140,
     borderWidth: 1,
     borderColor: 'rgba(220,220,220, 1)',
-    borderRadius: 10,
     paddingHorizontal: 10,
   },
   productName: {
@@ -429,11 +574,6 @@ const styles = StyleSheet.create({
   productPrice: {
     fontFamily: FONTS.PoppinsBold,
     fontSize: FONTS.Paragraph2,
-  },
-  addBtn: {
-    fontFamily: FONTS.Poppins,
-    fontSize: FONTS.subhead1,
-    color: '#407BFF',
   },
 });
 

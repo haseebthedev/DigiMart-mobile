@@ -211,6 +211,7 @@ const Layout = ({navigation}) => {
                   style={{width: 25, height: 25, tintColor: color}}
                 />
               ),
+              tabBarBadge: 13,
             }}
           />
           <Tab.Screen
@@ -223,6 +224,7 @@ const Layout = ({navigation}) => {
                   style={{width: 25, height: 25, tintColor: color}}
                 />
               ),
+              tabBarBadge: 2,
             }}
           />
           <Tab.Screen
@@ -262,7 +264,7 @@ const TabButton = (currentTab, setCurrentTab, title, image, navigation) => {
           paddingVertical: 8,
           backgroundColor: currentTab == title ? 'white' : 'transparent',
           paddingLeft: 13,
-          paddingRight: 35,
+          paddingRight: 40,
           borderRadius: 5,
           marginTop: 15,
         }}>
@@ -271,15 +273,16 @@ const TabButton = (currentTab, setCurrentTab, title, image, navigation) => {
           style={{
             width: 25,
             height: 25,
-            tintColor: currentTab == title ? '#5359D1' : 'white',
-          }}></Image>
+            tintColor: currentTab == title ? '#407BFF' : 'white',
+          }}
+        />
 
         <Text
           style={{
             fontSize: 15,
             fontWeight: 'bold',
             paddingLeft: 15,
-            color: currentTab == title ? '#5359D1' : 'white',
+            color: currentTab == title ? '#407BFF' : 'white',
           }}>
           {title}
         </Text>
