@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,11 +6,11 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
+  Dimensions
 } from 'react-native';
-import {SliderBox} from 'react-native-image-slider-box';
-import {Rating, AirbnbRating} from 'react-native-ratings';
-import {FONTS, COLORS, IMAGES} from '../constants/index';
+import { SliderBox } from 'react-native-image-slider-box';
+import { Rating } from 'react-native-ratings';
+import { FONTS, COLORS, IMAGES } from '../constants/index';
 
 // Icons
 import categoryIcon from '../assets/icons/categoriesIcon.png';
@@ -25,25 +25,24 @@ import sportsIcon from '../assets/icons/sportsIcon.png';
 import homeAppliencesIcon from '../assets/icons/homeAppliencesIcon.png';
 import addIcon from '../assets/icons/addIcon.png';
 
-// product image
+// Images
 import laptopImage from '../assets/images/laptop-image.png';
 import banner2 from '../assets/images/banner2.png';
 
 // Calculate margin for product cards
 function ApplyMargin(index) {
-  let margin = {marginRight: 0, marginBottom: 0};
+  let margin = { marginRight: 0, marginBottom: 0 };
   margin =
     index % 2 === 0
-      ? {marginRight: 5, marginBottom: 10}
-      : {marginLeft: 5, marginBottom: 10};
+      ? { marginRight: 5, marginBottom: 10 }
+      : { marginLeft: 5, marginBottom: 10 };
   return margin;
 }
 
-const Homepage = () => {
-  const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
+const Homepage = ({ navigation }) => {
   const [BannerImages, setBannerImages] = useState([]);
-
   const [ProductList] = useState([
     {
       id: 1,
@@ -51,7 +50,7 @@ const Homepage = () => {
       price: '100',
       colors: '2 Colors',
       ratings: 4.6,
-      image: require('../assets/images/laptop-image.png'),
+      image: require('../assets/images/laptop-image.png')
     },
     {
       id: 2,
@@ -59,7 +58,7 @@ const Homepage = () => {
       price: '230',
       colors: '5 Colors',
       ratings: 2,
-      image: require('../assets/images/laptop-image.png'),
+      image: require('../assets/images/laptop-image.png')
     },
     {
       id: 3,
@@ -67,7 +66,7 @@ const Homepage = () => {
       price: '340',
       colors: '12 Colors',
       ratings: 5,
-      image: require('../assets/images/laptop-image.png'),
+      image: require('../assets/images/laptop-image.png')
     },
     {
       id: 4,
@@ -75,7 +74,7 @@ const Homepage = () => {
       price: '500',
       colors: '9 Colors',
       ratings: 4,
-      image: require('../assets/images/laptop-image.png'),
+      image: require('../assets/images/laptop-image.png')
     },
     {
       id: 5,
@@ -83,7 +82,7 @@ const Homepage = () => {
       price: '6000',
       colors: '4 Colors',
       ratings: 3.5,
-      image: require('../assets/images/laptop-image.png'),
+      image: require('../assets/images/laptop-image.png')
     },
     {
       id: 6,
@@ -91,20 +90,18 @@ const Homepage = () => {
       price: '2300',
       colors: '12 Colors',
       ratings: 2,
-      image: require('../assets/images/laptop-image.png'),
-    },
+      image: require('../assets/images/laptop-image.png')
+    }
   ]);
 
   useEffect(() => {
     const images = [
       'https://source.unsplash.com/1024x768/?laptop',
       'https://source.unsplash.com/1024x768/?mobile',
-      'https://source.unsplash.com/1024x768/?tech',
       'https://source.unsplash.com/1024x768/?technology',
       'https://source.unsplash.com/1024x768/?macbook',
       'https://source.unsplash.com/1024x768/?engineer',
-      'https://source.unsplash.com/1024x768/?science',
-      'https://source.unsplash.com/1024x768/?ecommerce',
+      'https://source.unsplash.com/1024x768/?ecommerce'
     ];
 
     setBannerImages(images);
@@ -112,6 +109,17 @@ const Homepage = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <View
+        style={{
+          marginVertical: 10,
+          paddingHorizontal: 20
+        }}
+      >
+        <Text style={{ fontFamily: FONTS.PoppinsBold, fontSize: 30 }}>
+          Discover Now
+        </Text>
+      </View>
+
       {/* Image Slider */}
       <View>
         <SliderBox
@@ -121,9 +129,9 @@ const Homepage = () => {
           inactiveDotColor="#90A4AE"
           dotStyle={{
             width: 8,
-            height: 8,
+            height: 8
           }}
-          ImageComponentStyle={{borderRadius: 8, width: '90%'}}
+          ImageComponentStyle={{ borderRadius: 8, width: '90%' }}
           paginationBoxVerticalPadding={8}
           autoplay
           circleLoop
@@ -138,114 +146,125 @@ const Homepage = () => {
           marginTop: 20,
           paddingHorizontal: 20,
           flexDirection: 'row',
-          justifyContent: 'space-evenly',
-        }}>
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          justifyContent: 'space-evenly'
+        }}
+      >
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
               width: 60,
               height: 60,
               borderRadius: 30,
               justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image source={categoryIcon} style={{width: 45, height: 45}} />
+              alignItems: 'center'
+            }}
+          >
+            <Image source={categoryIcon} style={{ width: 45, height: 45 }} />
           </View>
           <Text
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 10,
               color: 'grey',
-              marginTop: 2,
-            }}>
+              marginTop: 2
+            }}
+          >
             Categories
           </Text>
         </View>
 
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
               width: 60,
               height: 60,
               borderRadius: 30,
               justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image source={topSellingIcon} style={{width: 45, height: 45}} />
+              alignItems: 'center'
+            }}
+          >
+            <Image source={topSellingIcon} style={{ width: 45, height: 45 }} />
           </View>
           <Text
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 10,
               color: 'grey',
-              marginTop: 2,
-            }}>
+              marginTop: 2
+            }}
+          >
             Top Selling
           </Text>
         </View>
 
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
               width: 60,
               height: 60,
               borderRadius: 30,
               justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image source={topRatedIcon} style={{width: 45, height: 45}} />
+              alignItems: 'center'
+            }}
+          >
+            <Image source={topRatedIcon} style={{ width: 45, height: 45 }} />
           </View>
           <Text
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 10,
               color: 'grey',
-              marginTop: 2,
-            }}>
+              marginTop: 2
+            }}
+          >
             Top Rated
           </Text>
         </View>
 
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
               width: 60,
               height: 60,
               borderRadius: 30,
               justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image source={newAddedIcon} style={{width: 45, height: 45}} />
+              alignItems: 'center'
+            }}
+          >
+            <Image source={newAddedIcon} style={{ width: 45, height: 45 }} />
           </View>
           <Text
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 10,
               color: 'grey',
-              marginTop: 2,
-            }}>
+              marginTop: 2
+            }}
+          >
             New Arrival
           </Text>
         </View>
 
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
               width: 60,
               height: 60,
               borderRadius: 40,
               justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image source={cheapIcon} style={{width: 45, height: 45}} />
+              alignItems: 'center'
+            }}
+          >
+            <Image source={cheapIcon} style={{ width: 45, height: 45 }} />
           </View>
           <Text
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 10,
               color: 'grey',
-              marginTop: 2,
-            }}>
+              marginTop: 2
+            }}
+          >
             Low Cost
           </Text>
         </View>
@@ -257,64 +276,46 @@ const Homepage = () => {
           marginTop: 20,
           paddingHorizontal: 20,
           flexDirection: 'row',
-          justifyContent: 'space-evenly',
-        }}>
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          justifyContent: 'space-evenly'
+        }}
+      >
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
               width: 60,
               height: 60,
               borderRadius: 30,
               justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image source={techIcon} style={{width: 45, height: 45}} />
+              alignItems: 'center'
+            }}
+          >
+            <Image source={techIcon} style={{ width: 45, height: 45 }} />
           </View>
           <Text
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 10,
               color: 'grey',
-              marginTop: 2,
-            }}>
+              marginTop: 2
+            }}
+          >
             Tech
           </Text>
         </View>
 
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
               width: 60,
               height: 60,
               borderRadius: 30,
               justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image source={musicDevicesIcon} style={{width: 45, height: 45}} />
-          </View>
-          <Text
-            style={{
-              fontFamily: FONTS.Poppins,
-              fontSize: 10,
-              color: 'grey',
-              marginTop: 2,
-            }}>
-            Music
-          </Text>
-        </View>
-
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-          <View
-            style={{
-              width: 60,
-              height: 60,
-              borderRadius: 40,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
+              alignItems: 'center'
+            }}
+          >
             <Image
-              source={homeAppliencesIcon}
-              style={{width: 45, height: 45}}
+              source={musicDevicesIcon}
+              style={{ width: 45, height: 45 }}
             />
           </View>
           <Text
@@ -322,52 +323,84 @@ const Homepage = () => {
               fontFamily: FONTS.Poppins,
               fontSize: 10,
               color: 'grey',
-              marginTop: 2,
-            }}>
+              marginTop: 2
+            }}
+          >
+            Music
+          </Text>
+        </View>
+
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View
+            style={{
+              width: 60,
+              height: 60,
+              borderRadius: 40,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <Image
+              source={homeAppliencesIcon}
+              style={{ width: 45, height: 45 }}
+            />
+          </View>
+          <Text
+            style={{
+              fontFamily: FONTS.Poppins,
+              fontSize: 10,
+              color: 'grey',
+              marginTop: 2
+            }}
+          >
             Households
           </Text>
         </View>
 
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
               width: 60,
               height: 60,
               borderRadius: 30,
               justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image source={fashionIcon} style={{width: 45, height: 45}} />
+              alignItems: 'center'
+            }}
+          >
+            <Image source={fashionIcon} style={{ width: 45, height: 45 }} />
           </View>
           <Text
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 10,
               color: 'grey',
-              marginTop: 2,
-            }}>
+              marginTop: 2
+            }}
+          >
             Fashion
           </Text>
         </View>
 
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
             style={{
               width: 60,
               height: 60,
               borderRadius: 30,
               justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image source={sportsIcon} style={{width: 45, height: 45}} />
+              alignItems: 'center'
+            }}
+          >
+            <Image source={sportsIcon} style={{ width: 45, height: 45 }} />
           </View>
           <Text
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 10,
               color: 'grey',
-              marginTop: 2,
-            }}>
+              marginTop: 2
+            }}
+          >
             Sports
           </Text>
         </View>
@@ -381,20 +414,19 @@ const Homepage = () => {
             paddingHorizontal: 20,
             flexDirection: 'row',
             justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <Text style={{fontFamily: FONTS.PoppinsBold, fontSize: 20}}>
+            alignItems: 'center'
+          }}
+        >
+          <Text style={{ fontFamily: FONTS.PoppinsBold, fontSize: 20 }}>
             Hot Deals
           </Text>
           <Text
             style={{
-              fontFamily: FONTS.Poppins,
-              backgroundColor: '#407BFF',
-              color: '#fff',
-              paddingHorizontal: 10,
-              paddingVertical: 6,
-              borderRadius: 5,
-            }}>
+              fontFamily: FONTS.PoppinsBold,
+              color: '#407BFF',
+              paddingVertical: 6
+            }}
+          >
             View All
           </Text>
         </View>
@@ -403,25 +435,32 @@ const Homepage = () => {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{paddingHorizontal: 20}}>
+          contentContainerStyle={{ paddingHorizontal: 20 }}
+        >
           {ProductList.map((el, index) => (
-            <View
+            <TouchableOpacity
               key={index}
               style={[
                 styles.productCard,
                 index !== ProductList.length - 1
-                  ? {marginRight: 10}
-                  : {marginRight: 0},
-              ]}>
-              <View style={{alignItems: 'center'}}>
-                <Image source={laptopImage} style={{width: 110, height: 110}} />
+                  ? { marginRight: 10 }
+                  : { marginRight: 0 }
+              ]}
+              onPress={() => navigation.navigate('ProductPage')}
+            >
+              <View style={{ alignItems: 'center' }}>
+                <Image
+                  source={laptopImage}
+                  style={{ width: 110, height: 110 }}
+                />
               </View>
               <Text style={styles.productName}>{el.name}</Text>
               <View
                 style={{
                   alignItems: 'center',
-                  flexDirection: 'row',
-                }}>
+                  flexDirection: 'row'
+                }}
+              >
                 <Rating
                   readonly={true}
                   ratingColor="#3498db"
@@ -433,8 +472,9 @@ const Homepage = () => {
                   style={{
                     fontFamily: FONTS.Poppins,
                     fontSize: 10,
-                    marginLeft: 4,
-                  }}>
+                    marginLeft: 4
+                  }}
+                >
                   {'(' + el.ratings + ')'}
                 </Text>
               </View>
@@ -443,17 +483,22 @@ const Homepage = () => {
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  paddingBottom: 10,
-                }}>
+                  paddingBottom: 10
+                }}
+              >
                 <Text style={styles.productPrice}>{'Rs. ' + el.price}</Text>
                 <TouchableOpacity>
                   <Image
                     source={addIcon}
-                    style={{width: 30, height: 30, tintColor: '#407BFF'}}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      tintColor: '#407BFF'
+                    }}
                   />
                 </TouchableOpacity>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
@@ -461,14 +506,15 @@ const Homepage = () => {
       {/* Image Banner */}
       <View
         style={{
-          paddingHorizontal: 20,
-        }}>
+          paddingHorizontal: 20
+        }}
+      >
         <Image
           source={banner2}
           style={{
             width: width - 40,
             height: (width * 377) / 870,
-            borderRadius: 10,
+            borderRadius: 10
           }}
           resizeMode="contain"
         />
@@ -483,9 +529,10 @@ const Homepage = () => {
             paddingHorizontal: 20,
             flexDirection: 'row',
             justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Text style={{fontFamily: FONTS.PoppinsBold, fontSize: 20}}>
+            alignItems: 'center'
+          }}
+        >
+          <Text style={{ fontFamily: FONTS.PoppinsBold, fontSize: 20 }}>
             Newly Added
           </Text>
         </View>
@@ -493,24 +540,27 @@ const Homepage = () => {
         {/* Newly Added Product List */}
         <ScrollView
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{paddingHorizontal: 20}}>
-          <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+          contentContainerStyle={{ paddingHorizontal: 20 }}
+        >
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
             {ProductList.map((el, index) => (
               <View
                 key={index}
-                style={[styles.productCard, ApplyMargin(index)]}>
-                <View style={{alignItems: 'center'}}>
+                style={[styles.productCard, ApplyMargin(index)]}
+              >
+                <View style={{ alignItems: 'center' }}>
                   <Image
                     source={laptopImage}
-                    style={{width: 110, height: 110}}
+                    style={{ width: 110, height: 110 }}
                   />
                 </View>
                 <Text style={styles.productName}>{el.name}</Text>
                 <View
                   style={{
                     alignItems: 'center',
-                    flexDirection: 'row',
-                  }}>
+                    flexDirection: 'row'
+                  }}
+                >
                   <Rating
                     readonly={true}
                     ratingColor="#3498db"
@@ -522,8 +572,9 @@ const Homepage = () => {
                     style={{
                       fontFamily: FONTS.Poppins,
                       fontSize: 10,
-                      marginLeft: 4,
-                    }}>
+                      marginLeft: 4
+                    }}
+                  >
                     {'(' + el.ratings + ')'}
                   </Text>
                 </View>
@@ -532,13 +583,18 @@ const Homepage = () => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    paddingBottom: 10,
-                  }}>
+                    paddingBottom: 10
+                  }}
+                >
                   <Text style={styles.productPrice}>{'Rs. ' + el.price}</Text>
                   <TouchableOpacity>
                     <Image
                       source={addIcon}
-                      style={{width: 30, height: 30, tintColor: '#407BFF'}}
+                      style={{
+                        width: 30,
+                        height: 30,
+                        tintColor: '#407BFF'
+                      }}
                     />
                   </TouchableOpacity>
                 </View>
@@ -554,27 +610,26 @@ const Homepage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fff'
   },
   productCard: {
     width: 155,
-    // width: 140,
     borderWidth: 1,
     borderColor: 'rgba(220,220,220, 1)',
-    paddingHorizontal: 10,
+    paddingHorizontal: 10
   },
   productName: {
     fontFamily: FONTS.Poppins,
-    fontSize: FONTS.Paragraph2,
+    fontSize: FONTS.Paragraph2
   },
   productColors: {
     color: '#fff',
-    fontSize: FONTS.Paragraph4,
+    fontSize: FONTS.Paragraph4
   },
   productPrice: {
     fontFamily: FONTS.PoppinsBold,
-    fontSize: FONTS.Paragraph2,
-  },
+    fontSize: FONTS.Paragraph2
+  }
 });
 
 export default Homepage;

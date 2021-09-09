@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  TextInput,
+  TextInput
 } from 'react-native';
 
 // Icons...
@@ -21,8 +21,8 @@ import logoutIcon from '../../assets/icons/logoutIcon.png';
 import searchIcon from '../../assets/icons/searchIcon.png';
 import scanIcon from '../../assets/icons/scanIcon.png';
 
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {FONTS, COLORS, IMAGES} from '../../constants/index';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { FONTS, COLORS, IMAGES } from '../../constants/index';
 
 // MainScreens
 import Homepage from '../Homepage';
@@ -32,7 +32,7 @@ import Account from '../Account';
 
 const Tab = createMaterialBottomTabNavigator();
 
-const Layout = ({navigation}) => {
+const Layout = ({ navigation }) => {
   // State
   const [currentTab, setCurrentTab] = useState('Homepage');
   const [showMenu, setShowMenu] = useState(false);
@@ -47,43 +47,44 @@ const Layout = ({navigation}) => {
     Animated.timing(scaleValue, {
       toValue: showMenu ? 1 : 0.88,
       duration: 300,
-      useNativeDriver: true,
+      useNativeDriver: true
     }).start();
 
     Animated.timing(offsetValue, {
       toValue: showMenu ? 0 : 230,
       duration: 300,
-      useNativeDriver: true,
+      useNativeDriver: true
     }).start();
 
     Animated.timing(closeButtonOffset, {
       toValue: !showMenu ? -30 : 0,
       duration: 300,
-      useNativeDriver: true,
+      useNativeDriver: true
     }).start();
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{justifyContent: 'flex-start', padding: 15}}>
+      <View style={{ justifyContent: 'flex-start', padding: 15 }}>
         <View
           style={{
             flexGrow: 1,
-            marginTop: 50,
-          }}>
+            marginTop: 50
+          }}
+        >
           {TabButton(
             currentTab,
             setCurrentTab,
             'Homepage',
             homeIcon,
-            navigation,
+            navigation
           )}
           {TabButton(
             currentTab,
             setCurrentTab,
             'Messages',
             chatIcon,
-            navigation,
+            navigation
           )}
           {TabButton(currentTab, setCurrentTab, 'Cart', cartIcon, navigation)}
           {TabButton(
@@ -91,14 +92,14 @@ const Layout = ({navigation}) => {
             setCurrentTab,
             'Account',
             accountIcon,
-            navigation,
+            navigation
           )}
           {TabButton(
             currentTab,
             setCurrentTab,
             'Login',
             logoutIcon,
-            navigation,
+            navigation
           )}
         </View>
       </View>
@@ -116,9 +117,10 @@ const Layout = ({navigation}) => {
           // paddingHorizontal: showMenu ? 10 : 0,
           // paddingVertical: showMenu ? 10 : 0,
           borderRadius: showMenu ? 10 : 0,
-          transform: [{scale: scaleValue}, {translateX: offsetValue}],
+          transform: [{ scale: scaleValue }, { translateX: offsetValue }]
         }}
-        elevation={2}>
+        elevation={2}
+      >
         <Animated.View>
           <View
             style={{
@@ -126,19 +128,21 @@ const Layout = ({navigation}) => {
               justifyContent: 'space-between',
               alignItems: 'center',
               paddingVertical: 10,
-              paddingHorizontal: 20,
-            }}>
+              paddingHorizontal: 20
+            }}
+          >
             <TouchableOpacity
               onPress={() => {
                 drawerAnimation();
                 setShowMenu(!showMenu);
-              }}>
+              }}
+            >
               <Image
                 source={showMenu ? close : menu}
                 style={{
                   width: 30,
                   height: 30,
-                  tintColor: 'black',
+                  tintColor: 'black'
                 }}
               />
             </TouchableOpacity>
@@ -150,8 +154,9 @@ const Layout = ({navigation}) => {
                 paddingLeft: 40,
                 backgroundColor: 'rgba(220,220,220, 0.5)',
                 borderRadius: 5,
-                justifyContent: 'center',
-              }}>
+                justifyContent: 'center'
+              }}
+            >
               <Image
                 source={searchIcon}
                 style={{
@@ -159,7 +164,7 @@ const Layout = ({navigation}) => {
                   height: 20,
                   tintColor: 'grey',
                   position: 'absolute',
-                  left: 10,
+                  left: 10
                 }}
               />
               <TextInput
@@ -168,7 +173,7 @@ const Layout = ({navigation}) => {
                   fontSize: 12,
                   marginTop: -5,
                   marginBottom: -10,
-                  fontFamily: FONTS.Poppins,
+                  fontFamily: FONTS.Poppins
                 }}
               />
             </View>
@@ -177,7 +182,7 @@ const Layout = ({navigation}) => {
               style={{
                 width: 30,
                 height: 30,
-                tintColor: 'black',
+                tintColor: 'black'
               }}
             />
           </View>
@@ -188,55 +193,56 @@ const Layout = ({navigation}) => {
           activeColor="#407BFF"
           inactiveColor="#B2B2B2"
           labeled={false}
-          barStyle={{backgroundColor: '#fff'}}>
+          barStyle={{ backgroundColor: '#fff' }}
+        >
           <Tab.Screen
             name="Homepage"
             component={Homepage}
             options={{
-              tabBarIcon: ({color}) => (
+              tabBarIcon: ({ color }) => (
                 <Image
                   source={homeIcon}
-                  style={{width: 25, height: 25, tintColor: color}}
+                  style={{ width: 25, height: 25, tintColor: color }}
                 />
-              ),
+              )
             }}
           />
           <Tab.Screen
             name="Messages"
             component={Messages}
             options={{
-              tabBarIcon: ({color}) => (
+              tabBarIcon: ({ color }) => (
                 <Image
                   source={chatIcon}
-                  style={{width: 25, height: 25, tintColor: color}}
+                  style={{ width: 25, height: 25, tintColor: color }}
                 />
               ),
-              tabBarBadge: 13,
+              tabBarBadge: 13
             }}
           />
           <Tab.Screen
             name="Cart"
             component={Cart}
             options={{
-              tabBarIcon: ({color}) => (
+              tabBarIcon: ({ color }) => (
                 <Image
                   source={cartIcon}
-                  style={{width: 25, height: 25, tintColor: color}}
+                  style={{ width: 25, height: 25, tintColor: color }}
                 />
               ),
-              tabBarBadge: 2,
+              tabBarBadge: 2
             }}
           />
           <Tab.Screen
             name="Account"
             component={Account}
             options={{
-              tabBarIcon: ({color}) => (
+              tabBarIcon: ({ color }) => (
                 <Image
                   source={accountIcon}
-                  style={{width: 25, height: 25, tintColor: color}}
+                  style={{ width: 25, height: 25, tintColor: color }}
                 />
-              ),
+              )
             }}
           />
         </Tab.Navigator>
@@ -256,7 +262,8 @@ const TabButton = (currentTab, setCurrentTab, title, image, navigation) => {
           setCurrentTab(title);
           navigation.navigate(title);
         }
-      }}>
+      }}
+    >
       <View
         style={{
           flexDirection: 'row',
@@ -264,26 +271,28 @@ const TabButton = (currentTab, setCurrentTab, title, image, navigation) => {
           paddingVertical: 8,
           backgroundColor: currentTab == title ? 'white' : 'transparent',
           paddingLeft: 13,
-          paddingRight: 40,
+          paddingRight: 35,
           borderRadius: 5,
-          marginTop: 15,
-        }}>
+          marginTop: 15
+        }}
+      >
         <Image
           source={image}
           style={{
             width: 25,
             height: 25,
-            tintColor: currentTab == title ? '#407BFF' : 'white',
+            tintColor: currentTab == title ? '#407BFF' : 'white'
           }}
         />
 
         <Text
           style={{
-            fontSize: 15,
-            fontWeight: 'bold',
+            // fontSize: 15,
             paddingLeft: 15,
-            color: currentTab == title ? '#407BFF' : 'white',
-          }}>
+            fontFamily: FONTS.PoppinsBold,
+            color: currentTab == title ? '#407BFF' : 'white'
+          }}
+        >
           {title}
         </Text>
       </View>
@@ -296,8 +305,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#407BFF',
     alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-  },
+    justifyContent: 'flex-start'
+  }
 });
 
 export default Layout;
