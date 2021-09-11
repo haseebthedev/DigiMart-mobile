@@ -1,19 +1,27 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet, TextInput} from 'react-native';
-import {FONTS, COLORS, IMAGES} from '../constants/index';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity
+} from 'react-native';
+import { FONTS, COLORS, IMAGES } from '../constants/index';
 
-const Login = ({navigation}) => {
+const Login = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <View style={{marginTop: 80, marginBottom: 50, alignItems: 'center'}}>
+      <View style={{ marginTop: 80, marginBottom: 50, alignItems: 'center' }}>
         <Image source={IMAGES.loginIllustration} style={styles.loginImage} />
       </View>
-      <View style={{alignItems: 'center', marginBottom: 10}}>
+      <View style={{ alignItems: 'center', marginBottom: 10 }}>
         <Text
           style={{
             fontSize: FONTS.subhead4,
-            fontFamily: FONTS.Poppins,
-          }}>
+            fontFamily: FONTS.Poppins
+          }}
+        >
           Login to your Account
         </Text>
       </View>
@@ -23,23 +31,28 @@ const Login = ({navigation}) => {
         secureTextEntry
         style={styles.inputField}
       />
-      <View style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Layout')}
+      >
         <Text style={styles.loginButton}>LOGIN</Text>
-      </View>
+      </TouchableOpacity>
       <View
         style={{
           marginVertical: 20,
-          alignItems: 'center',
-        }}>
+          alignItems: 'center'
+        }}
+      >
         <Text
           onPress={() => navigation.navigate('Register')}
           style={{
             fontSize: FONTS.Paragraph2,
             fontFamily: FONTS.Poppins,
-            color: 'grey',
-          }}>
+            color: 'grey'
+          }}
+        >
           Don't have an account?{' '}
-          <Text style={{color: COLORS.PRIMARY}}>Sign Up</Text>
+          <Text style={{ color: COLORS.PRIMARY }}>Sign Up</Text>
         </Text>
       </View>
     </View>
@@ -49,7 +62,7 @@ const Login = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fff'
   },
   loginImage: {
     width: 200,
@@ -57,7 +70,7 @@ const styles = StyleSheet.create({
     borderRadius: 200,
     backgroundColor: '#e1e1e1',
     borderColor: '#407BFF',
-    borderWidth: 4,
+    borderWidth: 4
   },
   inputField: {
     paddingHorizontal: 15,
@@ -68,7 +81,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontFamily: FONTS.Poppins,
     fontSize: FONTS.Paragraph1,
-    paddingTop: 15,
+    paddingTop: 15
   },
   button: {
     height: 50,
@@ -77,14 +90,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.PRIMARY,
     borderRadius: 8,
     marginHorizontal: 20,
-    marginTop: 10,
+    marginTop: 10
   },
   loginButton: {
     fontSize: FONTS.Paragraph1,
     fontFamily: FONTS.Poppins,
     color: '#fff',
-    fontWeight: 'bold',
-  },
+    fontWeight: 'bold'
+  }
 });
 
 export default Login;

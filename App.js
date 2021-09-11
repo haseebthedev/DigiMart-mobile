@@ -22,7 +22,7 @@ const App = () => {
     <NavigationContainer>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <Stack.Navigator
-        initialRouteName="ProductPage"
+        initialRouteName="Login"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={Login} />
