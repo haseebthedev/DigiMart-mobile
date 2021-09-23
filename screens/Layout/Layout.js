@@ -24,6 +24,9 @@ import scanIcon from '../../assets/icons/scanIcon.png';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
 
+// Images
+import myImage from '../../assets/images/myImage.jpg';
+
 // MainScreens
 import Homepage from '../Homepage';
 import Messages from '../Messages';
@@ -68,10 +71,40 @@ const Layout = ({ navigation }) => {
       <View style={{ justifyContent: 'flex-start', padding: 15 }}>
         <View
           style={{
-            flexGrow: 1,
-            marginTop: 50
+            marginTop: 40
           }}
         >
+          <View style={{ alignItems: 'center' }}>
+            <Image
+              source={myImage}
+              style={{
+                width: 75,
+                height: 75,
+                borderRadius: 8,
+                borderWidth: 3,
+                borderColor: '#fff'
+              }}
+            />
+            <Text
+              style={{
+                fontFamily: FONTS.PoppinsBold,
+                color: '#fff',
+                marginTop: 10
+              }}
+            >
+              Haseeb Ahmed
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.Poppins,
+                fontSize: 10,
+                color: '#fff',
+                marginBottom: 15
+              }}
+            >
+              haseeb@gmail.com
+            </Text>
+          </View>
           {TabButton(
             currentTab,
             setCurrentTab,
@@ -86,7 +119,9 @@ const Layout = ({ navigation }) => {
             chatIcon,
             navigation
           )}
+
           {TabButton(currentTab, setCurrentTab, 'Cart', cartIcon, navigation)}
+
           {TabButton(
             currentTab,
             setCurrentTab,
@@ -114,8 +149,6 @@ const Layout = ({ navigation }) => {
           bottom: 0,
           left: 0,
           right: 0,
-          // paddingHorizontal: showMenu ? 10 : 0,
-          // paddingVertical: showMenu ? 10 : 0,
           borderRadius: showMenu ? 10 : 0,
           transform: [{ scale: scaleValue }, { translateX: offsetValue }]
         }}
@@ -178,11 +211,11 @@ const Layout = ({ navigation }) => {
               />
             </View>
             <Image
-              source={scanIcon}
+              source={myImage}
               style={{
                 width: 30,
                 height: 30,
-                tintColor: 'black'
+                borderRadius: 15
               }}
             />
           </View>
@@ -279,17 +312,17 @@ const TabButton = (currentTab, setCurrentTab, title, image, navigation) => {
         <Image
           source={image}
           style={{
-            width: 25,
-            height: 25,
+            width: 20,
+            height: 20,
             tintColor: currentTab == title ? '#407BFF' : 'white'
           }}
         />
 
         <Text
           style={{
-            // fontSize: 15,
             paddingLeft: 15,
             fontFamily: FONTS.PoppinsBold,
+            fontSize: 12,
             color: currentTab == title ? '#407BFF' : 'white'
           }}
         >

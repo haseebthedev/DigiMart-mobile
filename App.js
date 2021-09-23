@@ -9,6 +9,8 @@ import Register from './screens/Register';
 import Login from './screens/Login';
 import Layout from './screens/Layout/Layout';
 import ProductPage from './screens/ProductPage';
+import Account from './screens/Account';
+import Checkout from './screens/Checkout';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,12 +24,14 @@ const App = () => {
     <NavigationContainer>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName="Layout"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
+        {/* <Stack.Screen name="Account" component={Account} /> */}
         <Stack.Screen name="ProductPage" component={ProductPage} />
+        <Stack.Screen name="Checkout" component={Checkout} />
         <Stack.Screen name="Layout" component={Layout} />
       </Stack.Navigator>
     </NavigationContainer>

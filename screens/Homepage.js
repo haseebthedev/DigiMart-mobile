@@ -422,7 +422,7 @@ const Homepage = ({ navigation }) => {
           </Text>
           <Text
             style={{
-              fontFamily: FONTS.PoppinsBold,
+              fontFamily: FONTS.Poppins,
               color: '#407BFF',
               paddingVertical: 6
             }}
@@ -493,7 +493,7 @@ const Homepage = ({ navigation }) => {
                     style={{
                       width: 30,
                       height: 30,
-                      tintColor: '#407BFF'
+                      tintColor: 'black'
                     }}
                   />
                 </TouchableOpacity>
@@ -506,7 +506,8 @@ const Homepage = ({ navigation }) => {
       {/* Image Banner */}
       <View
         style={{
-          paddingHorizontal: 20
+          paddingHorizontal: 20,
+          marginTop: 10
         }}
       >
         <Image
@@ -544,9 +545,10 @@ const Homepage = ({ navigation }) => {
         >
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
             {ProductList.map((el, index) => (
-              <View
+              <TouchableOpacity
                 key={index}
                 style={[styles.productCard, ApplyMargin(index)]}
+                onPress={() => navigation.navigate('ProductPage')}
               >
                 <View style={{ alignItems: 'center' }}>
                   <Image
@@ -593,12 +595,12 @@ const Homepage = ({ navigation }) => {
                       style={{
                         width: 30,
                         height: 30,
-                        tintColor: '#407BFF'
+                        tintColor: 'black'
                       }}
                     />
                   </TouchableOpacity>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </ScrollView>

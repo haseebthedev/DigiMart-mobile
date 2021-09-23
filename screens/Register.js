@@ -1,9 +1,10 @@
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
-import {Picker} from '@react-native-picker/picker';
-import {FONTS, COLORS} from '../constants/index';
+import { View, Text, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
-const Register = ({navigation}) => {
+import { FONTS, COLORS } from '../constants/index';
+
+const Register = ({ navigation }) => {
   return (
     <ScrollView scrollEnabled style={styles.container}>
       <View>
@@ -11,21 +12,24 @@ const Register = ({navigation}) => {
           style={{
             marginHorizontal: 20,
             marginVertical: 35,
-            alignItems: 'center',
-          }}>
+            alignItems: 'center'
+          }}
+        >
           <Text
             style={{
               fontSize: FONTS.subhead2,
               fontFamily: FONTS.Poppins,
-              color: COLORS.PRIMARY,
-            }}>
+              color: COLORS.PRIMARY
+            }}
+          >
             Create Your Account
           </Text>
           <Text
             style={{
               fontSize: FONTS.Paragraph3,
-              fontFamily: FONTS.Poppins,
-            }}>
+              fontFamily: FONTS.Poppins
+            }}
+          >
             Please enter info to create your account
           </Text>
         </View>
@@ -44,12 +48,15 @@ const Register = ({navigation}) => {
               borderWidth: 1,
               borderColor: '#e1e1e1',
               marginHorizontal: 20,
-              marginBottom: 10,
-            }}>
+              marginBottom: 10
+              // paddingLeft: 10
+            }}
+          >
             <Picker
-              style={{color: 'grey'}}
+              style={{ color: 'grey', fontFamily: FONTS.Poppins }}
               selectedValue={'Select your Gender'}
-              onValueChange={(itemValue, itemIndex) => console.log('changed')}>
+              onValueChange={(itemValue, itemIndex) => console.log('changed')}
+            >
               <Picker.Item label="Male" value="Male" />
               <Picker.Item label="Female" value="Female" />
               <Picker.Item label="Other" value="Other" />
@@ -72,17 +79,19 @@ const Register = ({navigation}) => {
         <View
           style={{
             marginVertical: 20,
-            alignItems: 'center',
-          }}>
+            alignItems: 'center'
+          }}
+        >
           <Text
             style={{
               fontSize: FONTS.Paragraph2,
               fontFamily: FONTS.Poppins,
-              color: 'grey',
+              color: 'grey'
             }}
-            onPress={() => navigation.navigate('Login')}>
+            onPress={() => navigation.navigate('Login')}
+          >
             Already have an account?{' '}
-            <Text style={{color: COLORS.PRIMARY}}>Login Here</Text>
+            <Text style={{ color: COLORS.PRIMARY }}>Login Here</Text>
           </Text>
         </View>
       </View>
@@ -93,7 +102,7 @@ const Register = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fff'
   },
   userInput: {
     paddingHorizontal: 15,
@@ -104,7 +113,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 10,
     fontFamily: FONTS.Poppins,
-    fontSize: FONTS.Paragraph2,
+    fontSize: FONTS.Paragraph2
   },
   button: {
     height: 50,
@@ -113,14 +122,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.PRIMARY,
     borderRadius: 8,
     marginHorizontal: 20,
-    marginTop: 20,
+    marginTop: 20
   },
   loginButton: {
     fontSize: FONTS.Paragraph1,
     fontFamily: FONTS.Poppins,
     color: '#fff',
-    fontWeight: 'bold',
-  },
+    fontWeight: 'bold'
+  }
 });
 
 export default Register;

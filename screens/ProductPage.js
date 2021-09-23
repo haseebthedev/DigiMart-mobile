@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import RBSheet from 'react-native-raw-bottom-sheet';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableNativeFeedback,
+  TouchableOpacity,
   Dimensions,
   ToastAndroid,
   ScrollView
@@ -64,6 +66,12 @@ const ProductPage = ({ navigation }) => {
     ]
   });
 
+  const [SelectedColor, setSelectedColor] = useState('red');
+  const [Quantity, setQuantity] = useState(1);
+
+  // Modal AddToCart
+  const refRBSheet = useRef();
+
   useEffect(() => {
     const images = [
       'https://source.unsplash.com/1024x768/?laptop',
@@ -71,6 +79,7 @@ const ProductPage = ({ navigation }) => {
       'https://source.unsplash.com/1024x768/?hp laptop'
     ];
 
+    setSelectedColor(ProductDetails.colors[0]);
     setBannerImages(images);
   }, []);
 
@@ -408,7 +417,7 @@ const ProductPage = ({ navigation }) => {
             {ProductDetails.price}
           </Text>
         </View>
-        <View
+        <TouchableOpacity
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -417,21 +426,155 @@ const ProductPage = ({ navigation }) => {
             paddingVertical: 8,
             borderRadius: 8
           }}
+          onPress={() => refRBSheet.current.open()}
         >
           <Image
             source={cartIcon}
             style={{ width: 20, height: 20, marginTop: -4, marginRight: 5 }}
           />
-          <Text
+          <View
             style={{
               fontSize: FONTS.Paragraph2,
               fontFamily: FONTS.Poppins
             }}
           >
-            Add to Cart
-          </Text>
-        </View>
+            <Text>Add to Cart</Text>
+          </View>
+        </TouchableOpacity>
       </View>
+
+      {/* Add to Cart Modal */}
+      <RBSheet
+        ref={refRBSheet}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        closeOnPressMask={true}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(0,0,0, 0.5)'
+          },
+          container: {
+            paddingHorizontal: 20
+          },
+          draggableIcon: {
+            backgroundColor: '#e1e1e1'
+          }
+        }}
+      >
+        <View style={{ marginBottom: 10 }}>
+          <Text style={{ fontFamily: FONTS.PoppinsBold, color: 'grey' }}>
+            Choose Color:
+          </Text>
+          <View>
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              {ProductDetails.colors.map((el, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    {
+                      width: 32,
+                      height: 32,
+                      backgroundColor: el,
+                      borderRadius: 20,
+                      margin: 8,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: 0.4
+                    }
+                  ]}
+                  onPress={() => setSelectedColor(el)}
+                >
+                  <View
+                    style={[
+                      {
+                        width: 25,
+                        height: 25,
+                        opacity: 0.6,
+                        backgroundColor: el,
+                        borderRadius: 15
+                      },
+                      SelectedColor === el ? { opacity: 1 } : { opacity: 0 }
+                    ]}
+                  ></View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+        <View style={{ marginBottom: 10 }}>
+          <Text style={{ fontFamily: FONTS.PoppinsBold, color: 'grey' }}>
+            Quantity:
+          </Text>
+          <View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                margin: 8
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderColor: '#DCDCDC',
+                  borderLeftWidth: 1,
+                  borderTopWidth: 1,
+                  borderBottomWidth: 1,
+                  borderRightWidth: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+                onPress={() => setQuantity((prev) => prev - 1)}
+              >
+                <Text style={{ fontSize: 18 }}>-</Text>
+              </TouchableOpacity>
+              <View
+                style={{
+                  width: 80,
+                  height: 30,
+                  borderColor: '#e1e1e1',
+                  borderWidth: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <Text style={{ fontFamily: FONTS.Poppins }}>{Quantity}</Text>
+              </View>
+              <TouchableOpacity
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderColor: '#DCDCDC',
+                  borderLeftWidth: 0,
+                  borderTopWidth: 1,
+                  borderBottomWidth: 1,
+                  borderRightWidth: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+                onPress={() => setQuantity((prev) => prev + 1)}
+              >
+                <Text style={{ fontSize: 18 }}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#407BFF',
+              height: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 20,
+              borderRadius: 6
+            }}
+          >
+            <Text style={{ fontFamily: FONTS.PoppinsBold, color: '#fff' }}>
+              Add to Cart
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
     </View>
   );
 };
@@ -456,7 +599,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20
   },
   title: {
-    fontSize: FONTS.subhead1,
+    fontSize: FONTS.subhead3,
     fontFamily: FONTS.PoppinsBold
   },
   description: {
