@@ -11,7 +11,7 @@ const Account = () => {
       {/* Top Header */}
       <View
         style={{
-          backgroundColor: '#407BFF',
+          backgroundColor: '#e1e1e1',
           height: 120,
           flexDirection: 'row',
           justifyContent: 'space-evenly',
@@ -23,7 +23,7 @@ const Account = () => {
             style={{
               fontFamily: FONTS.PoppinsBold,
               fontSize: 22,
-              color: '#fff'
+              color: 'black'
             }}
           >
             12
@@ -32,7 +32,7 @@ const Account = () => {
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 14,
-              color: '#fff'
+              color: 'black'
             }}
           >
             Liked Products
@@ -43,7 +43,7 @@ const Account = () => {
             style={{
               fontFamily: FONTS.PoppinsBold,
               fontSize: 22,
-              color: '#fff'
+              color: 'black'
             }}
           >
             4
@@ -52,7 +52,7 @@ const Account = () => {
             style={{
               fontFamily: FONTS.Poppins,
               fontSize: 14,
-              color: '#fff'
+              color: 'black'
             }}
           >
             Stores Followed

@@ -9,11 +9,13 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Modal,
-  ImageBackground,
+  TouchableNativeFeedback,
   StatusBar
 } from 'react-native';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 const { width, height } = Dimensions.get('screen');
+
+// icons
 import addressIcon from '../assets/icons/addressIcon.png';
 import phoneIcon from '../assets/icons/phoneIcon.png';
 import mailIcon from '../assets/icons/mailIcon.png';
@@ -21,10 +23,12 @@ import deliveryIcon from '../assets/icons/deliveryIcon.png';
 import okIcon from '../assets/icons/okIcon.png';
 import paymentIcon from '../assets/icons/paymentIcon.png';
 import orderSuccessIcon from '../assets/icons/orderSuccessIcon.png';
+import deleteIcon from '../assets/icons/deleteIcon.png';
+import backIcon from '../assets/icons/backIcon.png';
 
 const Cart = ({ navigation }) => {
   const [Quantity, setQuantity] = useState(1);
-  const [modalSuccess, setModalSuccess] = useState(false);
+  const [CheckOutModal, setCheckOutModal] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -37,17 +41,39 @@ const Cart = ({ navigation }) => {
           textAlign: 'center'
         }}
       >
-        Checkout
+        CHECKOUT
       </Text>
+
+      {/* Back Button */}
+      <TouchableNativeFeedback onPress={() => navigation.goBack()}>
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+            borderRadius: 15,
+            position: 'absolute',
+            top: 20,
+            left: 20
+          }}
+        >
+          <Image
+            source={backIcon}
+            style={{ width: 25, height: 25, tintColor: 'black' }}
+          />
+        </View>
+      </TouchableNativeFeedback>
 
       {/* Checkout Details */}
       <View
         style={{
-          marginTop: 40,
+          marginTop: 50,
           paddingHorizontal: 20
         }}
       >
-        <View style={{ marginBottom: 10 }}>
+        <View style={{ marginBottom: 20 }}>
           <View style={{ flexDirection: 'row' }}>
             <Image source={addressIcon} style={{ width: 20, height: 20 }} />
             <Text style={{ fontFamily: FONTS.PoppinsBold, marginLeft: 10 }}>
@@ -83,7 +109,7 @@ const Cart = ({ navigation }) => {
         </View>
 
         {/* Contact Number */}
-        <View style={{ marginBottom: 10 }}>
+        <View style={{ marginBottom: 20 }}>
           <View style={{ flexDirection: 'row' }}>
             <Image source={phoneIcon} style={{ width: 20, height: 20 }} />
             <Text style={{ fontFamily: FONTS.PoppinsBold, marginLeft: 10 }}>
@@ -96,7 +122,7 @@ const Cart = ({ navigation }) => {
         </View>
 
         {/* Email */}
-        <View style={{ marginBottom: 10 }}>
+        <View style={{ marginBottom: 20 }}>
           <View style={{ flexDirection: 'row' }}>
             <Image source={mailIcon} style={{ width: 20, height: 20 }} />
             <Text style={{ fontFamily: FONTS.PoppinsBold, marginLeft: 10 }}>
@@ -109,7 +135,7 @@ const Cart = ({ navigation }) => {
         </View>
 
         {/* Delivery Option */}
-        <View style={{ marginBottom: 15 }}>
+        <View style={{ marginBottom: 20 }}>
           <View style={{ flexDirection: 'row' }}>
             <Image source={deliveryIcon} style={{ width: 20, height: 20 }} />
             <Text style={{ fontFamily: FONTS.PoppinsBold, marginLeft: 10 }}>
@@ -151,7 +177,7 @@ const Cart = ({ navigation }) => {
         </View>
 
         {/* Total Charges */}
-        <View style={{ marginBottom: 15 }}>
+        <View style={{ marginBottom: 20 }}>
           <View style={{ flexDirection: 'row' }}>
             <Image source={deliveryIcon} style={{ width: 20, height: 20 }} />
             <Text style={{ fontFamily: FONTS.PoppinsBold, marginLeft: 10 }}>
@@ -267,7 +293,7 @@ const Cart = ({ navigation }) => {
             backgroundColor: '#407BFF',
             borderRadius: 8
           }}
-          onPress={() => setModalSuccess(true)}
+          onPress={() => setCheckOutModal(true)}
         >
           <Text
             style={{
@@ -281,9 +307,8 @@ const Cart = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Success Modal */}
-
-      <Modal transparent={true} animationType={'fade'} visible={modalSuccess}>
+      {/* Checkout Modal */}
+      <Modal transparent={true} animationType={'fade'} visible={CheckOutModal}>
         <StatusBar backgroundColor="#000000" />
         <View style={styles.modal}>
           <Image
@@ -356,7 +381,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0, .7)'
+    backgroundColor: 'rgba(0,0,0, .9)'
   }
 });
 

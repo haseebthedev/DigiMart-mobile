@@ -5,7 +5,8 @@ import {
   Image,
   StyleSheet,
   Dimensions,
-  TouchableOpacity
+  TouchableOpacity,
+  Modal
 } from 'react-native';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 import deleteIcon from '../assets/icons/deleteIcon.png';
@@ -14,6 +15,7 @@ const { width, height } = Dimensions.get('screen');
 
 const Cart = ({ navigation }) => {
   const [Quantity, setQuantity] = useState(1);
+  const [DeleteProductModal, setDeleteProductModal] = useState(true);
 
   return (
     <View style={styles.container}>
@@ -115,7 +117,7 @@ const Cart = ({ navigation }) => {
           </View>
 
           {/* Delete Icon */}
-          <View
+          <TouchableOpacity
             style={{
               width: 30,
               height: 30,
@@ -127,12 +129,13 @@ const Cart = ({ navigation }) => {
               top: 10,
               right: 10
             }}
+            onPress={() => setDeleteProductModal(true)}
           >
             <Image
               source={deleteIcon}
               style={{ width: 20, height: 20, tintColor: '#FFF' }}
             />
-          </View>
+          </TouchableOpacity>
 
           {/* Product Price */}
           <View
@@ -213,6 +216,98 @@ const Cart = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Delete Product Modal */}
+      <Modal
+        transparent={true}
+        animationType={'fade'}
+        visible={DeleteProductModal}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: '#fff',
+              width: width * 0.8,
+              padding: 30,
+              elevation: 10,
+              alignItems: 'center'
+            }}
+          >
+            <Image
+              source={deleteIcon}
+              style={{
+                width: 60,
+                height: 60,
+                tintColor: 'red',
+                marginBottom: 30
+              }}
+            />
+            <Text
+              style={{
+                fontFamily: FONTS.PoppinsBold,
+                fontSize: FONTS.Paragraph1,
+                marginBottom: 10
+              }}
+            >
+              Are You Sure?
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.Poppins,
+                fontSize: FONTS.Paragraph2,
+                textAlign: 'center',
+                color: 'grey'
+              }}
+            >
+              This will delete the product from the Cart page!
+            </Text>
+            <View style={{ flexDirection: 'row', marginTop: 30 }}>
+              <View
+                style={{
+                  paddingHorizontal: 15,
+                  paddingVertical: 10,
+                  marginRight: 5
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: FONTS.Poppins,
+                    fontSize: FONTS.Paragraph2
+                  }}
+                >
+                  Cancel
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={{
+                  paddingHorizontal: 15,
+                  paddingVertical: 10,
+                  backgroundColor: 'red',
+                  borderRadius: 4,
+                  marginLeft: 5
+                }}
+                onPress={() => setDeleteProductModal(false)}
+              >
+                <Text
+                  style={{
+                    fontFamily: FONTS.Poppins,
+                    fontSize: FONTS.Paragraph2,
+                    color: '#fff'
+                  }}
+                >
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
