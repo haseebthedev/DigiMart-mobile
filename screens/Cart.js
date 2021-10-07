@@ -6,7 +6,8 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  Modal
+  Modal,
+  FlatList
 } from 'react-native';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 import deleteIcon from '../assets/icons/deleteIcon.png';
@@ -14,150 +15,208 @@ import productImage from '../assets/images/laptop-image.png';
 const { width, height } = Dimensions.get('screen');
 
 const Cart = ({ navigation }) => {
-  const [Quantity, setQuantity] = useState(1);
-  const [DeleteProductModal, setDeleteProductModal] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState();
+  const [DeleteProductModal, setDeleteProductModal] = useState(false);
+  const [productList, setproductList] = useState([
+    {
+      id: 1,
+      image: productImage,
+      name: 'HP Laptop 15',
+      Quantity: 7,
+      price: 1280
+    },
+    {
+      id: 2,
+      image: productImage,
+      name: 'HP Laptop 21',
+      Quantity: 2,
+      price: 2120
+    },
+    {
+      id: 3,
+      image: productImage,
+      name: 'HP Laptop 24',
+      Quantity: 4,
+      price: 5400
+    }
+  ]);
+
+  // Delete Product from Cart
+  const deleteProduct = () => {
+    let newArr = productList.filter((el) => el.id !== selectedProduct);
+    setproductList(newArr);
+  };
+
+  const handleQuantity = (id, type) => {
+    let prevQty;
+
+    productList.map((el) => {
+      if (el.id === id) {
+        prevQty = el;
+      }
+    });
+
+    let newQty = {
+      ...prevQty,
+      Quantity: type === 'INC' ? prevQty.Quantity + 1 : prevQty.Quantity - 1
+    };
+
+    let cartList = productList.map((el) => (el.id === id ? newQty : el));
+    setproductList(cartList);
+  };
+
+  // Product Card
+  const renderItem = ({ item }) => {
+    return (
+      <View
+        style={{
+          marginTop: 10,
+          marginHorizontal: 20,
+          width: width - 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: '#fff',
+          borderRadius: 4,
+          overflow: 'hidden'
+        }}
+        elevation={1}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {/* Product Image */}
+          <View style={{ padding: 10 }}>
+            <Image
+              source={productImage}
+              style={{ width: 50, height: 50, margin: 8 }}
+            />
+          </View>
+
+          {/* Product Details */}
+          <View style={{ marginLeft: 10 }}>
+            <Text
+              style={{
+                fontFamily: FONTS.PoppinsBold,
+                fontSize: FONTS.Paragraph1
+              }}
+            >
+              {item.name}
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 4
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  width: 25,
+                  height: 25,
+                  borderColor: '#DCDCDC',
+                  borderLeftWidth: 1,
+                  borderTopWidth: 1,
+                  borderBottomWidth: 1,
+                  borderRightWidth: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+                onPress={() => handleQuantity(item.id, 'DEC')}
+              >
+                <Text style={{ fontSize: 18 }}>-</Text>
+              </TouchableOpacity>
+              <View
+                style={{
+                  width: 40,
+                  height: 25,
+                  borderColor: '#e1e1e1',
+                  borderWidth: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: FONTS.Poppins,
+                    fontSize: FONTS.Paragraph3
+                  }}
+                >
+                  {item.Quantity}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={{
+                  width: 25,
+                  height: 25,
+                  borderColor: '#DCDCDC',
+                  borderLeftWidth: 0,
+                  borderTopWidth: 1,
+                  borderBottomWidth: 1,
+                  borderRightWidth: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+                onPress={() => handleQuantity(item.id, 'INC')}
+              >
+                <Text style={{ fontSize: 18 }}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* Delete Icon */}
+        <TouchableOpacity
+          style={{
+            width: 30,
+            height: 30,
+            backgroundColor: '#407BFF',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 15,
+            position: 'absolute',
+            top: 10,
+            right: 10
+          }}
+          onPress={() => {
+            setSelectedProduct(item.id);
+            setDeleteProductModal(true);
+          }}
+        >
+          <Image
+            source={deleteIcon}
+            style={{ width: 20, height: 20, tintColor: '#FFF' }}
+          />
+        </TouchableOpacity>
+
+        {/* Product Price */}
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'absolute',
+            bottom: 10,
+            right: 10
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: FONTS.Poppins,
+              fontSize: FONTS.Paragraph2
+            }}
+          >
+            Rs. {item.price}
+          </Text>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {/* Item */}
-      {[1, 2, 3].map((el) => (
-        <View
-          key={el}
-          style={{
-            marginTop: 10,
-            marginHorizontal: 20,
-            width: width - 30,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: '#fff',
-            borderRadius: 4,
-            overflow: 'hidden'
-          }}
-          elevation={1}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            {/* Product Image */}
-            <View style={{ padding: 10 }}>
-              <Image
-                source={productImage}
-                style={{ width: 50, height: 50, margin: 8 }}
-              />
-            </View>
-
-            {/* Product Details */}
-            <View style={{ marginLeft: 10 }}>
-              <Text
-                style={{
-                  fontFamily: FONTS.PoppinsBold,
-                  fontSize: FONTS.Paragraph1
-                }}
-              >
-                HP 15 Laptop
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginTop: 4
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    width: 25,
-                    height: 25,
-                    borderColor: '#DCDCDC',
-                    borderLeftWidth: 1,
-                    borderTopWidth: 1,
-                    borderBottomWidth: 1,
-                    borderRightWidth: 0,
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                  onPress={() => setQuantity((prev) => prev - 1)}
-                >
-                  <Text style={{ fontSize: 18 }}>-</Text>
-                </TouchableOpacity>
-                <View
-                  style={{
-                    width: 40,
-                    height: 25,
-                    borderColor: '#e1e1e1',
-                    borderWidth: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: FONTS.Poppins,
-                      fontSize: FONTS.Paragraph3
-                    }}
-                  >
-                    {Quantity}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={{
-                    width: 25,
-                    height: 25,
-                    borderColor: '#DCDCDC',
-                    borderLeftWidth: 0,
-                    borderTopWidth: 1,
-                    borderBottomWidth: 1,
-                    borderRightWidth: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                  onPress={() => setQuantity((prev) => prev + 1)}
-                >
-                  <Text style={{ fontSize: 18 }}>+</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          {/* Delete Icon */}
-          <TouchableOpacity
-            style={{
-              width: 30,
-              height: 30,
-              backgroundColor: '#407BFF',
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 15,
-              position: 'absolute',
-              top: 10,
-              right: 10
-            }}
-            onPress={() => setDeleteProductModal(true)}
-          >
-            <Image
-              source={deleteIcon}
-              style={{ width: 20, height: 20, tintColor: '#FFF' }}
-            />
-          </TouchableOpacity>
-
-          {/* Product Price */}
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'absolute',
-              bottom: 10,
-              right: 10
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: FONTS.Poppins,
-                fontSize: FONTS.Paragraph2
-              }}
-            >
-              Rs. {Math.floor(Math.random() * 1000)}
-            </Text>
-          </View>
-        </View>
-      ))}
+      {/* Product List */}
+      <FlatList
+        data={productList}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+      />
 
       {/* Checkout Button */}
       <View
@@ -268,12 +327,13 @@ const Cart = ({ navigation }) => {
               This will delete the product from the Cart page!
             </Text>
             <View style={{ flexDirection: 'row', marginTop: 30 }}>
-              <View
+              <TouchableOpacity
                 style={{
                   paddingHorizontal: 15,
                   paddingVertical: 10,
                   marginRight: 5
                 }}
+                onPress={() => setDeleteProductModal(false)}
               >
                 <Text
                   style={{
@@ -283,7 +343,7 @@ const Cart = ({ navigation }) => {
                 >
                   Cancel
                 </Text>
-              </View>
+              </TouchableOpacity>
               <TouchableOpacity
                 style={{
                   paddingHorizontal: 15,
@@ -292,7 +352,10 @@ const Cart = ({ navigation }) => {
                   borderRadius: 4,
                   marginLeft: 5
                 }}
-                onPress={() => setDeleteProductModal(false)}
+                onPress={() => {
+                  deleteProduct();
+                  setDeleteProductModal(false);
+                }}
               >
                 <Text
                   style={{
@@ -316,7 +379,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center'
-    // justifyContent: 'center',
+    // justifyContent: 'center'
   }
 });
 
