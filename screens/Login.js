@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,25 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
+import axios from 'axios';
+import api from '../axios/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
+  const [loginData, setLoginData] = useState({
+    email: 'sheikh.ameen252@gmail.com',
+    password: 'ameen321'
+  });
+
+  const handlerLogin = async () => {
+    // await api
+    //   .post('/buyer/login', loginData)
+    //   .then((res) => console.log(res.data.data))
+    //   .catch((error) => console.log('error', error));
+    // await AsyncStorage.setItem('USER_DATA', res.data.data.token);
+    navigation.navigate('Layout');
+  };
+
   return (
     <View style={styles.container}>
       <View style={{ marginTop: 80, marginBottom: 50, alignItems: 'center' }}>
@@ -31,10 +48,7 @@ const Login = ({ navigation }) => {
         secureTextEntry
         style={styles.inputField}
       />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('Layout')}
-      >
+      <TouchableOpacity style={styles.button} onPress={handlerLogin}>
         <Text style={styles.loginButton}>LOGIN</Text>
       </TouchableOpacity>
       <View

@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Animated,
   Image,
@@ -9,6 +10,8 @@ import {
   View,
   TextInput
 } from 'react-native';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { FONTS, COLORS, IMAGES } from '../../constants/index';
 
 // Icons...
 import menu from '../../assets/icons/menuIcon.png';
@@ -19,12 +22,7 @@ import cartIcon from '../../assets/icons/cartIcon.png';
 import accountIcon from '../../assets/icons/accountIcon.png';
 import logoutIcon from '../../assets/icons/logoutIcon.png';
 import searchIcon from '../../assets/icons/searchIcon.png';
-import scanIcon from '../../assets/icons/scanIcon.png';
-
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { FONTS, COLORS, IMAGES } from '../../constants/index';
-
-// Images
+// import scanIcon from '../../assets/icons/scanIcon.png';
 import myImage from '../../assets/images/myImage.jpg';
 
 // MainScreens
@@ -39,12 +37,10 @@ const Layout = ({ navigation }) => {
   // State
   const [currentTab, setCurrentTab] = useState('Homepage');
   const [showMenu, setShowMenu] = useState(false);
-
   // Animated Properties
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
   const closeButtonOffset = useRef(new Animated.Value(0)).current;
-
   // Animation Functions
   const drawerAnimation = () => {
     Animated.timing(scaleValue, {
@@ -64,6 +60,17 @@ const Layout = ({ navigation }) => {
       duration: 300,
       useNativeDriver: true
     }).start();
+  };
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('USER_DATA');
+      if (value !== null) {
+        console.log('value', value);
+      }
+    } catch (e) {
+      // error reading value
+    }
   };
 
   return (
@@ -210,14 +217,16 @@ const Layout = ({ navigation }) => {
                 }}
               />
             </View>
-            <Image
-              source={myImage}
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 15
-              }}
-            />
+            <TouchableOpacity onPress={getData}>
+              <Image
+                source={myImage}
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15
+                }}
+              />
+            </TouchableOpacity>
           </View>
         </Animated.View>
 

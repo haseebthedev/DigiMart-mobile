@@ -7,14 +7,17 @@ import {
   Dimensions,
   TouchableOpacity,
   Modal,
-  FlatList
+  FlatList,
+  TouchableNativeFeedback
 } from 'react-native';
-import { FONTS, COLORS, IMAGES } from '../constants/index';
-import deleteIcon from '../assets/icons/deleteIcon.png';
-import productImage from '../assets/images/laptop-image.png';
+import { FONTS, COLORS, IMAGES } from '../../constants/index';
+import deleteIcon from '../../assets/icons/deleteIcon.png';
+import productImage from '../../assets/images/laptop-image.png';
+import backIcon from '../../assets/icons/backIcon.png';
+
 const { width, height } = Dimensions.get('screen');
 
-const Cart = ({ navigation }) => {
+const LikedProducts = ({ navigation }) => {
   const [selectedProduct, setSelectedProduct] = useState();
   const [DeleteProductModal, setDeleteProductModal] = useState(false);
   const [productList, setproductList] = useState([
@@ -45,37 +48,6 @@ const Cart = ({ navigation }) => {
   const deleteProduct = () => {
     let newArr = productList.filter((el) => el.id !== selectedProduct);
     setproductList(newArr);
-  };
-
-  const calQty = (type, qty) => {
-    if (type === 'INC') {
-      return qty + 1;
-    } else {
-      if (qty > 1) {
-        return qty - 1;
-      } else {
-        return 1;
-      }
-    }
-  };
-
-  const handleQuantity = (id, type) => {
-    let prevQty;
-
-    productList.map((el) => {
-      if (el.id === id) {
-        prevQty = el;
-      }
-    });
-
-    let newQty = {
-      ...prevQty,
-      // Quantity: type === 'INC' ? prevQty.Quantity + 1 : prevQty.Quantity - 1
-      Quantity: calQty(type, prevQty.Quantity)
-    };
-
-    let cartList = productList.map((el) => (el.id === id ? newQty : el));
-    setproductList(cartList);
   };
 
   // Product Card
@@ -114,64 +86,14 @@ const Cart = ({ navigation }) => {
             >
               {item.name}
             </Text>
-            <View
+            <Text
               style={{
-                flexDirection: 'row',
-                marginTop: 4
+                fontFamily: FONTS.Poppins,
+                fontSize: FONTS.Paragraph2
               }}
             >
-              <TouchableOpacity
-                style={{
-                  width: 25,
-                  height: 25,
-                  borderColor: '#DCDCDC',
-                  borderLeftWidth: 1,
-                  borderTopWidth: 1,
-                  borderBottomWidth: 1,
-                  borderRightWidth: 0,
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
-                onPress={() => handleQuantity(item.id, 'DEC')}
-              >
-                <Text style={{ fontSize: 18 }}>-</Text>
-              </TouchableOpacity>
-              <View
-                style={{
-                  width: 40,
-                  height: 25,
-                  borderColor: '#e1e1e1',
-                  borderWidth: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: FONTS.Poppins,
-                    fontSize: FONTS.Paragraph3
-                  }}
-                >
-                  {item.Quantity}
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={{
-                  width: 25,
-                  height: 25,
-                  borderColor: '#DCDCDC',
-                  borderLeftWidth: 0,
-                  borderTopWidth: 1,
-                  borderBottomWidth: 1,
-                  borderRightWidth: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
-                onPress={() => handleQuantity(item.id, 'INC')}
-              >
-                <Text style={{ fontSize: 18 }}>+</Text>
-              </TouchableOpacity>
-            </View>
+              Rs. {item.price}
+            </Text>
           </View>
         </View>
 
@@ -184,9 +106,7 @@ const Cart = ({ navigation }) => {
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 15,
-            position: 'absolute',
-            top: 10,
-            right: 10
+            marginRight: 20
           }}
           onPress={() => {
             setSelectedProduct(item.id);
@@ -198,96 +118,53 @@ const Cart = ({ navigation }) => {
             style={{ width: 20, height: 20, tintColor: '#FFF' }}
           />
         </TouchableOpacity>
-
-        {/* Product Price */}
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            position: 'absolute',
-            bottom: 10,
-            right: 10
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: FONTS.Poppins,
-              fontSize: FONTS.Paragraph2
-            }}
-          >
-            Rs. {item.price}
-          </Text>
-        </View>
       </View>
     );
   };
 
   return (
     <View style={styles.container}>
+      <Text
+        style={{
+          fontFamily: FONTS.PoppinsBold,
+          fontSize: FONTS.subhead4,
+          color: '#407BFF',
+          marginTop: 20,
+          textAlign: 'center',
+          marginBottom: 30
+        }}
+      >
+        LIKED PRODUCTS
+      </Text>
+
+      {/* Back Button */}
+      <TouchableNativeFeedback onPress={() => navigation.goBack()}>
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+            borderRadius: 15,
+            position: 'absolute',
+            top: 20,
+            left: 20
+          }}
+        >
+          <Image
+            source={backIcon}
+            style={{ width: 25, height: 25, tintColor: 'black' }}
+          />
+        </View>
+      </TouchableNativeFeedback>
+
       {/* Product List */}
       <FlatList
         data={productList}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
-
-      {/* Checkout Button */}
-      <View
-        style={{
-          width,
-          height: 70,
-          backgroundColor: 'white',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexDirection: 'row',
-          paddingHorizontal: 20,
-          position: 'absolute',
-          bottom: 0
-        }}
-      >
-        <View style={{ alignItems: 'flex-end' }}>
-          <Text
-            style={{
-              color: 'grey',
-              fontFamily: FONTS.Poppins,
-              fontSize: FONTS.Paragraph3
-            }}
-          >
-            Shipping:{' '}
-            <Text style={{ color: '#407BFF' }}>
-              Rs. {Math.floor(Math.random() * 100)}
-            </Text>
-          </Text>
-          <Text
-            style={{ fontFamily: FONTS.Poppins, fontSize: FONTS.Paragraph2 }}
-          >
-            Total:{' '}
-            <Text style={{ fontFamily: FONTS.PoppinsBold, color: '#407BFF' }}>
-              Rs. {Math.floor(Math.random() * 5000)}
-            </Text>
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={{
-            paddingHorizontal: 25,
-            paddingVertical: 8,
-            backgroundColor: '#407BFF',
-            borderRadius: 8
-          }}
-          onPress={() => navigation.navigate('Checkout')}
-        >
-          <Text
-            style={{
-              color: '#fff',
-              fontFamily: FONTS.PoppinsBold,
-              fontSize: FONTS.Paragraph2
-            }}
-          >
-            Check Out
-          </Text>
-        </TouchableOpacity>
-      </View>
 
       {/* Delete Product Modal */}
       <Modal
@@ -392,8 +269,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center'
-    // justifyContent: 'center'
   }
 });
 
-export default Cart;
+export default LikedProducts;

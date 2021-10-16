@@ -4,22 +4,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const UserContext = createContext();
 
 function userReducer(store = [], action) {
+  console.log('action', action);
+
   switch (action.type) {
-    case 'REGISTER':
+    case 'LOGIN_SUCCESS':
       return {
         ...store,
-        isAuthenticated: true,
-        data: { data: action.data, token: action.token }
+        data: action.data,
+        token: action.token,
+        isAuthenticated: true
       };
     default:
-      throw new Error(`Unhandled action type: ${action.type}`);
+      return store;
   }
 }
 
 function UserProvider({ children }) {
   const [store, dispatch] = useReducer(userReducer, {
-    isAuthenticated: !!JSON.parse(AsyncStorage.getItem('USER_DATA')),
-    data: JSON.parse(AsyncStorage.getItem('USER_DATA'))
+    data: AsyncStorage.getItem('USER_DATA')
   });
 
   const value = { store, dispatch };
@@ -34,4 +36,20 @@ function useUserContext() {
   return context;
 }
 
-export { UserProvider, useUserContext };
+const loginUser = async (dispatch, data, token) => {
+  try {
+    AsyncStorage.setItem(
+      'USER_DATA',
+      JSON.stringify({
+        data,
+        token,
+        isAuthenticated: true
+      })
+    );
+    await dispatch({ type: 'LOGIN_SUCCESS', data, token });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export { UserProvider, useUserContext, loginUser };

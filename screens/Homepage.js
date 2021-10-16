@@ -493,7 +493,7 @@ const Homepage = ({ navigation }) => {
                     style={{
                       width: 30,
                       height: 30,
-                      tintColor: 'black'
+                      tintColor: '#407BFF'
                     }}
                   />
                 </TouchableOpacity>
@@ -595,7 +595,7 @@ const Homepage = ({ navigation }) => {
                       style={{
                         width: 30,
                         height: 30,
-                        tintColor: 'black'
+                        tintColor: '#407BFF'
                       }}
                     />
                   </TouchableOpacity>
