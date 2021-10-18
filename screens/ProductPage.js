@@ -352,7 +352,10 @@ const ProductPage = ({ navigation }) => {
                   alignItems: 'center'
                 }}
               >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity
+                  style={{ flexDirection: 'row', alignItems: 'center' }}
+                  onPress={() => navigation.navigate('Store')}
+                >
                   <Image
                     source={sellerLogo}
                     style={{
@@ -382,7 +385,7 @@ const ProductPage = ({ navigation }) => {
                       Islamabad, Pakistan
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
                 <View
                   style={{
                     paddingHorizontal: 15,

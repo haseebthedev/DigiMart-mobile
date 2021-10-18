@@ -13,6 +13,7 @@ import Messages from './screens/Messages';
 import Checkout from './screens/Checkout';
 import Cart from './screens/Cart';
 import Chat from './screens/Messages/Chat';
+import Store from './screens/Store/Store';
 
 // Accounts Page
 import Account from './screens/Account';
@@ -24,8 +25,17 @@ import PendingOrders from './screens/Account/MyOrders/PendingOrders';
 import ActiveOrders from './screens/Account/MyOrders/ActiveOrders';
 import ReturnedOrders from './screens/Account/MyOrders/ReturnedOrders';
 import CancelledOrders from './screens/Account/MyOrders/CancelledOrders';
+// Services
+import Reviews from './screens/Account/MyServices/Reviews';
+import Payments from './screens/Account/MyServices/Payments';
+import ReportProblem from './screens/Account/MyServices/ReportProblem';
+import Support from './screens/Account/MyServices/Support';
 // settings
-import Settings from './screens/Account/Settings';
+import Settings from './screens/Account/Settings/Settings';
+import AccountInfo from './screens/Account/Settings/AccountInfo';
+import AddressBook from './screens/Account/Settings/AddressBook';
+import FAQ from './screens/Account/Settings/FAQ';
+import PrivacyPolicy from './screens/Account/Settings/PrivacyPolicy';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,21 +56,30 @@ const App = () => {
         <Stack.Screen name="Messages" component={Messages} />
         <Stack.Screen name="ProductPage" component={ProductPage} />
         <Stack.Screen name="Checkout" component={Checkout} />
-        <Stack.Screen name="Layout" component={Layout} />
         <Stack.Screen name="Chat" component={Chat} />
         <Stack.Screen name="Cart" component={Cart} />
+        <Stack.Screen name="Layout" component={Layout} />
 
         {/* Accounts */}
         <Stack.Screen name="Account" component={Account} />
         <Stack.Screen name="LikedProducts" component={LikedProducts} />
         <Stack.Screen name="StoresFollowed" component={StoresFollowed} />
-        <Stack.Screen name="Settings" component={Settings} />
-        {/* SubPages */}
         <Stack.Screen name="DeliveredOrders" component={DeliveredOrders} />
         <Stack.Screen name="PendingOrders" component={PendingOrders} />
         <Stack.Screen name="ActiveOrders" component={ActiveOrders} />
         <Stack.Screen name="ReturnedOrders" component={ReturnedOrders} />
         <Stack.Screen name="CancelledOrders" component={CancelledOrders} />
+        <Stack.Screen name="Reviews" component={Reviews} />
+        <Stack.Screen name="Payments" component={Payments} />
+        <Stack.Screen name="ReportProblem" component={ReportProblem} />
+        <Stack.Screen name="Support" component={Support} />
+
+        <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="AccountInfo" component={AccountInfo} />
+        <Stack.Screen name="AddressBook" component={AddressBook} />
+        <Stack.Screen name="FAQ" component={FAQ} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+        <Stack.Screen name="Store" component={Store} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -221,7 +221,10 @@ const Account = ({ navigation }) => {
               Messages
             </Text>
           </TouchableOpacity>
-          <View style={{ alignItems: 'center' }}>
+          <TouchableOpacity
+            style={{ alignItems: 'center' }}
+            onPress={() => navigation.navigate('Reviews')}
+          >
             <Image
               source={reviewsAccIcon}
               style={{ width: 40, height: 40, tintColor: '#006BDA' }}
@@ -236,8 +239,11 @@ const Account = ({ navigation }) => {
             >
               Reviews
             </Text>
-          </View>
-          <View style={{ alignItems: 'center' }}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ alignItems: 'center' }}
+            onPress={() => navigation.navigate('Payments')}
+          >
             <Image
               source={paymentAccIcon}
               style={{ width: 40, height: 40, tintColor: '#006BDA' }}
@@ -252,24 +258,11 @@ const Account = ({ navigation }) => {
             >
               Payments
             </Text>
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <Image
-              source={reportProbIcon}
-              style={{ width: 40, height: 40, tintColor: '#006BDA' }}
-            />
-            <Text
-              style={{
-                fontFamily: FONTS.Poppins,
-                fontSize: 10,
-                marginTop: 4,
-                color: 'grey'
-              }}
-            >
-              Report Problem
-            </Text>
-          </View>
-          <View style={{ alignItems: 'center' }}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ alignItems: 'center' }}
+            onPress={() => navigation.navigate('Support')}
+          >
             <Image
               source={helpAccIcon}
               style={{ width: 40, height: 40, tintColor: '#006BDA' }}
@@ -284,7 +277,26 @@ const Account = ({ navigation }) => {
             >
               Support
             </Text>
-          </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ alignItems: 'center' }}
+            onPress={() => navigation.navigate('ReportProblem')}
+          >
+            <Image
+              source={reportProbIcon}
+              style={{ width: 40, height: 40, tintColor: '#006BDA' }}
+            />
+            <Text
+              style={{
+                fontFamily: FONTS.Poppins,
+                fontSize: 10,
+                marginTop: 4,
+                color: 'grey'
+              }}
+            >
+              Report Prob.
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Settings */}
@@ -334,7 +346,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff'
-    // paddingHorizontal: 20
   }
 });
 

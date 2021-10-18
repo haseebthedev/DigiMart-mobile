@@ -6,12 +6,10 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  Modal,
-  FlatList,
   TouchableNativeFeedback
 } from 'react-native';
-import { FONTS, COLORS, IMAGES } from '../../constants/index';
-import backIcon from '../../assets/icons/backIcon.png';
+import { FONTS, COLORS, IMAGES } from '../../../constants/index';
+import backIcon from '../../../assets/icons/backIcon.png';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -62,6 +60,7 @@ const Settings = ({ navigation }) => {
             borderBottomColor: '#e1e1e1',
             borderTopColor: '#e1e1e1'
           }}
+          onPress={() => navigation.navigate('AccountInfo')}
         >
           <Text style={{ fontSize: 14, fontFamily: FONTS.Poppins }}>
             Account Information
@@ -73,31 +72,10 @@ const Settings = ({ navigation }) => {
             borderBottomWidth: 1,
             borderBottomColor: '#e1e1e1'
           }}
+          onPress={() => navigation.navigate('AddressBook')}
         >
           <Text style={{ fontSize: 14, fontFamily: FONTS.Poppins }}>
             Address Book
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            paddingVertical: 15,
-            borderBottomWidth: 1,
-            borderBottomColor: '#e1e1e1'
-          }}
-        >
-          <Text style={{ fontSize: 14, fontFamily: FONTS.Poppins }}>
-            Messages
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            paddingVertical: 15,
-            borderBottomWidth: 1,
-            borderBottomColor: '#e1e1e1'
-          }}
-        >
-          <Text style={{ fontSize: 14, fontFamily: FONTS.Poppins }}>
-            Utilities
           </Text>
         </TouchableOpacity>
 
@@ -107,6 +85,18 @@ const Settings = ({ navigation }) => {
             borderBottomWidth: 1,
             borderBottomColor: '#e1e1e1'
           }}
+          onPress={() => navigation.navigate('FAQ')}
+        >
+          <Text style={{ fontSize: 14, fontFamily: FONTS.Poppins }}>FAQ's</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            paddingVertical: 15,
+            borderBottomWidth: 1,
+            borderBottomColor: '#e1e1e1'
+          }}
+          onPress={() => navigation.navigate('PrivacyPolicy')}
         >
           <Text style={{ fontSize: 14, fontFamily: FONTS.Poppins }}>
             Privacy Policy
