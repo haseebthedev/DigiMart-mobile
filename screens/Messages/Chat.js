@@ -157,14 +157,20 @@ const Chat = ({ navigation }) => {
           </TouchableOpacity>
           <Image
             source={myImage}
-            style={{ width: 40, height: 40, borderRadius: 30, marginLeft: 3 }}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 30,
+              marginLeft: 3,
+              backgroundColor: '#fff'
+            }}
           />
           <View style={{ marginLeft: 15 }}>
             <Text
               style={{
                 color: '#fff',
                 fontFamily: FONTS.PoppinsBold,
-                fontSize: 18
+                fontSize: 16
               }}
             >
               Haseeb Ahmed
@@ -173,7 +179,7 @@ const Chat = ({ navigation }) => {
               style={{
                 color: '#fff',
                 fontFamily: FONTS.Poppins,
-                fontSize: 12,
+                fontSize: 10,
                 marginTop: -5
               }}
             >
