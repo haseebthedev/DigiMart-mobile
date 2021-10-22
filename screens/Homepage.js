@@ -6,7 +6,9 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
+  Alert,
+  BackHandler
 } from 'react-native';
 import { SliderBox } from 'react-native-image-slider-box';
 import { Rating } from 'react-native-ratings';
@@ -105,6 +107,26 @@ const Homepage = ({ navigation }) => {
     ];
 
     setBannerImages(images);
+  }, []);
+
+  const backAction = () => {
+    Alert.alert('Exit App', 'Are you sure you want to exit?', [
+      {
+        text: 'Cancel',
+        onPress: () => null,
+        style: 'cancel'
+      },
+      { text: 'YES', style: 'default', onPress: () => BackHandler.exitApp() }
+    ]);
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', backAction);
+    };
   }, []);
 
   return (

@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
-import { StatusBar } from 'react-native';
+import { BackHandler, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+// UserContext
+import ContextProvider, { userCounter } from './contexts/UserContext';
 
 // Screens
 import Register from './screens/Register';
@@ -45,43 +48,45 @@ const App = () => {
   }, []);
 
   return (
-    <NavigationContainer>
-      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-      <Stack.Navigator
-        initialRouteName="Layout"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Messages" component={Messages} />
-        <Stack.Screen name="ProductPage" component={ProductPage} />
-        <Stack.Screen name="Checkout" component={Checkout} />
-        <Stack.Screen name="Chat" component={Chat} />
-        <Stack.Screen name="Cart" component={Cart} />
-        <Stack.Screen name="Layout" component={Layout} />
+    <ContextProvider>
+      <NavigationContainer>
+        <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+        <Stack.Navigator
+          initialRouteName="Layout"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Messages" component={Messages} />
+          <Stack.Screen name="ProductPage" component={ProductPage} />
+          <Stack.Screen name="Checkout" component={Checkout} />
+          <Stack.Screen name="Chat" component={Chat} />
+          <Stack.Screen name="Cart" component={Cart} />
+          <Stack.Screen name="Layout" component={Layout} />
 
-        {/* Accounts */}
-        <Stack.Screen name="Account" component={Account} />
-        <Stack.Screen name="LikedProducts" component={LikedProducts} />
-        <Stack.Screen name="StoresFollowed" component={StoresFollowed} />
-        <Stack.Screen name="DeliveredOrders" component={DeliveredOrders} />
-        <Stack.Screen name="PendingOrders" component={PendingOrders} />
-        <Stack.Screen name="ActiveOrders" component={ActiveOrders} />
-        <Stack.Screen name="ReturnedOrders" component={ReturnedOrders} />
-        <Stack.Screen name="CancelledOrders" component={CancelledOrders} />
-        <Stack.Screen name="Reviews" component={Reviews} />
-        <Stack.Screen name="Payments" component={Payments} />
-        <Stack.Screen name="ReportProblem" component={ReportProblem} />
-        <Stack.Screen name="Support" component={Support} />
+          {/* Accounts */}
+          <Stack.Screen name="Account" component={Account} />
+          <Stack.Screen name="LikedProducts" component={LikedProducts} />
+          <Stack.Screen name="StoresFollowed" component={StoresFollowed} />
+          <Stack.Screen name="DeliveredOrders" component={DeliveredOrders} />
+          <Stack.Screen name="PendingOrders" component={PendingOrders} />
+          <Stack.Screen name="ActiveOrders" component={ActiveOrders} />
+          <Stack.Screen name="ReturnedOrders" component={ReturnedOrders} />
+          <Stack.Screen name="CancelledOrders" component={CancelledOrders} />
+          <Stack.Screen name="Reviews" component={Reviews} />
+          <Stack.Screen name="Payments" component={Payments} />
+          <Stack.Screen name="ReportProblem" component={ReportProblem} />
+          <Stack.Screen name="Support" component={Support} />
 
-        <Stack.Screen name="Settings" component={Settings} />
-        <Stack.Screen name="AccountInfo" component={AccountInfo} />
-        <Stack.Screen name="AddressBook" component={AddressBook} />
-        <Stack.Screen name="FAQ" component={FAQ} />
-        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-        <Stack.Screen name="Store" component={Store} />
-      </Stack.Navigator>
-    </NavigationContainer>
+          <Stack.Screen name="Settings" component={Settings} />
+          <Stack.Screen name="AccountInfo" component={AccountInfo} />
+          <Stack.Screen name="AddressBook" component={AddressBook} />
+          <Stack.Screen name="FAQ" component={FAQ} />
+          <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+          <Stack.Screen name="Store" component={Store} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ContextProvider>
   );
 };
 
