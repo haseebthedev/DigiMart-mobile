@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,28 +7,51 @@ import {
   TextInput,
   TouchableOpacity
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 import axios from 'axios';
 import api from '../axios/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../contexts/UserContext';
 
 const Login = ({ navigation }) => {
+  const { ADD_USER } = UserContext();
+
   const [loginData, setLoginData] = useState({
     email: 'sheikh.ameen252@gmail.com',
     password: 'ameen321'
   });
 
   const handlerLogin = async () => {
-    // await api
-    //   .post('/buyer/login', loginData)
-    //   .then((res) => console.log(res.data.data))
-    //   .catch((error) => console.log('error', error));
-    // await AsyncStorage.setItem('USER_DATA', res.data.data.token);
-    navigation.navigate('Layout');
+    await api
+      .post('/buyer/login', loginData)
+      .then((res) => {
+        // res => res.data.data.buyer
+        // res => res.data.data.token
+        Toast.show({
+          type: 'success',
+          text1: 'Login Successfully!',
+          text2: 'Redirecting to Homepage...',
+          onShow: () => {
+            ADD_USER({ token: res.data.data.token, data: res.data.data.buyer });
+          },
+          onHide: () => {
+            navigation.navigate('Layout');
+          }
+        });
+      })
+      .catch((error) => {
+        Toast.show({
+          type: 'error',
+          text1: 'Wrong Credentials',
+          text2: 'Either email or password is invalid!'
+        });
+      });
   };
 
   return (
     <View style={styles.container}>
+      <Toast ref={(ref) => Toast.setRef(ref)} />
       <View style={{ marginTop: 80, marginBottom: 50, alignItems: 'center' }}>
         <Image source={IMAGES.loginIllustration} style={styles.loginImage} />
       </View>
@@ -51,6 +74,7 @@ const Login = ({ navigation }) => {
       <TouchableOpacity style={styles.button} onPress={handlerLogin}>
         <Text style={styles.loginButton}>LOGIN</Text>
       </TouchableOpacity>
+
       <View
         style={{
           marginVertical: 20,
@@ -84,7 +108,8 @@ const styles = StyleSheet.create({
     borderRadius: 200,
     backgroundColor: '#e1e1e1',
     borderColor: '#407BFF',
-    borderWidth: 4
+    borderWidth: 4,
+    zIndex: -10
   },
   inputField: {
     paddingHorizontal: 15,

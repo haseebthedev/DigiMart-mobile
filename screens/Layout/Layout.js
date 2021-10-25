@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Animated,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
+import { UserContext } from '../../contexts/UserContext';
 
 // Icons...
 import menu from '../../assets/icons/menuIcon.png';
@@ -34,6 +35,9 @@ import Account from '../Account';
 const Tab = createMaterialBottomTabNavigator();
 
 const Layout = ({ navigation }) => {
+  const { user } = UserContext();
+  const [profileImage, setProfileImage] = useState('');
+
   // State
   const [currentTab, setCurrentTab] = useState('Homepage');
   const [showMenu, setShowMenu] = useState(false);
@@ -72,6 +76,11 @@ const Layout = ({ navigation }) => {
       // error reading value
     }
   };
+
+  useEffect(() => {
+    // setProfileImage(user.data.profilePic);
+    console.log('user.data.profilePic', user);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

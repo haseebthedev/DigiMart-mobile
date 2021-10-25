@@ -1,24 +1,24 @@
-import React, {useContext, createContext, useState, useEffect} from 'react';
+import React, { useContext, createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const UserContext = createContext({});
+const Context = createContext({});
 
-export const userCounter = () => useContext(UserContext);
+export const UserContext = () => useContext(Context);
 
-const ContextProvider = ({children}) => {
-  const [user, setUser] = useState({token: ''});
+const ContextProvider = ({ children }) => {
+  const [user, setUser] = useState({ data: '', token: '' });
 
   // Manipulation functions
-  const ADD_USER = payload => {
-    setUser(payload);
+  const ADD_USER = (payload) => {
+    setUser({ token: payload.token, data: payload.data });
   };
 
   const SIGN_OUT = () => {
-    setUser({data: undefined});
+    setUser({ data: '', token: '' });
   };
 
   async function fetchData() {
-    let data = await AsyncStorage.getItem('DEMO_APP::COUNT_VALUE');
+    let data = await AsyncStorage.getItem('DIGI-MART:APP_DATA');
     setUser(JSON.parse(data));
   }
 
@@ -29,13 +29,13 @@ const ContextProvider = ({children}) => {
 
   // Saving Data
   useEffect(() => {
-    AsyncStorage.setItem('DEMO_APP::COUNT_VALUE', JSON.stringify(user));
+    AsyncStorage.setItem('DIGI-MART:APP_DATA', JSON.stringify(user));
   }, [user]);
 
   return (
-    <UserContext.Provider value={{user, ADD_USER, SIGN_OUT}}>
+    <Context.Provider value={{ user, ADD_USER, SIGN_OUT }}>
       {children}
-    </UserContext.Provider>
+    </Context.Provider>
   );
 };
 
