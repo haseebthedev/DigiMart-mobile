@@ -8,11 +8,11 @@ import {
   Text,
   TouchableOpacity,
   View,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
-import { UserContext } from '../../contexts/UserContext';
 
 // Icons...
 import menu from '../../assets/icons/menuIcon.png';
@@ -24,7 +24,7 @@ import accountIcon from '../../assets/icons/accountIcon.png';
 import logoutIcon from '../../assets/icons/logoutIcon.png';
 import searchIcon from '../../assets/icons/searchIcon.png';
 // import scanIcon from '../../assets/icons/scanIcon.png';
-import myImage from '../../assets/images/myImage.jpg';
+import defaultUser from '../../assets/images/defaultUser.png';
 
 // MainScreens
 import Homepage from '../Homepage';
@@ -35,8 +35,10 @@ import Account from '../Account';
 const Tab = createMaterialBottomTabNavigator();
 
 const Layout = ({ navigation }) => {
-  const { user } = UserContext();
-  const [profileImage, setProfileImage] = useState('');
+  const [UserToken, setUserToken] = useState('');
+  const [UserProfile, setUserProfile] = useState('');
+  const [Username, setUsername] = useState('');
+  const [UserEmail, setUserEmail] = useState('');
 
   // State
   const [currentTab, setCurrentTab] = useState('Homepage');
@@ -66,20 +68,34 @@ const Layout = ({ navigation }) => {
     }).start();
   };
 
-  const getData = async () => {
+  const retriveUserToken = async () => {
     try {
-      const value = await AsyncStorage.getItem('USER_DATA');
+      let value = await AsyncStorage.getItem('@USER_TOKEN');
       if (value !== null) {
-        console.log('value', value);
+        setUserToken(value);
       }
     } catch (e) {
-      // error reading value
+      console.log('Error :: Retriving token failed :: ', e);
+    }
+  };
+
+  const retriveUserData = async () => {
+    try {
+      let res = await AsyncStorage.getItem('@USER_DATA');
+      if (res != null) {
+        let data = JSON.parse(res);
+        setUserProfile(data.profilePic);
+        setUsername(data.name);
+        setUserEmail(data.email);
+      }
+    } catch (e) {
+      console.log('Error :: Retriving data failed :: ', e);
     }
   };
 
   useEffect(() => {
-    // setProfileImage(user.data.profilePic);
-    console.log('user.data.profilePic', user);
+    retriveUserToken();
+    retriveUserData();
   }, []);
 
   return (
@@ -92,7 +108,9 @@ const Layout = ({ navigation }) => {
         >
           <View style={{ alignItems: 'center' }}>
             <Image
-              source={myImage}
+              source={
+                UserProfile.length > 0 ? { uri: UserProfile } : defaultUser
+              }
               style={{
                 width: 75,
                 height: 75,
@@ -108,7 +126,7 @@ const Layout = ({ navigation }) => {
                 marginTop: 10
               }}
             >
-              Haseeb Ahmed
+              {Username.toUpperCase()}
             </Text>
             <Text
               style={{
@@ -118,7 +136,7 @@ const Layout = ({ navigation }) => {
                 marginBottom: 15
               }}
             >
-              haseeb@gmail.com
+              {UserEmail}
             </Text>
           </View>
           {TabButton(
@@ -226,9 +244,11 @@ const Layout = ({ navigation }) => {
                 }}
               />
             </View>
-            <TouchableOpacity onPress={getData}>
+            <TouchableOpacity>
               <Image
-                source={myImage}
+                source={
+                  UserProfile.length > 0 ? { uri: UserProfile } : defaultUser
+                }
                 style={{
                   width: 30,
                   height: 30,

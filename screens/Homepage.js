@@ -6,10 +6,10 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
-  Alert,
-  BackHandler
+  Dimensions
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../axios/api';
 import { SliderBox } from 'react-native-image-slider-box';
 import { Rating } from 'react-native-ratings';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
@@ -28,7 +28,7 @@ import homeAppliencesIcon from '../assets/icons/homeAppliencesIcon.png';
 import addIcon from '../assets/icons/addIcon.png';
 
 // Images
-import laptopImage from '../assets/images/laptop-image.png';
+import imageNotAvailable from '../assets/images/imageNotAvailable.png';
 import banner2 from '../assets/images/banner2.png';
 
 // Calculate margin for product cards
@@ -44,6 +44,7 @@ function ApplyMargin(index) {
 const { width, height } = Dimensions.get('window');
 
 const Homepage = ({ navigation }) => {
+  const [UserToken, setUserToken] = useState('');
   const [BannerImages, setBannerImages] = useState([]);
   const [ProductList] = useState([
     {
@@ -96,7 +97,43 @@ const Homepage = ({ navigation }) => {
     }
   ]);
 
+  const [ProductsOnSale, setProductsOnSale] = useState([]);
+
+  const retriveUserToken = async () => {
+    try {
+      let value = await AsyncStorage.getItem('@USER_TOKEN');
+      if (value !== null) {
+        setUserToken(value);
+      }
+    } catch (e) {
+      console.log('Error :: Retriving token failed :: ', e);
+    }
+  };
+
+  const getProductsOnSale = async () => {
+    await api
+      .get('/')
+      .then((res) => {
+        setProductsOnSale(res.data.data.ProductsOnSale);
+      })
+      .catch((error) =>
+        console.log('ERROR: ' + JSON.stringify(error.response.data.error))
+      );
+  };
+
+  function trimProdName(name) {
+    let res = '';
+    if (name.length > 14) {
+      res = name.toString().substring(0, 15) + '...';
+    } else {
+      res = name;
+    }
+    return res;
+  }
+
   useEffect(() => {
+    retriveUserToken();
+
     const images = [
       'https://source.unsplash.com/1024x768/?laptop',
       'https://source.unsplash.com/1024x768/?mobile',
@@ -105,28 +142,8 @@ const Homepage = ({ navigation }) => {
       'https://source.unsplash.com/1024x768/?engineer',
       'https://source.unsplash.com/1024x768/?ecommerce'
     ];
-
     setBannerImages(images);
-  }, []);
-
-  const backAction = () => {
-    Alert.alert('Exit App', 'Are you sure you want to exit?', [
-      {
-        text: 'Cancel',
-        onPress: () => null,
-        style: 'cancel'
-      },
-      { text: 'YES', style: 'default', onPress: () => BackHandler.exitApp() }
-    ]);
-    return true;
-  };
-
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', backAction);
-
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', backAction);
-    };
+    getProductsOnSale();
   }, []);
 
   return (
@@ -459,24 +476,32 @@ const Homepage = ({ navigation }) => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 20 }}
         >
-          {ProductList.map((el, index) => (
+          {ProductsOnSale.map((el, index) => (
             <TouchableOpacity
-              key={index}
+              key={el.product._id}
               style={[
                 styles.productCard,
-                index !== ProductList.length - 1
+                index !== ProductsOnSale.length - 1
                   ? { marginRight: 10 }
                   : { marginRight: 0 }
               ]}
-              onPress={() => navigation.navigate('ProductPage')}
+              onPress={() =>
+                navigation.navigate('ProductPage', { prodId: el.product._id })
+              }
             >
               <View style={{ alignItems: 'center' }}>
                 <Image
-                  source={laptopImage}
-                  style={{ width: 110, height: 110 }}
+                  source={
+                    el.product.images.length > 0
+                      ? { uri: el.product.images[0] }
+                      : imageNotAvailable
+                  }
+                  style={{ width: 90, height: 90, marginVertical: 10 }}
                 />
               </View>
-              <Text style={styles.productName}>{el.name}</Text>
+              <Text style={styles.productName}>
+                {trimProdName(el.product.name)}
+              </Text>
               <View
                 style={{
                   alignItems: 'center',
@@ -487,7 +512,7 @@ const Homepage = ({ navigation }) => {
                   readonly={true}
                   ratingColor="#3498db"
                   ratingBackgroundColor="#c8c7c8"
-                  startingValue={el.ratings}
+                  startingValue={el.avgRating}
                   imageSize={12}
                 />
                 <Text
@@ -497,7 +522,7 @@ const Homepage = ({ navigation }) => {
                     marginLeft: 4
                   }}
                 >
-                  {'(' + el.ratings + ')'}
+                  {'(' + el.avgRating + ')'}
                 </Text>
               </View>
               <View
@@ -508,7 +533,9 @@ const Homepage = ({ navigation }) => {
                   paddingBottom: 10
                 }}
               >
-                <Text style={styles.productPrice}>{'Rs. ' + el.price}</Text>
+                <Text style={styles.productPrice}>
+                  {'Rs. ' + el.product.discountPrice}
+                </Text>
                 <TouchableOpacity>
                   <Image
                     source={addIcon}
@@ -556,7 +583,7 @@ const Homepage = ({ navigation }) => {
           }}
         >
           <Text style={{ fontFamily: FONTS.PoppinsBold, fontSize: 20 }}>
-            Newly Added
+            Top Reviewed
           </Text>
         </View>
 
@@ -566,19 +593,25 @@ const Homepage = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20 }}
         >
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-            {ProductList.map((el, index) => (
+            {ProductsOnSale.map((el, index) => (
               <TouchableOpacity
-                key={index}
+                key={el.product._id}
                 style={[styles.productCard, ApplyMargin(index)]}
                 onPress={() => navigation.navigate('ProductPage')}
               >
                 <View style={{ alignItems: 'center' }}>
                   <Image
-                    source={laptopImage}
-                    style={{ width: 110, height: 110 }}
+                    source={
+                      el.product.images.length > 0
+                        ? { uri: el.product.images[0] }
+                        : imageNotAvailable
+                    }
+                    style={{ width: 90, height: 90, marginVertical: 10 }}
                   />
                 </View>
-                <Text style={styles.productName}>{el.name}</Text>
+                <Text style={styles.productName}>
+                  {trimProdName(el.product.name)}
+                </Text>
                 <View
                   style={{
                     alignItems: 'center',
@@ -589,7 +622,7 @@ const Homepage = ({ navigation }) => {
                     readonly={true}
                     ratingColor="#3498db"
                     ratingBackgroundColor="#c8c7c8"
-                    startingValue={el.ratings}
+                    startingValue={el.avgRating}
                     imageSize={12}
                   />
                   <Text
@@ -599,7 +632,7 @@ const Homepage = ({ navigation }) => {
                       marginLeft: 4
                     }}
                   >
-                    {'(' + el.ratings + ')'}
+                    {'(' + el.avgRating + ')'}
                   </Text>
                 </View>
                 <View
@@ -610,7 +643,9 @@ const Homepage = ({ navigation }) => {
                     paddingBottom: 10
                   }}
                 >
-                  <Text style={styles.productPrice}>{'Rs. ' + el.price}</Text>
+                  <Text style={styles.productPrice}>
+                    {'Rs. ' + el.product.discountPrice}
+                  </Text>
                   <TouchableOpacity>
                     <Image
                       source={addIcon}

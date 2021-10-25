@@ -9,31 +9,40 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
-import axios from 'axios';
 import api from '../axios/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserContext } from '../contexts/UserContext';
 
 const Login = ({ navigation }) => {
-  const { ADD_USER } = UserContext();
+  const [LoginEmail, setLoginEmail] = useState('sheikh.ameen252@gmail.com');
+  const [LoginPass, setLoginPass] = useState('ameen321');
 
-  const [loginData, setLoginData] = useState({
-    email: 'sheikh.ameen252@gmail.com',
-    password: 'ameen321'
-  });
+  const storeUserToken = async (token) => {
+    try {
+      await AsyncStorage.setItem('@USER_TOKEN', token);
+    } catch (e) {
+      console.log('Error :: Saving token failed :: ', e);
+    }
+  };
+
+  const storeUserData = async (data) => {
+    try {
+      await AsyncStorage.setItem('@USER_DATA', JSON.stringify(data));
+    } catch (e) {
+      console.log('Error :: Saving data failed :: ', e);
+    }
+  };
 
   const handlerLogin = async () => {
     await api
-      .post('/buyer/login', loginData)
+      .post('/buyer/login', { email: LoginEmail, password: LoginPass })
       .then((res) => {
-        // res => res.data.data.buyer
-        // res => res.data.data.token
         Toast.show({
           type: 'success',
           text1: 'Login Successfully!',
           text2: 'Redirecting to Homepage...',
           onShow: () => {
-            ADD_USER({ token: res.data.data.token, data: res.data.data.buyer });
+            storeUserToken(res.data.data.token);
+            storeUserData(res.data.data.buyer);
           },
           onHide: () => {
             navigation.navigate('Layout');
@@ -65,11 +74,18 @@ const Login = ({ navigation }) => {
           Login to your Account
         </Text>
       </View>
-      <TextInput placeholder="Email" style={styles.inputField} />
+      <TextInput
+        placeholder="Email"
+        style={styles.inputField}
+        onChange={setLoginEmail}
+        value={LoginEmail}
+      />
       <TextInput
         placeholder="Password"
         secureTextEntry
         style={styles.inputField}
+        onChange={setLoginPass}
+        value={LoginPass}
       />
       <TouchableOpacity style={styles.button} onPress={handlerLogin}>
         <Text style={styles.loginButton}>LOGIN</Text>
