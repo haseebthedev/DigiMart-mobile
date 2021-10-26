@@ -33,57 +33,45 @@ const ProductPage = ({ route, navigation }) => {
   const { prodId } = route.params;
 
   const [BannerImages, setBannerImages] = useState([]);
-  // const [ProductDetails] = useState({
-  //   title: 'HP Laptop 2021',
-  //   ratings: {
-  //     ratingValue: '4.3',
-  //     ratingCount: 234
-  //   },
-  //   category: 'Electronics',
-  //   subCategory: 'AC/DC Invertor',
-  //   description:
-  //     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. \n\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-  //   price: '120.00',
-  //   warranty: '2 years',
-  //   state: 'New',
-  //   shippingCost: 120,
-  //   stockAvailable: 20,
-  //   storeName: 'GUCCI Pakistan',
-  //   colors: ['red', 'green', 'blue'],
-  //   reviews: [
-  //     {
-  //       id: 1,
-  //       pictures: [reviewImage, reviewImage, reviewImage],
-  //       buyerName: 'Haseeb Ahmed',
-  //       comment: 'Product is nice.',
-  //       rating: 4.3,
-  //       createdAt: '2021-08-16T11:19:11.787+00:00'
-  //     },
-  //     {
-  //       id: 2,
-  //       pictures: [reviewImage, reviewImage],
-  //       buyerName: 'M. Ameen',
-  //       comment: 'This Product is very cheap!',
-  //       rating: 4.7,
-  //       createdAt: '2021-08-16T11:19:11.787+00:00'
-  //     }
-  //   ]
-  // });
+  const [ProductDetails] = useState({
+    title: 'HP Laptop 2021',
+    ratings: {
+      ratingValue: '4.3',
+      ratingCount: 234
+    },
+    category: 'Electronics',
+    subCategory: 'AC/DC Invertor',
+    description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. \n\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+    price: '120.00',
+    warranty: '2 years',
+    state: 'New',
+    shippingCost: 120,
+    stockAvailable: 20,
+    storeName: 'GUCCI Pakistan',
+    colors: ['red', 'green', 'blue'],
+    reviews: [
+      {
+        id: 1,
+        pictures: [reviewImage, reviewImage, reviewImage],
+        buyerName: 'Haseeb Ahmed',
+        comment: 'Product is nice.',
+        rating: 4.3,
+        createdAt: '2021-08-16T11:19:11.787+00:00'
+      },
+      {
+        id: 2,
+        pictures: [reviewImage, reviewImage],
+        buyerName: 'M. Ameen',
+        comment: 'This Product is very cheap!',
+        rating: 4.7,
+        createdAt: '2021-08-16T11:19:11.787+00:00'
+      }
+    ]
+  });
 
-  const [ProductDetails, setProductDetails] = useState({});
   const [SelectedColor, setSelectedColor] = useState('red');
   const [Quantity, setQuantity] = useState(1);
-
-  const getProductDetails = async () => {
-    await api
-      .get('/')
-      .then((res) => {
-        setProductsOnSale(res.data.data.ProductsOnSale);
-      })
-      .catch((error) =>
-        console.log('ERROR: ' + JSON.stringify(error.response.data.error))
-      );
-  };
 
   useEffect(() => {
     const images = [
@@ -91,10 +79,6 @@ const ProductPage = ({ route, navigation }) => {
       'https://source.unsplash.com/1024x768/?macbook',
       'https://source.unsplash.com/1024x768/?hp laptop'
     ];
-
-    setProductDetails;
-
-    setSelectedColor(ProductDetails.colors[0]);
     setBannerImages(images);
   }, []);
 

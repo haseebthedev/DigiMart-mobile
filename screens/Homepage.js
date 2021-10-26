@@ -131,6 +131,7 @@ const Homepage = ({ navigation }) => {
     return res;
   }
 
+  // Token and Product List from DB
   useEffect(() => {
     retriveUserToken();
 
@@ -188,7 +189,10 @@ const Homepage = ({ navigation }) => {
           justifyContent: 'space-evenly'
         }}
       >
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={() => navigation.navigate('AllCategories')}
+        >
           <View
             style={{
               width: 60,
@@ -210,7 +214,7 @@ const Homepage = ({ navigation }) => {
           >
             Categories
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View
@@ -478,7 +482,7 @@ const Homepage = ({ navigation }) => {
         >
           {ProductsOnSale.map((el, index) => (
             <TouchableOpacity
-              key={el.product._id}
+              key={index}
               style={[
                 styles.productCard,
                 index !== ProductsOnSale.length - 1
@@ -486,22 +490,20 @@ const Homepage = ({ navigation }) => {
                   : { marginRight: 0 }
               ]}
               onPress={() =>
-                navigation.navigate('ProductPage', { prodId: el.product._id })
+                navigation.navigate('ProductPage', { prodId: el._id })
               }
             >
               <View style={{ alignItems: 'center' }}>
                 <Image
                   source={
-                    el.product.images.length > 0
-                      ? { uri: el.product.images[0] }
+                    el.images.length > 0
+                      ? { uri: el.images[0] }
                       : imageNotAvailable
                   }
                   style={{ width: 90, height: 90, marginVertical: 10 }}
                 />
               </View>
-              <Text style={styles.productName}>
-                {trimProdName(el.product.name)}
-              </Text>
+              <Text style={styles.productName}>{trimProdName(el.name)}</Text>
               <View
                 style={{
                   alignItems: 'center',
@@ -522,7 +524,9 @@ const Homepage = ({ navigation }) => {
                     marginLeft: 4
                   }}
                 >
-                  {'(' + el.avgRating + ')'}
+                  {el.reviews.length > 0
+                    ? '(' + el.reviews.length + ')'
+                    : '(' + 0 + ')'}
                 </Text>
               </View>
               <View
@@ -534,7 +538,7 @@ const Homepage = ({ navigation }) => {
                 }}
               >
                 <Text style={styles.productPrice}>
-                  {'Rs. ' + el.product.discountPrice}
+                  {'Rs. ' + el.discountPrice}
                 </Text>
                 <TouchableOpacity>
                   <Image
@@ -595,23 +599,21 @@ const Homepage = ({ navigation }) => {
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
             {ProductsOnSale.map((el, index) => (
               <TouchableOpacity
-                key={el.product._id}
+                key={el._id}
                 style={[styles.productCard, ApplyMargin(index)]}
                 onPress={() => navigation.navigate('ProductPage')}
               >
                 <View style={{ alignItems: 'center' }}>
                   <Image
                     source={
-                      el.product.images.length > 0
-                        ? { uri: el.product.images[0] }
+                      el.images.length > 0
+                        ? { uri: el.images[0] }
                         : imageNotAvailable
                     }
                     style={{ width: 90, height: 90, marginVertical: 10 }}
                   />
                 </View>
-                <Text style={styles.productName}>
-                  {trimProdName(el.product.name)}
-                </Text>
+                <Text style={styles.productName}>{trimProdName(el.name)}</Text>
                 <View
                   style={{
                     alignItems: 'center',
@@ -632,7 +634,9 @@ const Homepage = ({ navigation }) => {
                       marginLeft: 4
                     }}
                   >
-                    {'(' + el.avgRating + ')'}
+                    {el.reviews.length > 0
+                      ? '(' + el.reviews.length + ')'
+                      : '(' + 0 + ')'}
                   </Text>
                 </View>
                 <View
@@ -644,7 +648,7 @@ const Homepage = ({ navigation }) => {
                   }}
                 >
                   <Text style={styles.productPrice}>
-                    {'Rs. ' + el.product.discountPrice}
+                    {'Rs. ' + el.discountPrice}
                   </Text>
                   <TouchableOpacity>
                     <Image

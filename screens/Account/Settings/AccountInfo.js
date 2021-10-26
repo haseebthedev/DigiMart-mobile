@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,16 +9,102 @@ import {
   TouchableNativeFeedback,
   TextInput
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
+import api from '../../../axios/api';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import backIcon from '../../../assets/icons/backIcon.png';
-import myImage from '../../../assets/images/myImage.jpg';
+import myImage from '../../../assets/images/imageNotAvailable.png';
 import uploadIcon from '../../../assets/icons/uploadIcon.png';
 
 const { width, height } = Dimensions.get('screen');
 
 const AccountInfo = ({ navigation }) => {
+  const [token, setToken] = useState('');
+
+  const [profileData, setProfileData] = useState({
+    profilePic: null,
+    name: '',
+    email: '',
+    phoneNumber: '',
+    birthday: ''
+  });
+
+  const retriveToken = () => {
+    try {
+      AsyncStorage.getItem('@USER_TOKEN').then((value) => {
+        if (value !== null) {
+          setToken(value);
+        }
+      });
+    } catch (e) {
+      console.log('Error :: Retriving token failed :: ', e);
+    }
+  };
+
+  const getUserInfo = async () => {
+    await api
+      .get('/buyer/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        const { profilePic, name, email, phoneNumber, birthday } =
+          res.data.data.buyer[0];
+
+        setProfileData({
+          profilePic,
+          name,
+          email,
+          phoneNumber,
+          birthday
+        });
+      })
+      .catch((e) => {
+        console.log('Error :: Retriving User failed :: ', e);
+      });
+  };
+
+  const UpdateProfile = async () => {
+    await api
+      .patch(
+        '/buyer/me',
+        {
+          ...profileData
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      .then(() => {
+        Toast.show({
+          type: 'success',
+          text1: 'SUCCESS',
+          text2: 'Profile Updated Successfully!',
+          position: 'bottom'
+        });
+      })
+      .catch((e) => {
+        Toast.show({
+          type: 'error',
+          text1: 'Update Failed !',
+          text2: e,
+          position: 'bottom'
+        });
+      });
+  };
+
+  useEffect(() => {
+    retriveToken();
+  }, []);
+
+  useEffect(() => {
+    getUserInfo();
+  }, [token]);
+
   return (
     <View style={styles.container}>
+      <Toast ref={(ref) => Toast.setRef(ref)} />
+
       <Text
         style={{
           fontFamily: FONTS.PoppinsBold,
@@ -61,7 +147,11 @@ const AccountInfo = ({ navigation }) => {
         }}
       >
         <Image
-          source={myImage}
+          source={
+            profileData.profilePic != null
+              ? { uri: profileData.profilePic }
+              : myImage
+          }
           style={{
             width: 120,
             height: 120,
@@ -91,18 +181,43 @@ const AccountInfo = ({ navigation }) => {
         </View>
       </View>
       <View style={{ marginTop: 40, width: width - 40 }}>
-        <TextInput placeholder="Name" style={styles.userInput} />
-        <TextInput placeholder="Email" style={styles.userInput} />
+        <TextInput
+          placeholder="Name"
+          style={styles.userInput}
+          value={profileData.name}
+          onChangeText={(text) =>
+            setProfileData({ ...profileData, name: text })
+          }
+        />
+        <TextInput
+          placeholder="Email"
+          style={styles.userInput}
+          value={profileData.email}
+          onChangeText={(text) =>
+            setProfileData({ ...profileData, email: text })
+          }
+        />
         <TextInput
           placeholder="Phone #"
           style={styles.userInput}
           keyboardType="number-pad"
+          value={profileData.phoneNumber}
+          onChangeText={(text) =>
+            setProfileData({ ...profileData, phoneNumber: text })
+          }
         />
-        <TextInput placeholder="Date of Birth" style={styles.userInput} />
+        <TextInput
+          placeholder="Date of Birth"
+          style={styles.userInput}
+          value={profileData.birthday}
+          onChangeText={(text) =>
+            setProfileData({ ...profileData, birthday: text })
+          }
+        />
       </View>
-      <View style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={UpdateProfile}>
         <Text style={styles.loginButton}>UPDATE</Text>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };

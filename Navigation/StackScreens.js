@@ -17,6 +17,9 @@ import Cart from '.././screens/Cart';
 import Chat from '.././screens/Messages/Chat';
 import Store from '.././screens/Store/Store';
 
+// Homepage
+import AllCategories from '../screens/HomepageMisc/AllCategories';
+
 // Accounts Page
 import Account from '.././screens/Account';
 import LikedProducts from '.././screens/Account/LikedProducts';
@@ -75,6 +78,7 @@ const StackScreens = () => {
       <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name="Cart" component={Cart} />
       <Stack.Screen name="Layout" component={Layout} />
+      <Stack.Screen name="AllCategories" component={AllCategories} />
 
       {/* Accounts */}
       <Stack.Screen name="Account" component={Account} />
