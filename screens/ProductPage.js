@@ -11,9 +11,10 @@ import {
   ToastAndroid,
   ScrollView
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SliderBox } from 'react-native-image-slider-box';
 import { Rating } from 'react-native-ratings';
-
+import api from '../axios/api';
 // Icons
 import backIcon from '../assets/icons/backIcon.png';
 import emptyHeartIcon from '../assets/icons/emptyHeartIcon.png';
@@ -22,65 +23,81 @@ import cartIcon from '../assets/icons/cartIcon.png';
 import { FONTS, COLORS } from '../constants';
 
 // Dummy Images
-import reviewImage from '../assets/images/laptop-image.png';
+import imageNotAvailable from '../assets/images/imageNotAvailable.png';
 import sellerLogo from '../assets/images/seller-logo.png';
 
 const { width, height } = Dimensions.get('window');
 
 const ProductPage = ({ route, navigation }) => {
-  // Modal AddToCart
   const refRBSheet = useRef();
   const { prodId } = route.params;
-
-  const [BannerImages, setBannerImages] = useState([]);
-  const [ProductDetails] = useState({
-    title: 'HP Laptop 2021',
-    ratings: {
-      ratingValue: '4.3',
-      ratingCount: 234
-    },
-    category: 'Electronics',
-    subCategory: 'AC/DC Invertor',
-    description:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. \n\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-    price: '120.00',
-    warranty: '2 years',
-    state: 'New',
-    shippingCost: 120,
-    stockAvailable: 20,
-    storeName: 'GUCCI Pakistan',
-    colors: ['red', 'green', 'blue'],
-    reviews: [
-      {
-        id: 1,
-        pictures: [reviewImage, reviewImage, reviewImage],
-        buyerName: 'Haseeb Ahmed',
-        comment: 'Product is nice.',
-        rating: 4.3,
-        createdAt: '2021-08-16T11:19:11.787+00:00'
-      },
-      {
-        id: 2,
-        pictures: [reviewImage, reviewImage],
-        buyerName: 'M. Ameen',
-        comment: 'This Product is very cheap!',
-        rating: 4.7,
-        createdAt: '2021-08-16T11:19:11.787+00:00'
-      }
-    ]
-  });
+  const [token, setToken] = useState('');
 
   const [SelectedColor, setSelectedColor] = useState('red');
   const [Quantity, setQuantity] = useState(1);
+  const [ProductDetails, setProductDetails] = useState({
+    _id: '6133d94c010d5e2cc84487db',
+    name: 'HP Laptop',
+    description: 'testProduct',
+    category: 'Electronics',
+    subCategory: 'AC/DC Invertor',
+    isOnSale: false,
+    discountPercentage: null,
+    warranty: '2 year',
+    images: ['https://source.unsplash.com/1024x768/?laptop'],
+    colors: ['Green', 'Black', 'Purple'],
+    isVisibilityEnabled: true,
+    isAuthenticVendorProduct: false,
+    vendorCompanyName: 'Other',
+    vendorCategory: 'Other',
+    manufactureDate: '11/06/2003',
+    purchasePrice: 100,
+    salePrice: 120,
+    state: 'New',
+    shippingCost: 100,
+    discountPrice: 0,
+    stockAvailable: 0,
+    dimensions: '10in 10in 20in',
+    weight: '200 grams',
+    storeID: '6128c6ec00130918d0120ec4',
+    storeName: 'ABC STORE',
+    sellerID: '6128c65800130918d0120ec1',
+    sellerName: 'Haseeb Ahmed',
+    createdAt: '2021-09-04T20:38:36.583Z',
+    updatedAt: '2021-10-05T20:34:26.762Z'
+  });
+  const [Reviews, setReviews] = useState([]);
+
+  const retriveUserToken = async () => {
+    try {
+      let value = await AsyncStorage.getItem('@USER_TOKEN');
+      if (value !== null) {
+        setToken(value);
+      }
+    } catch (e) {
+      console.log('Error :: Retriving token failed :: ', e);
+    }
+  };
+
+  const getProductsDetailsById = async () => {
+    await api
+      .get(`/buyer/product/${prodId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        setProductDetails(res.data.data.product);
+      })
+      .catch((error) => console.log('ERROR: Fetching Product Details!'));
+  };
+
+  // Token
+  useEffect(() => {
+    retriveUserToken();
+  }, []);
 
   useEffect(() => {
-    const images = [
-      'https://source.unsplash.com/1024x768/?laptop',
-      'https://source.unsplash.com/1024x768/?macbook',
-      'https://source.unsplash.com/1024x768/?hp laptop'
-    ];
-    setBannerImages(images);
-  }, []);
+    getProductsDetailsById();
+  }, [token]);
 
   return (
     <View style={styles.container}>
@@ -89,7 +106,11 @@ const ProductPage = ({ route, navigation }) => {
           <View>
             {/* Image Slider */}
             <SliderBox
-              images={BannerImages}
+              images={
+                ProductDetails.images.length > 0
+                  ? ProductDetails.images
+                  : [imageNotAvailable]
+              }
               sliderBoxHeight={320}
               dotColor="#FFF"
               inactiveDotColor="#90A4AE"
@@ -151,7 +172,7 @@ const ProductPage = ({ route, navigation }) => {
 
           {/* PRODUCT DESCRIPTION */}
           <View style={styles.productDetails}>
-            <Text style={styles.title}>{ProductDetails.title}</Text>
+            <Text style={styles.title}>{ProductDetails.name}</Text>
 
             {/* Name, Rating */}
             <View
@@ -165,7 +186,8 @@ const ProductPage = ({ route, navigation }) => {
                 readonly={true}
                 ratingColor="#3498db"
                 ratingBackgroundColor="#c8c7c8"
-                startingValue={ProductDetails.ratings.ratingValue}
+                // startingValue={ProductDetails.ratings.ratingValue}
+                startingValue={2}
                 imageSize={12}
               />
               <Text
@@ -175,7 +197,7 @@ const ProductPage = ({ route, navigation }) => {
                   marginLeft: 4
                 }}
               >
-                {'(' + ProductDetails.ratings.ratingCount + ')'}
+                {'(231)'}
               </Text>
             </View>
 
@@ -206,22 +228,20 @@ const ProductPage = ({ route, navigation }) => {
                 >
                   Available Colors:
                 </Text>
-                <View>
-                  <View style={{ flexDirection: 'row' }}>
-                    {ProductDetails.colors.map((el, index) => (
-                      <View
-                        style={{
-                          width: 25,
-                          height: 25,
-                          opacity: 0.6,
-                          backgroundColor: el,
-                          borderRadius: 15,
-                          marginLeft: 8
-                        }}
-                        key={index}
-                      ></View>
-                    ))}
-                  </View>
+                <View style={{ flexDirection: 'row' }}>
+                  {ProductDetails.colors.map((el, index) => (
+                    <View
+                      style={{
+                        backgroundColor: el.toLowerCase(),
+                        width: 20,
+                        height: 20,
+                        opacity: 0.6,
+                        borderRadius: 15,
+                        marginLeft: 5
+                      }}
+                      key={index}
+                    />
+                  ))}
                 </View>
               </View>
 
@@ -281,7 +301,7 @@ const ProductPage = ({ route, navigation }) => {
                 </Text>
               </View>
 
-              {ProductDetails.reviews.map((el, index) => (
+              {/* {Reviews.map((el, index) => (
                 <View style={{ paddingTop: 10 }} key={index}>
                   <View
                     style={{
@@ -335,7 +355,7 @@ const ProductPage = ({ route, navigation }) => {
                     ))}
                   </View>
                 </View>
-              ))}
+              ))} */}
             </View>
 
             {/* Seller Details */}
@@ -373,7 +393,7 @@ const ProductPage = ({ route, navigation }) => {
                         fontSize: FONTS.Paragraph2
                       }}
                     >
-                      Tech Traders PK
+                      {ProductDetails.storeName}
                     </Text>
                     <Text
                       style={{
@@ -416,7 +436,7 @@ const ProductPage = ({ route, navigation }) => {
           <Text
             style={{ fontSize: FONTS.subhead2, fontFamily: FONTS.PoppinsBold }}
           >
-            {ProductDetails.price}
+            {ProductDetails.salePrice}
           </Text>
         </View>
         <TouchableOpacity

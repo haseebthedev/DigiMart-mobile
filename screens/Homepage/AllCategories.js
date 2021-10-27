@@ -7,8 +7,6 @@ import {
   Dimensions,
   TouchableOpacity,
   TouchableNativeFeedback,
-  TextInput,
-  FlatList,
   ScrollView
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,6 +20,9 @@ const { width, height } = Dimensions.get('screen');
 const AllCategories = ({ navigation }) => {
   const [token, setToken] = useState('');
   const [productCategories, setProductCategories] = useState([]);
+
+  // const [expanded, setExpanded] = React.useState(true);
+  // const handlePress = () => setExpanded(!expanded);
 
   const retriveToken = () => {
     try {
@@ -37,7 +38,7 @@ const AllCategories = ({ navigation }) => {
 
   const getAllCategories = async () => {
     await api
-      .get('/buyer/product/categories', {
+      .get('/buyer/product/categories/all', {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then((res) => {
@@ -71,7 +72,7 @@ const AllCategories = ({ navigation }) => {
           marginBottom: 40
         }}
       >
-        CATEGORIES
+        SELECT CATEGORIES
       </Text>
 
       {/* Back Button */}
@@ -99,7 +100,13 @@ const AllCategories = ({ navigation }) => {
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
         {productCategories.map((el, index) => {
           return (
-            <TouchableOpacity key={index}>
+            <TouchableOpacity
+              key={index}
+              onPress={() =>
+                navigation.navigate('SubCategories', { category: el })
+              }
+              style={{ marginVertical: 5 }}
+            >
               <View
                 style={{
                   paddingVertical: 20,

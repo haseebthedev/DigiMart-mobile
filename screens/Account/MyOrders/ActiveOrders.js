@@ -1,57 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  Dimensions,
-  TouchableNativeFeedback,
-  TouchableOpacity
+  TouchableNativeFeedback
 } from 'react-native';
-import { FONTS, COLORS, IMAGES } from '../../../constants/index';
-import backIcon from '../../../assets/icons/backIcon.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../../../axios/api';
 import { DataTable } from 'react-native-paper';
-
-const { width, height } = Dimensions.get('screen');
+import { FONTS } from '../../../constants/index';
+import backIcon from '../../../assets/icons/backIcon.png';
 
 const ActiveOrders = ({ navigation }) => {
-  const [orderDetails, setOrderDetails] = useState([
-    {
-      id: 1,
-      orderId: 'DM-124FN',
-      amount: 43200,
-      EstArrival: '21-Oct-2021',
-      status: 'ACTIVE'
-    },
-    {
-      id: 2,
-      orderId: 'DM-123JA',
-      amount: 350,
-      EstArrival: '28-Oct-2021',
-      status: 'ACTIVE'
-    },
-    {
-      id: 3,
-      orderId: 'DM-19QJA',
-      amount: 740,
-      EstArrival: '22-Oct-2021',
-      status: 'ACTIVE'
-    },
-    {
-      id: 4,
-      orderId: 'DM-423JA',
-      amount: 1200,
-      EstArrival: '24-Oct-2021',
-      status: 'ACTIVE'
-    },
-    {
-      id: 5,
-      orderId: 'DM-523JA',
-      amount: 350,
-      EstArrival: '26-Oct-2021',
-      status: 'ACTIVE'
+  const [token, setToken] = useState('');
+  const [orderDetails, setOrderDetails] = useState([]);
+
+  const retriveUserToken = async () => {
+    try {
+      let value = await AsyncStorage.getItem('@USER_TOKEN');
+      if (value !== null) {
+        setToken(value);
+      }
+    } catch (e) {
+      console.log('Error :: Retriving token failed :: ', e);
     }
-  ]);
+  };
+
+  const getActiveOrders = async () => {
+    await api
+      .get(`/buyer/orders/Active`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        setOrderDetails(res.data.data.orders);
+      })
+      .catch((error) => console.log('ERROR: Fetching Order Details!'));
+  };
+
+  // Token
+  useEffect(() => {
+    retriveUserToken();
+  }, []);
+
+  useEffect(() => {
+    getActiveOrders();
+  }, [token]);
+
+  function formatDate(d) {
+    date = new Date(d);
+    var dd = date.getDate();
+    var mm = date.getMonth() + 1;
+    var yyyy = date.getFullYear();
+    if (dd < 10) {
+      dd = '0' + dd;
+    }
+    if (mm < 10) {
+      mm = '0' + mm;
+    }
+    return (d = dd + '/' + mm + '/' + yyyy);
+  }
 
   return (
     <View style={styles.container}>
@@ -119,26 +127,25 @@ const ActiveOrders = ({ navigation }) => {
             <DataTable.Row key={index}>
               <DataTable.Cell>
                 <Text style={{ fontFamily: FONTS.Poppins, fontSize: 12 }}>
-                  {el.orderId}
+                  {el._id}
                 </Text>
               </DataTable.Cell>
               <DataTable.Cell>
                 <Text style={{ fontFamily: FONTS.Poppins, fontSize: 12 }}>
-                  Rs.{' ' + el.amount}
+                  Rs.{' ' + el.totalPrice}
                 </Text>
               </DataTable.Cell>
               <DataTable.Cell numeric>
                 <Text style={{ fontFamily: FONTS.Poppins, fontSize: 12 }}>
-                  {el.EstArrival}
+                  {formatDate(el.deliveryDate)}
                 </Text>
               </DataTable.Cell>
               <DataTable.Cell numeric>
                 <Text
                   style={{
-                    fontFamily: FONTS.Poppins,
+                    fontFamily: FONTS.PoppinsBold,
                     fontSize: 12,
-                    color: '#fff',
-                    backgroundColor: 'red'
+                    color: 'green'
                   }}
                 >
                   {el.status}

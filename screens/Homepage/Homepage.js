@@ -9,27 +9,27 @@ import {
   Dimensions
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../axios/api';
+import api from '../../axios/api';
 import { SliderBox } from 'react-native-image-slider-box';
 import { Rating } from 'react-native-ratings';
-import { FONTS, COLORS, IMAGES } from '../constants/index';
+import { FONTS, COLORS, IMAGES } from '../../constants/index';
 
 // Icons
-import categoryIcon from '../assets/icons/categoriesIcon.png';
-import topSellingIcon from '../assets/icons/topSellingIcon.png';
-import topRatedIcon from '../assets/icons/topRatedIcon.png';
-import newAddedIcon from '../assets/icons/newAddedIcon.png';
-import cheapIcon from '../assets/icons/cheapIcon.png';
-import techIcon from '../assets/icons/techIcon.png';
-import musicDevicesIcon from '../assets/icons/musicDevicesIcon.png';
-import fashionIcon from '../assets/icons/fashionIcon.png';
-import sportsIcon from '../assets/icons/sportsIcon.png';
-import homeAppliencesIcon from '../assets/icons/homeAppliencesIcon.png';
-import addIcon from '../assets/icons/addIcon.png';
+import categoryIcon from '../../assets/icons/categoriesIcon.png';
+import topSellingIcon from '../../assets/icons/topSellingIcon.png';
+import topRatedIcon from '../../assets/icons/topRatedIcon.png';
+import newAddedIcon from '../../assets/icons/newAddedIcon.png';
+import cheapIcon from '../../assets/icons/cheapIcon.png';
+import techIcon from '../../assets/icons/techIcon.png';
+import musicDevicesIcon from '../../assets/icons/musicDevicesIcon.png';
+import fashionIcon from '../../assets/icons/fashionIcon.png';
+import sportsIcon from '../../assets/icons/sportsIcon.png';
+import homeAppliencesIcon from '../../assets/icons/homeAppliencesIcon.png';
+import addIcon from '../../assets/icons/addIcon.png';
 
 // Images
-import imageNotAvailable from '../assets/images/imageNotAvailable.png';
-import banner2 from '../assets/images/banner2.png';
+import imageNotAvailable from '../../assets/images/imageNotAvailable.png';
+import banner2 from '../../assets/images/banner2.png';
 
 // Calculate margin for product cards
 function ApplyMargin(index) {
@@ -44,66 +44,15 @@ function ApplyMargin(index) {
 const { width, height } = Dimensions.get('window');
 
 const Homepage = ({ navigation }) => {
-  const [UserToken, setUserToken] = useState('');
+  const [token, setToken] = useState('');
   const [BannerImages, setBannerImages] = useState([]);
-  const [ProductList] = useState([
-    {
-      id: 1,
-      name: 'HP Laptop 15',
-      price: '100',
-      colors: '2 Colors',
-      ratings: 4.6,
-      image: require('../assets/images/laptop-image.png')
-    },
-    {
-      id: 2,
-      name: 'HP Laptop',
-      price: '230',
-      colors: '5 Colors',
-      ratings: 2,
-      image: require('../assets/images/laptop-image.png')
-    },
-    {
-      id: 3,
-      name: 'HP Laptop',
-      price: '340',
-      colors: '12 Colors',
-      ratings: 5,
-      image: require('../assets/images/laptop-image.png')
-    },
-    {
-      id: 4,
-      name: 'HP Laptop',
-      price: '500',
-      colors: '9 Colors',
-      ratings: 4,
-      image: require('../assets/images/laptop-image.png')
-    },
-    {
-      id: 5,
-      name: 'HP Laptop',
-      price: '6000',
-      colors: '4 Colors',
-      ratings: 3.5,
-      image: require('../assets/images/laptop-image.png')
-    },
-    {
-      id: 6,
-      name: 'HP Laptop',
-      price: '2300',
-      colors: '12 Colors',
-      ratings: 2,
-      image: require('../assets/images/laptop-image.png')
-    }
-  ]);
-
   const [ProductsOnSale, setProductsOnSale] = useState([]);
 
   const retriveUserToken = async () => {
     try {
       let value = await AsyncStorage.getItem('@USER_TOKEN');
       if (value !== null) {
-        setUserToken(value);
+        setToken(value);
       }
     } catch (e) {
       console.log('Error :: Retriving token failed :: ', e);
@@ -216,7 +165,12 @@ const Homepage = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('SearchedProducts', { type: 'TopSelling' })
+          }
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+        >
           <View
             style={{
               width: 60,
@@ -238,9 +192,14 @@ const Homepage = ({ navigation }) => {
           >
             Top Selling
           </Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={() =>
+            navigation.navigate('SearchedProducts', { type: 'TopRated' })
+          }
+        >
           <View
             style={{
               width: 60,
@@ -262,9 +221,14 @@ const Homepage = ({ navigation }) => {
           >
             Top Rated
           </Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={() =>
+            navigation.navigate('SearchedProducts', { type: 'NewArrival' })
+          }
+        >
           <View
             style={{
               width: 60,
@@ -286,9 +250,14 @@ const Homepage = ({ navigation }) => {
           >
             New Arrival
           </Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={() =>
+            navigation.navigate('SearchedProducts', { type: 'LowCost' })
+          }
+        >
           <View
             style={{
               width: 60,
@@ -310,7 +279,7 @@ const Homepage = ({ navigation }) => {
           >
             Low Cost
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* 2. UNDER BANNER */}
@@ -322,7 +291,12 @@ const Homepage = ({ navigation }) => {
           justifyContent: 'space-evenly'
         }}
       >
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={() =>
+            navigation.navigate('SearchedProducts', { type: 'Tech' })
+          }
+        >
           <View
             style={{
               width: 60,
@@ -344,9 +318,14 @@ const Homepage = ({ navigation }) => {
           >
             Tech
           </Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={() =>
+            navigation.navigate('SearchedProducts', { type: 'Music' })
+          }
+        >
           <View
             style={{
               width: 60,
@@ -371,9 +350,14 @@ const Homepage = ({ navigation }) => {
           >
             Music
           </Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={() =>
+            navigation.navigate('SearchedProducts', { type: 'Households' })
+          }
+        >
           <View
             style={{
               width: 60,
@@ -398,9 +382,14 @@ const Homepage = ({ navigation }) => {
           >
             Households
           </Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={() =>
+            navigation.navigate('SearchedProducts', { type: 'Fashion' })
+          }
+        >
           <View
             style={{
               width: 60,
@@ -422,9 +411,14 @@ const Homepage = ({ navigation }) => {
           >
             Fashion
           </Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={() =>
+            navigation.navigate('SearchedProducts', { type: 'Sports' })
+          }
+        >
           <View
             style={{
               width: 60,
@@ -446,7 +440,7 @@ const Homepage = ({ navigation }) => {
           >
             Sports
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* PRODUCTS DEALS  */}
@@ -463,15 +457,21 @@ const Homepage = ({ navigation }) => {
           <Text style={{ fontFamily: FONTS.PoppinsBold, fontSize: 20 }}>
             Hot Deals
           </Text>
-          <Text
-            style={{
-              fontFamily: FONTS.Poppins,
-              color: '#407BFF',
-              paddingVertical: 6
-            }}
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('SearchedProducts', { type: 'Hot Deals' })
+            }
           >
-            View All
-          </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.Poppins,
+                color: '#407BFF',
+                paddingVertical: 6
+              }}
+            >
+              View All
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Product List */}

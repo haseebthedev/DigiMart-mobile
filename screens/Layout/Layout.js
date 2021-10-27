@@ -27,7 +27,7 @@ import searchIcon from '../../assets/icons/searchIcon.png';
 import defaultUser from '../../assets/images/defaultUser.png';
 
 // MainScreens
-import Homepage from '../Homepage';
+import Homepage from '../Homepage/Homepage';
 import Messages from '../Messages';
 import Cart from '../Cart';
 import Account from '../Account';

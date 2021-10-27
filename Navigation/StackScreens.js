@@ -3,9 +3,6 @@ import SplashScreen from 'react-native-splash-screen';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-// UserContext
-// import { UserContext } from '.././contexts/UserContext';
-
 // Screens
 import Register from '.././screens/Register';
 import Login from '.././screens/Login';
@@ -18,7 +15,9 @@ import Chat from '.././screens/Messages/Chat';
 import Store from '.././screens/Store/Store';
 
 // Homepage
-import AllCategories from '../screens/HomepageMisc/AllCategories';
+import AllCategories from '../screens/Homepage/AllCategories';
+import SubCategories from '../screens/Homepage/SubCategories';
+import SearchedProducts from '../screens/Homepage/SearchedProducts';
 
 // Accounts Page
 import Account from '.././screens/Account';
@@ -79,6 +78,8 @@ const StackScreens = () => {
       <Stack.Screen name="Cart" component={Cart} />
       <Stack.Screen name="Layout" component={Layout} />
       <Stack.Screen name="AllCategories" component={AllCategories} />
+      <Stack.Screen name="SubCategories" component={SubCategories} />
+      <Stack.Screen name="SearchedProducts" component={SearchedProducts} />
 
       {/* Accounts */}
       <Stack.Screen name="Account" component={Account} />
