@@ -45,44 +45,43 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
 
 const StackScreens = () => {
-  const [UserToken, setUserToken] = useState(null);
+  const [UserState, setUserState] = useState(null);
 
-  const fetchUserState = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@USER_TOKEN');
+  const fetchUserState = () => {
+    AsyncStorage.getItem('@USER_TOKEN').then((value) => {
       if (value !== null) {
-        setUserToken(value);
+        setUserState(value);
       }
-    } catch (e) {
-      console.log('Error :: ', e);
-    }
+    });
   };
 
   useEffect(() => {
     fetchUserState();
+  });
+
+  useEffect(() => {
     SplashScreen.hide();
   }, []);
 
   return (
     <Stack.Navigator
-      initialRouteName={'Layout'}
-      // initialRouteName={UserToken !== null ? 'Layout' : 'Login'}
+      initialRouteName={UserState === null ? 'Layout' : 'Login'}
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
-      <Stack.Screen name="Messages" component={Messages} />
+      {/* <Stack.Screen name="Messages" component={Messages} /> */}
       <Stack.Screen name="ProductPage" component={ProductPage} />
       <Stack.Screen name="Checkout" component={Checkout} />
       <Stack.Screen name="Chat" component={Chat} />
-      <Stack.Screen name="Cart" component={Cart} />
+      {/* <Stack.Screen name="Cart" component={Cart} /> */}
       <Stack.Screen name="Layout" component={Layout} />
       <Stack.Screen name="AllCategories" component={AllCategories} />
       <Stack.Screen name="SubCategories" component={SubCategories} />
       <Stack.Screen name="SearchedProducts" component={SearchedProducts} />
 
       {/* Accounts */}
-      <Stack.Screen name="Account" component={Account} />
+      {/* <Stack.Screen name="Account" component={Account} /> */}
       <Stack.Screen name="LikedProducts" component={LikedProducts} />
       <Stack.Screen name="StoresFollowed" component={StoresFollowed} />
       <Stack.Screen name="DeliveredOrders" component={DeliveredOrders} />

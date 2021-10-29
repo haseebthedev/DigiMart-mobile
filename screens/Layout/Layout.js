@@ -114,6 +114,7 @@ const Layout = ({ navigation }) => {
               style={{
                 width: 75,
                 height: 75,
+                backgroundColor: '#fff',
                 borderRadius: 8,
                 borderWidth: 3,
                 borderColor: '#fff'
@@ -324,11 +325,20 @@ const Layout = ({ navigation }) => {
 
 // For Drawer
 const TabButton = (currentTab, setCurrentTab, title, image, navigation) => {
+  const deletingUserToken = async () => {
+    try {
+      await AsyncStorage.removeItem('@USER_TOKEN');
+    } catch (error) {
+      console.log('ERROR signing out :: ', error);
+    }
+  };
+
   return (
     <TouchableOpacity
       onPress={() => {
         if (title === 'Login') {
           navigation.navigate('Login');
+          deletingUserToken();
         } else {
           setCurrentTab(title);
           navigation.navigate(title);

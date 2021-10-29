@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { FONTS, COLORS } from '../constants';
@@ -17,6 +18,48 @@ import reportProbIcon from '../assets/icons/reportProbIcon.png';
 import settingIcon from '../assets/icons/settingsIcon.png';
 
 const Account = ({ navigation }) => {
+  const [LikedProducts, setLikedProducts] = useState(0);
+  const [StoresFollowed, setStoresFollowed] = useState(0);
+
+  // Counting Liked Products
+  const countLikedProducts = () => {
+    try {
+      AsyncStorage.getItem('@LIKED_PRODUCTS').then((value) => {
+        if (value !== null) {
+          let dArr = JSON.parse(value);
+          setLikedProducts(dArr.length);
+        }
+      });
+    } catch (error) {
+      console.log('ERROR :: ', error);
+    }
+  };
+
+  // Counting Stores Followed
+  const countStoresFollowed = () => {
+    try {
+      AsyncStorage.getItem('@STORES_FOLLOWED').then((value) => {
+        if (value !== null) {
+          let dArr = JSON.parse(value);
+          setStoresFollowed(dArr.length);
+        }
+      });
+    } catch (error) {
+      console.log('ERROR :: ', error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // The screen is focused
+      // Call any action
+      countLikedProducts();
+      countStoresFollowed();
+    });
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       {/* Top Header */}
@@ -40,7 +83,7 @@ const Account = ({ navigation }) => {
               color: 'white'
             }}
           >
-            12
+            {LikedProducts}
           </Text>
           <Text
             style={{
@@ -63,7 +106,7 @@ const Account = ({ navigation }) => {
               color: 'white'
             }}
           >
-            4
+            {StoresFollowed}
           </Text>
           <Text
             style={{

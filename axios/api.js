@@ -7,5 +7,5 @@ export default axios.create({
   and copy the IPv4 Address, and paste it in baseURL.
   */
 
-  baseURL: `http://192.168.10.3:8080`
+  baseURL: `http://192.168.10.2:8080`
 });

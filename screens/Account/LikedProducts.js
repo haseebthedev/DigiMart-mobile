@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   FlatList,
   TouchableNativeFeedback
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
 import deleteIcon from '../../assets/icons/deleteIcon.png';
 import productImage from '../../assets/images/laptop-image.png';
@@ -20,34 +21,21 @@ const { width, height } = Dimensions.get('screen');
 const LikedProducts = ({ navigation }) => {
   const [selectedProduct, setSelectedProduct] = useState();
   const [DeleteProductModal, setDeleteProductModal] = useState(false);
-  const [productList, setproductList] = useState([
-    {
-      id: 1,
-      image: productImage,
-      name: 'HP Laptop 15',
-      Quantity: 7,
-      price: 1280
-    },
-    {
-      id: 2,
-      image: productImage,
-      name: 'HP Laptop 21',
-      Quantity: 2,
-      price: 2120
-    },
-    {
-      id: 3,
-      image: productImage,
-      name: 'HP Laptop 24',
-      Quantity: 4,
-      price: 5400
-    }
-  ]);
+  const [LikedProducts, setLikedProducts] = useState([]);
+
+  const retriveLikedProducts = () => {
+    AsyncStorage.getItem('@LIKED_PRODUCTS').then((value) => {
+      if (value !== null) {
+        setLikedProducts(JSON.parse(value));
+      }
+    });
+  };
 
   // Delete Product from Cart
-  const deleteProduct = () => {
-    let newArr = productList.filter((el) => el.id !== selectedProduct);
-    setproductList(newArr);
+  const deleteProduct = async () => {
+    let newArr = LikedProducts.filter((el) => el._id !== selectedProduct);
+    setLikedProducts(newArr);
+    await AsyncStorage.setItem('@LIKED_PRODUCTS', JSON.stringify(newArr));
   };
 
   // Product Card
@@ -92,7 +80,7 @@ const LikedProducts = ({ navigation }) => {
                 fontSize: FONTS.Paragraph2
               }}
             >
-              Rs. {item.price}
+              Rs. {item.salePrice}
             </Text>
           </View>
         </View>
@@ -109,7 +97,7 @@ const LikedProducts = ({ navigation }) => {
             marginRight: 20
           }}
           onPress={() => {
-            setSelectedProduct(item.id);
+            setSelectedProduct(item._id);
             setDeleteProductModal(true);
           }}
         >
@@ -121,6 +109,10 @@ const LikedProducts = ({ navigation }) => {
       </View>
     );
   };
+
+  useEffect(() => {
+    retriveLikedProducts();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -161,9 +153,9 @@ const LikedProducts = ({ navigation }) => {
 
       {/* Product List */}
       <FlatList
-        data={productList}
+        data={LikedProducts}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
       />
 
       {/* Delete Product Modal */}

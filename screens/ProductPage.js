@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import { RadioButton } from 'react-native-paper';
 import {
   View,
   Text,
@@ -32,9 +33,7 @@ const ProductPage = ({ route, navigation }) => {
   const refRBSheet = useRef();
   const { prodId } = route.params;
   const [token, setToken] = useState('');
-
-  const [SelectedColor, setSelectedColor] = useState('red');
-  const [Quantity, setQuantity] = useState(1);
+  const [IsLikedProduct, setIsLikedProduct] = useState(false);
   const [ProductDetails, setProductDetails] = useState({
     _id: '6133d94c010d5e2cc84487db',
     name: 'HP Laptop',
@@ -44,8 +43,8 @@ const ProductPage = ({ route, navigation }) => {
     isOnSale: false,
     discountPercentage: null,
     warranty: '2 year',
-    images: ['https://source.unsplash.com/1024x768/?laptop'],
-    colors: ['Green', 'Black', 'Purple'],
+    images: [imageNotAvailable],
+    colors: ['green', 'black', 'purple'],
     isVisibilityEnabled: true,
     isAuthenticVendorProduct: false,
     vendorCompanyName: 'Other',
@@ -66,6 +65,9 @@ const ProductPage = ({ route, navigation }) => {
     createdAt: '2021-09-04T20:38:36.583Z',
     updatedAt: '2021-10-05T20:34:26.762Z'
   });
+
+  const [SelectedColor, setSelectedColor] = useState('red');
+  const [Quantity, setQuantity] = useState(1);
   const [Reviews, setReviews] = useState([]);
 
   const retriveUserToken = async () => {
@@ -76,6 +78,61 @@ const ProductPage = ({ route, navigation }) => {
       }
     } catch (e) {
       console.log('Error :: Retriving token failed :: ', e);
+    }
+  };
+
+  const addProductInLiked = async (product) => {
+    try {
+      // Delete here
+      if (IsLikedProduct === true) {
+        AsyncStorage.getItem('@LIKED_PRODUCTS').then(async (value) => {
+          if (value !== null) {
+            let dArr = JSON.parse(value);
+            let newArr = dArr.filter((el) => el._id !== product._id);
+            await AsyncStorage.setItem(
+              '@LIKED_PRODUCTS',
+              JSON.stringify(newArr)
+            );
+            setIsLikedProduct(false);
+          }
+        });
+      }
+      // Add here
+      else {
+        AsyncStorage.getItem('@LIKED_PRODUCTS').then(async (value) => {
+          if (value !== null) {
+            let dArr = JSON.parse(value);
+            dArr.push(product);
+            await AsyncStorage.setItem('@LIKED_PRODUCTS', JSON.stringify(dArr));
+            setIsLikedProduct(true);
+          } else {
+            let newArr = [];
+            newArr.push(product);
+            await AsyncStorage.setItem(
+              '@LIKED_PRODUCTS',
+              JSON.stringify(newArr)
+            );
+            setIsLikedProduct(true);
+          }
+        });
+      }
+    } catch (e) {
+      console.log('Error :: Saving Product failed :: ', e);
+    }
+  };
+
+  const checkLikedStatus = async () => {
+    let value = await AsyncStorage.getItem('@LIKED_PRODUCTS');
+    if (value !== null) {
+      let dArr = JSON.parse(value);
+      let status = false;
+      for (let i = 0; i < dArr.length; i++) {
+        if (dArr[i]._id === ProductDetails._id) {
+          status = true;
+          break;
+        }
+      }
+      setIsLikedProduct(status);
     }
   };
 
@@ -90,14 +147,20 @@ const ProductPage = ({ route, navigation }) => {
       .catch((error) => console.log('ERROR: Fetching Product Details!'));
   };
 
-  // Token
-  useEffect(() => {
-    retriveUserToken();
-  }, []);
-
   useEffect(() => {
     getProductsDetailsById();
   }, [token]);
+
+  // Product Liked Status
+  useEffect(() => {
+    checkLikedStatus();
+  });
+
+  // Token
+  useEffect(() => {
+    retriveUserToken();
+    checkLikedStatus();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -144,13 +207,10 @@ const ProductPage = ({ route, navigation }) => {
 
             {/* Like Button */}
             <TouchableNativeFeedback
-              onPress={() =>
-                ToastAndroid.show(
-                  'You liked this Product!',
-                  ToastAndroid.SHORT,
-                  ToastAndroid.BOTTOM
-                )
-              }
+              onPress={() => {
+                addProductInLiked(ProductDetails);
+                setIsLikedProduct(!IsLikedProduct);
+              }}
             >
               <View
                 style={{
@@ -165,7 +225,12 @@ const ProductPage = ({ route, navigation }) => {
                   right: 20
                 }}
               >
-                <Image source={emptyHeartIcon} style={styles.likeButton} />
+                <Image
+                  source={
+                    IsLikedProduct === true ? FilledHeartIcon : emptyHeartIcon
+                  }
+                  style={styles.likeButton}
+                />
               </View>
             </TouchableNativeFeedback>
           </View>
@@ -492,32 +557,45 @@ const ProductPage = ({ route, navigation }) => {
               {ProductDetails.colors.map((el, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={[
-                    {
-                      width: 32,
-                      height: 32,
-                      backgroundColor: el,
-                      borderRadius: 20,
-                      margin: 8,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: 0.4
-                    }
-                  ]}
-                  onPress={() => setSelectedColor(el)}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    backgroundColor: el.toLowerCase(),
+                    borderRadius: 20,
+                    margin: 8,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    opacity: 1
+                  }}
+                  onPress={() => setSelectedColor(el.toLowerCase())}
                 >
                   <View
-                    style={[
-                      {
-                        width: 25,
-                        height: 25,
-                        opacity: 0.6,
-                        backgroundColor: el,
-                        borderRadius: 15
-                      },
-                      SelectedColor === el ? { opacity: 1 } : { opacity: 0 }
-                    ]}
-                  ></View>
+                    style={{
+                      width: 28,
+                      height: 28,
+                      backgroundColor: '#fff',
+                      borderRadius: 20,
+
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: 1
+                    }}
+                  >
+                    <View
+                      style={[
+                        {
+                          width: 22,
+                          height: 22,
+                          opacity: 0.6,
+                          backgroundColor: el.toLowerCase(),
+                          borderRadius: 15
+                        },
+                        SelectedColor == el.toLowerCase()
+                          ? { opacity: 1 }
+                          : { opacity: 0 }
+                      ]}
+                    ></View>
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>

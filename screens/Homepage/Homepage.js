@@ -601,7 +601,9 @@ const Homepage = ({ navigation }) => {
               <TouchableOpacity
                 key={el._id}
                 style={[styles.productCard, ApplyMargin(index)]}
-                onPress={() => navigation.navigate('ProductPage')}
+                onPress={() =>
+                  navigation.navigate('ProductPage', { prodId: el._id })
+                }
               >
                 <View style={{ alignItems: 'center' }}>
                   <Image
