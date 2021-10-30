@@ -1,22 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  Dimensions,
   TouchableNativeFeedback,
   TouchableOpacity,
   TextInput
 } from 'react-native';
-import { FONTS, COLORS, IMAGES } from '../../../constants/index';
+import api from '../../../axios/api';
+import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import backIcon from '../../../assets/icons/backIcon.png';
+import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import reportProblemImage from '../../../assets/images/reportProblemImage.png';
-const { width, height } = Dimensions.get('screen');
 
 const ReportProblem = ({ navigation }) => {
+  const [token, setToken] = useState('');
+  const [subject, SetSubject] = useState('');
+  const [description, SetDescription] = useState('');
+
+  const retriveToken = () => {
+    try {
+      AsyncStorage.getItem('@USER_TOKEN').then((value) => {
+        if (value !== null) {
+          setToken(value);
+        }
+      });
+    } catch (e) {
+      console.log('Error :: Retriving token failed :: ', e);
+    }
+  };
+
+  useEffect(() => {
+    retriveToken();
+  }, []);
+
+  const sendReport = async () => {
+    await api
+      .post(
+        '/buyer/reportProblem',
+        {
+          subject,
+          description,
+          screenShot: ''
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      .then((res) => {
+        Toast.show({
+          type: 'success',
+          text1: 'SUCCESS!',
+          text2: 'Your report has been sent!',
+          onShow: () => {
+            SetSubject('');
+            SetDescription('');
+          }
+        });
+      })
+      .catch((error) => console.log('ERROR: Reporting Problem failed.'));
+  };
+
   return (
     <View style={styles.container}>
+      <Toast ref={(ref) => Toast.setRef(ref)} />
       <Text
         style={{
           fontFamily: FONTS.PoppinsBold,
@@ -24,7 +73,8 @@ const ReportProblem = ({ navigation }) => {
           color: '#407BFF',
           marginTop: 20,
           textAlign: 'center',
-          marginBottom: 30
+          marginBottom: 30,
+          zIndex: -1
         }}
       >
         REPORT A PROBLEM
@@ -42,7 +92,8 @@ const ReportProblem = ({ navigation }) => {
             borderRadius: 15,
             position: 'absolute',
             top: 20,
-            left: 20
+            left: 20,
+            zIndex: -1
           }}
         >
           <Image
@@ -66,11 +117,18 @@ const ReportProblem = ({ navigation }) => {
             Share the details with us!
           </Text>
         </View>
-        <TextInput placeholder="Subject" style={styles.inputField} />
+        <TextInput
+          placeholder="Subject"
+          style={styles.inputField}
+          onChangeText={(text) => SetSubject(text)}
+          value={subject}
+        />
         <TextInput
           placeholder="Description"
           multiline
           style={styles.inputField}
+          onChangeText={(text) => SetDescription(text)}
+          value={description}
         />
         <View
           style={{
@@ -100,7 +158,7 @@ const ReportProblem = ({ navigation }) => {
             Upload Image / Screenshot
           </Text>
         </View>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={sendReport}>
           <Text style={styles.loginButton}>SEND</Text>
         </TouchableOpacity>
       </View>

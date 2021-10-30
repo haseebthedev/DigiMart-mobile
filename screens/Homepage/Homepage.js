@@ -41,59 +41,44 @@ function ApplyMargin(index) {
   return margin;
 }
 
+function trimProdName(name) {
+  let res = '';
+  if (name.length > 14) {
+    res = name.toString().substring(0, 13) + '...';
+  } else {
+    res = name;
+  }
+  return res;
+}
+
 const { width, height } = Dimensions.get('window');
 
 const Homepage = ({ navigation }) => {
-  const [token, setToken] = useState('');
-  const [BannerImages, setBannerImages] = useState([]);
+  const [BannerImages, setBannerImages] = useState([
+    'https://source.unsplash.com/1024x768/?laptop',
+    'https://source.unsplash.com/1024x768/?mobile',
+    'https://source.unsplash.com/1024x768/?technology',
+    'https://source.unsplash.com/1024x768/?macbook',
+    'https://source.unsplash.com/1024x768/?engineer',
+    'https://source.unsplash.com/1024x768/?ecommerce'
+  ]);
   const [ProductsOnSale, setProductsOnSale] = useState([]);
+  const [TopReviewedProducts, setTopReviewedProducts] = useState([]);
 
-  const retriveUserToken = async () => {
-    try {
-      let value = await AsyncStorage.getItem('@USER_TOKEN');
-      if (value !== null) {
-        setToken(value);
-      }
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
-  };
-
-  const getProductsOnSale = async () => {
+  const retriveProducts = async () => {
     await api
       .get('/')
       .then((res) => {
         setProductsOnSale(res.data.data.ProductsOnSale);
+        setTopReviewedProducts(res.data.data.TopReviewedProducts);
       })
       .catch((error) =>
         console.log('ERROR: ' + JSON.stringify(error.response.data.error))
       );
   };
 
-  function trimProdName(name) {
-    let res = '';
-    if (name.length > 14) {
-      res = name.toString().substring(0, 15) + '...';
-    } else {
-      res = name;
-    }
-    return res;
-  }
-
-  // Token and Product List from DB
   useEffect(() => {
-    retriveUserToken();
-
-    const images = [
-      'https://source.unsplash.com/1024x768/?laptop',
-      'https://source.unsplash.com/1024x768/?mobile',
-      'https://source.unsplash.com/1024x768/?technology',
-      'https://source.unsplash.com/1024x768/?macbook',
-      'https://source.unsplash.com/1024x768/?engineer',
-      'https://source.unsplash.com/1024x768/?ecommerce'
-    ];
-    setBannerImages(images);
-    getProductsOnSale();
+    retriveProducts();
   }, []);
 
   return (
@@ -167,7 +152,7 @@ const Homepage = ({ navigation }) => {
 
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate('SearchedProducts', { type: 'TopSelling' })
+            navigation.navigate('SearchedProducts', { type: 'topSelling' })
           }
           style={{ justifyContent: 'center', alignItems: 'center' }}
         >
@@ -197,7 +182,7 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', { type: 'TopRated' })
+            navigation.navigate('SearchedProducts', { type: 'topReviewed' })
           }
         >
           <View
@@ -226,7 +211,7 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', { type: 'NewArrival' })
+            navigation.navigate('SearchedProducts', { type: 'newArrival' })
           }
         >
           <View
@@ -255,7 +240,7 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', { type: 'LowCost' })
+            navigation.navigate('SearchedProducts', { type: 'lowCost' })
           }
         >
           <View
@@ -294,7 +279,10 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', { type: 'Tech' })
+            navigation.navigate('SearchedProducts', {
+              type: 'Category',
+              params: 'Tech'
+            })
           }
         >
           <View
@@ -323,7 +311,10 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', { type: 'Music' })
+            navigation.navigate('SearchedProducts', {
+              type: 'Category',
+              params: 'Music'
+            })
           }
         >
           <View
@@ -355,7 +346,10 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', { type: 'Households' })
+            navigation.navigate('SearchedProducts', {
+              type: 'Category',
+              params: 'Households'
+            })
           }
         >
           <View
@@ -387,7 +381,10 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', { type: 'Fashion' })
+            navigation.navigate('SearchedProducts', {
+              type: 'Category',
+              params: 'Fashion'
+            })
           }
         >
           <View
@@ -416,7 +413,10 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', { type: 'Sports' })
+            navigation.navigate('SearchedProducts', {
+              type: 'Category',
+              params: 'Sports'
+            })
           }
         >
           <View
@@ -443,7 +443,7 @@ const Homepage = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* PRODUCTS DEALS  */}
+      {/* HOT DEALS  */}
       <View>
         <View
           style={{
@@ -459,7 +459,7 @@ const Homepage = ({ navigation }) => {
           </Text>
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate('SearchedProducts', { type: 'Hot Deals' })
+              navigation.navigate('SearchedProducts', { type: 'topSelling' })
             }
           >
             <Text
@@ -495,11 +495,7 @@ const Homepage = ({ navigation }) => {
             >
               <View style={{ alignItems: 'center' }}>
                 <Image
-                  source={
-                    el.images.length > 0
-                      ? { uri: el.images[0] }
-                      : imageNotAvailable
-                  }
+                  source={{ uri: el.images }}
                   style={{ width: 90, height: 90, marginVertical: 10 }}
                 />
               </View>
@@ -524,9 +520,7 @@ const Homepage = ({ navigation }) => {
                     marginLeft: 4
                   }}
                 >
-                  {el.reviews.length > 0
-                    ? '(' + el.reviews.length + ')'
-                    : '(' + 0 + ')'}
+                  {'(' + el.totalRatingStars + ')'}
                 </Text>
               </View>
               <View
@@ -537,9 +531,7 @@ const Homepage = ({ navigation }) => {
                   paddingBottom: 10
                 }}
               >
-                <Text style={styles.productPrice}>
-                  {'Rs. ' + el.discountPrice}
-                </Text>
+                <Text style={styles.productPrice}>{'Rs. ' + el.salePrice}</Text>
                 <TouchableOpacity>
                   <Image
                     source={addIcon}
@@ -574,21 +566,35 @@ const Homepage = ({ navigation }) => {
         />
       </View>
 
-      {/* PRODUCTS DEALS  */}
+      {/* TOP REVIEWED  */}
       <View>
         <View
           style={{
-            marginTop: 10,
-            marginBottom: 10,
+            marginVertical: 20,
             paddingHorizontal: 20,
             flexDirection: 'row',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             alignItems: 'center'
           }}
         >
           <Text style={{ fontFamily: FONTS.PoppinsBold, fontSize: 20 }}>
             Top Reviewed
           </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('SearchedProducts', { type: 'topReviewed' })
+            }
+          >
+            <Text
+              style={{
+                fontFamily: FONTS.Poppins,
+                color: '#407BFF',
+                paddingVertical: 6
+              }}
+            >
+              View All
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Newly Added Product List */}
@@ -597,7 +603,7 @@ const Homepage = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 20 }}
         >
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-            {ProductsOnSale.map((el, index) => (
+            {TopReviewedProducts.map((el, index) => (
               <TouchableOpacity
                 key={el._id}
                 style={[styles.productCard, ApplyMargin(index)]}
@@ -607,11 +613,7 @@ const Homepage = ({ navigation }) => {
               >
                 <View style={{ alignItems: 'center' }}>
                   <Image
-                    source={
-                      el.images.length > 0
-                        ? { uri: el.images[0] }
-                        : imageNotAvailable
-                    }
+                    source={{ uri: el.images }}
                     style={{ width: 90, height: 90, marginVertical: 10 }}
                   />
                 </View>
@@ -636,9 +638,7 @@ const Homepage = ({ navigation }) => {
                       marginLeft: 4
                     }}
                   >
-                    {el.reviews.length > 0
-                      ? '(' + el.reviews.length + ')'
-                      : '(' + 0 + ')'}
+                    {'(' + el.totalRatingStars + ')'}
                   </Text>
                 </View>
                 <View
@@ -650,7 +650,7 @@ const Homepage = ({ navigation }) => {
                   }}
                 >
                   <Text style={styles.productPrice}>
-                    {'Rs. ' + el.discountPrice}
+                    {'Rs. ' + el.salePrice}
                   </Text>
                   <TouchableOpacity>
                     <Image

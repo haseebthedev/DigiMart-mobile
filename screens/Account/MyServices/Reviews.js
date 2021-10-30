@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,13 @@ import {
   Dimensions,
   TouchableNativeFeedback,
   TouchableOpacity,
-  FlatList
+  Modal,
+  ScrollView
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Rating } from 'react-native-ratings';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
+import api from '../../../axios/api';
 import backIcon from '../../../assets/icons/backIcon.png';
 import editIcon from '../../../assets/icons/editIcon.png';
 import deleteIcon from '../../../assets/icons/deleteIcon.png';
@@ -18,160 +21,67 @@ import productImage from '../../../assets/images/laptop-image.png';
 
 const { width, height } = Dimensions.get('screen');
 
+function trimName(name) {
+  let res = '';
+  if (name.length > 16) {
+    res = name.toString().substring(0, 10) + '...';
+  } else {
+    res = name;
+  }
+  return res;
+}
+
 const Reviews = ({ navigation }) => {
-  const [reviewsList, setReviewsList] = useState([
-    {
-      _id: '611a49afa097252998d7ab4f',
-      pictures: [],
-      productName: 'HP Laptop',
-      storeName: 'Google PK',
-      comment: 'The product was average.',
-      rating: 2.6,
-      response: 'LOL!'
-    },
-    {
-      _id: '612a49afa097252998d7ab9f',
-      pictures: [],
-      productName: 'Dell Mouse',
-      storeName: 'Realme Store',
-      comment:
-        'The product was not good. Actually my product was broken. Actually my product was broken.',
-      rating: 4.3,
-      response: 'Thank You!'
+  const [token, setToken] = useState('');
+  const [reviewsList, setReviewsList] = useState([]);
+  const [selectedReview, setselectedReview] = useState();
+  const [DeleteReviewModal, setDeleteReviewModal] = useState(false);
+
+  const retriveToken = () => {
+    try {
+      AsyncStorage.getItem('@USER_TOKEN').then((value) => {
+        if (value !== null) {
+          setToken(value);
+        }
+      });
+    } catch (e) {
+      console.log('Error :: Retriving token failed :: ', e);
     }
-  ]);
+  };
 
-  // Review Card
-  const renderItem = ({ item }) => {
-    return (
-      <View
-        style={{
-          marginTop: 10,
-          marginHorizontal: 20,
-          width: width - 40,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: '#fff',
-          borderRadius: 4,
-          overflow: 'hidden'
-        }}
-        elevation={1}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingVertical: 10
-          }}
-        >
-          <View style={{ padding: 10 }}>
-            <Image
-              source={productImage}
-              style={{ width: 50, height: 50, margin: 8 }}
-            />
-          </View>
-          <View style={{ marginLeft: 10 }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center'
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: FONTS.PoppinsBold,
-                  fontSize: FONTS.Paragraph2
-                }}
-              >
-                {item.productName}
-              </Text>
-              <Text
-                style={{
-                  fontFamily: FONTS.Poppins,
-                  fontSize: FONTS.Paragraph4,
-                  color: 'grey',
-                  marginLeft: 8
-                }}
-              >
-                27-OCT-2021
-              </Text>
-            </View>
+  const retriveReviews = async () => {
+    await api
+      .get('/buyer/reviews/view', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        setReviewsList(res.data.data.reviews);
+      })
+      .catch((error) => console.log('ERROR: Fetching reviews failed.'));
+  };
 
-            <View style={{ width: 160 }}>
-              <Text
-                style={{
-                  fontFamily: FONTS.Poppins,
-                  fontSize: FONTS.Paragraph3,
-                  textAlign: 'justify'
-                }}
-              >
-                {item.comment}
-              </Text>
-            </View>
-            <View
-              style={{
-                marginVertical: 5,
-                alignItems: 'flex-start'
-              }}
-            >
-              <Rating
-                readonly={true}
-                ratingColor="#3498db"
-                ratingBackgroundColor="#c8c7c8"
-                startingValue={item.rating}
-                imageSize={14}
-              />
-            </View>
-          </View>
-        </View>
+  useEffect(() => {
+    retriveToken();
+  }, []);
 
-        {/* Buttons */}
-        <View>
-          {/* Edit Icon */}
-          <TouchableOpacity
-            style={{
-              width: 30,
-              height: 30,
-              backgroundColor: '#407BFF',
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 15,
-              marginRight: 20,
-              marginBottom: 5
-            }}
-          >
-            <Image
-              source={editIcon}
-              style={{ width: 15, height: 15, tintColor: '#FFF' }}
-            />
-          </TouchableOpacity>
-          {/* Delete Icon */}
-          <TouchableOpacity
-            style={{
-              width: 30,
-              height: 30,
-              backgroundColor: '#407BFF',
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 15,
-              marginRight: 20,
+  useEffect(() => {
+    retriveReviews();
+  }, [token]);
 
-              marginTop: 5
-            }}
-          >
-            <Image
-              source={deleteIcon}
-              style={{ width: 20, height: 20, tintColor: '#FFF' }}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+  const deleteReview = async () => {
+    await api
+      .delete(`/buyer/product/review/${selectedReview}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        let newRevs = reviewsList.filter((el) => el._id !== selectedReview);
+        setReviewsList(newRevs);
+      })
+      .catch((error) => console.log('ERROR: Deleting review failed.'));
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text
         style={{
           fontFamily: FONTS.PoppinsBold,
@@ -208,14 +118,237 @@ const Reviews = ({ navigation }) => {
       </TouchableNativeFeedback>
 
       {/* Reviews List */}
-      <View>
-        <FlatList
-          data={reviewsList}
-          renderItem={renderItem}
-          keyExtractor={(item) => Math.random() * 0.43}
-        />
+      <View style={{ marginBottom: 20 }}>
+        {reviewsList.map((item) => {
+          return (
+            <View
+              style={{
+                marginTop: 10,
+                marginHorizontal: 20,
+                width: width - 40,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: '#fff',
+                borderRadius: 4,
+                overflow: 'hidden'
+              }}
+              elevation={1}
+              key={item._id}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingVertical: 10
+                }}
+              >
+                <View style={{ padding: 10 }}>
+                  <Image
+                    source={productImage}
+                    style={{ width: 50, height: 50, margin: 8 }}
+                  />
+                </View>
+                <View style={{ marginLeft: 10 }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: FONTS.PoppinsBold,
+                        fontSize: FONTS.Paragraph2
+                      }}
+                    >
+                      {trimName(item.productName)}
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.Poppins,
+                        fontSize: FONTS.Paragraph4,
+                        color: 'grey',
+                        marginLeft: 8
+                      }}
+                    >
+                      27-OCT-2021
+                    </Text>
+                  </View>
+
+                  <View style={{ width: 160 }}>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.Poppins,
+                        fontSize: FONTS.Paragraph3,
+                        textAlign: 'justify'
+                      }}
+                    >
+                      {item.comment}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      marginVertical: 5,
+                      alignItems: 'flex-start'
+                    }}
+                  >
+                    <Rating
+                      readonly={true}
+                      ratingColor="#3498db"
+                      ratingBackgroundColor="#c8c7c8"
+                      startingValue={item.rating}
+                      imageSize={14}
+                    />
+                  </View>
+                </View>
+              </View>
+
+              {/* Buttons */}
+              <View>
+                {/* Edit Icon */}
+                <TouchableOpacity
+                  style={{
+                    width: 30,
+                    height: 30,
+                    backgroundColor: '#407BFF',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 15,
+                    marginRight: 20,
+                    marginBottom: 5
+                  }}
+                >
+                  <Image
+                    source={editIcon}
+                    style={{ width: 15, height: 15, tintColor: '#FFF' }}
+                  />
+                </TouchableOpacity>
+                {/* Delete Icon */}
+                <TouchableOpacity
+                  style={{
+                    width: 30,
+                    height: 30,
+                    backgroundColor: '#407BFF',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 15,
+                    marginRight: 20,
+
+                    marginTop: 5
+                  }}
+                  onPress={() => {
+                    setselectedReview(item._id);
+                    setDeleteReviewModal(true);
+                  }}
+                >
+                  <Image
+                    source={deleteIcon}
+                    style={{ width: 20, height: 20, tintColor: '#FFF' }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })}
       </View>
-    </View>
+
+      {/* Delete Product Modal */}
+      <Modal
+        transparent={true}
+        animationType={'fade'}
+        visible={DeleteReviewModal}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: '#fff',
+              width: width * 0.8,
+              padding: 30,
+              elevation: 10,
+              alignItems: 'center'
+            }}
+          >
+            <Image
+              source={deleteIcon}
+              style={{
+                width: 60,
+                height: 60,
+                tintColor: 'red',
+                marginBottom: 30
+              }}
+            />
+            <Text
+              style={{
+                fontFamily: FONTS.PoppinsBold,
+                fontSize: FONTS.Paragraph1,
+                marginBottom: 10
+              }}
+            >
+              Are You Sure?
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.Poppins,
+                fontSize: FONTS.Paragraph2,
+                textAlign: 'center',
+                color: 'grey'
+              }}
+            >
+              This will delete the review from the product page!
+            </Text>
+            <View style={{ flexDirection: 'row', marginTop: 30 }}>
+              <TouchableOpacity
+                style={{
+                  paddingHorizontal: 15,
+                  paddingVertical: 10,
+                  marginRight: 5
+                }}
+                onPress={() => setDeleteReviewModal(false)}
+              >
+                <Text
+                  style={{
+                    fontFamily: FONTS.Poppins,
+                    fontSize: FONTS.Paragraph2
+                  }}
+                >
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  paddingHorizontal: 15,
+                  paddingVertical: 10,
+                  backgroundColor: 'red',
+                  borderRadius: 4,
+                  marginLeft: 5
+                }}
+                onPress={() => {
+                  deleteReview();
+                  setDeleteReviewModal(false);
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: FONTS.Poppins,
+                    fontSize: FONTS.Paragraph2,
+                    color: '#fff'
+                  }}
+                >
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
   );
 };
 

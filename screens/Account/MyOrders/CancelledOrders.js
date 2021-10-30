@@ -145,7 +145,7 @@ const CancelledOrders = ({ navigation }) => {
                   style={{
                     fontFamily: FONTS.PoppinsBold,
                     fontSize: 12,
-                    color: 'green'
+                    color: '#ff0a0a'
                   }}
                 >
                   {el.status}

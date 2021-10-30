@@ -13,10 +13,20 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
 import deleteIcon from '../../assets/icons/deleteIcon.png';
-import productImage from '../../assets/images/laptop-image.png';
+import imageNotAvailable from '../../assets/images/imageNotAvailable.png';
 import backIcon from '../../assets/icons/backIcon.png';
 
 const { width, height } = Dimensions.get('screen');
+
+function trimProdName(name) {
+  let res = '';
+  if (name.length > 16) {
+    res = name.toString().substring(0, 16) + '...';
+  } else {
+    res = name;
+  }
+  return res;
+}
 
 const LikedProducts = ({ navigation }) => {
   const [selectedProduct, setSelectedProduct] = useState();
@@ -41,7 +51,7 @@ const LikedProducts = ({ navigation }) => {
   // Product Card
   const renderItem = ({ item }) => {
     return (
-      <View
+      <TouchableOpacity
         style={{
           marginTop: 10,
           marginHorizontal: 20,
@@ -53,13 +63,17 @@ const LikedProducts = ({ navigation }) => {
           borderRadius: 4,
           overflow: 'hidden'
         }}
-        elevation={1}
+        onPress={() => navigation.navigate('ProductPage', { prodId: item._id })}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {/* Product Image */}
           <View style={{ padding: 10 }}>
             <Image
-              source={productImage}
+              source={
+                item.images.length > 0
+                  ? { uri: item.images[0] }
+                  : imageNotAvailable
+              }
               style={{ width: 50, height: 50, margin: 8 }}
             />
           </View>
@@ -72,7 +86,7 @@ const LikedProducts = ({ navigation }) => {
                 fontSize: FONTS.Paragraph2
               }}
             >
-              {item.name}
+              {trimProdName(item.name)}
             </Text>
             <Text
               style={{
@@ -106,7 +120,7 @@ const LikedProducts = ({ navigation }) => {
             style={{ width: 20, height: 20, tintColor: '#FFF' }}
           />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   };
 

@@ -145,7 +145,7 @@ const ActiveOrders = ({ navigation }) => {
                   style={{
                     fontFamily: FONTS.PoppinsBold,
                     fontSize: 12,
-                    color: 'green'
+                    color: '#1786dd'
                   }}
                 >
                   {el.status}

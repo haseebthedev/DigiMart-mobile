@@ -145,7 +145,7 @@ const PendingOrders = ({ navigation }) => {
                   style={{
                     fontFamily: FONTS.PoppinsBold,
                     fontSize: 12,
-                    color: 'green'
+                    color: '#775DD0'
                   }}
                 >
                   {el.status}

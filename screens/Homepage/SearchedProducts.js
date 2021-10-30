@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,67 +9,84 @@ import {
   TouchableNativeFeedback
 } from 'react-native';
 import api from '../../axios/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Rating } from 'react-native-ratings';
 import { FONTS } from '../../constants/index';
-import laptopImage from '../../assets/images/laptop-image.png';
+import imageNotAvailable from '../../assets/images/imageNotAvailable.png';
 import addIcon from '../../assets/icons/addIcon.png';
 import backIcon from '../../assets/icons/backIcon.png';
 import Toast from 'react-native-toast-message';
 
-const SearchedProducts = ({ route, navigation }) => {
-  const { type } = route.params;
+// Calculate margin for product cards
+function ApplyMargin(index) {
+  let margin = { marginRight: 0, marginBottom: 0 };
+  margin =
+    index % 2 === 0
+      ? { marginRight: 5, marginBottom: 10 }
+      : { marginLeft: 5, marginBottom: 10 };
+  return margin;
+}
 
-  const [ProductList] = useState([
-    {
-      id: 1,
-      name: 'HP Laptop 15',
-      price: '100',
-      colors: '2 Colors',
-      ratings: 4.6,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 2,
-      name: 'HP Laptop',
-      price: '230',
-      colors: '5 Colors',
-      ratings: 2,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 3,
-      name: 'HP Laptop',
-      price: '340',
-      colors: '12 Colors',
-      ratings: 5,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 4,
-      name: 'HP Laptop',
-      price: '500',
-      colors: '9 Colors',
-      ratings: 4,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 5,
-      name: 'HP Laptop',
-      price: '6000',
-      colors: '4 Colors',
-      ratings: 3.5,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 6,
-      name: 'HP Laptop',
-      price: '2300',
-      colors: '12 Colors',
-      ratings: 2,
-      image: require('../../assets/images/laptop-image.png')
+function trimProdName(name) {
+  let res = '';
+  if (name.length > 14) {
+    res = name.toString().substring(0, 13) + '...';
+  } else {
+    res = name;
+  }
+  return res;
+}
+
+const SearchedProducts = ({ route, navigation }) => {
+  const { type, params } = route.params;
+
+  const [Heading, setHeading] = useState('');
+  const [ProductList, setProductList] = useState([]);
+
+  const getProducts = async () => {
+    let reqURL = '';
+
+    if (type === 'subCategory') {
+      reqURL = `/buyer/products/subCategory/${params}`;
+      setHeading('Searched term: ' + params);
+    } else if (type === 'topSelling') {
+      reqURL = '/buyer/products/onSale';
+      setHeading('Searched term: Top Selling');
+    } else if (type === 'topReviewed') {
+      reqURL = '/buyer/products/topReviewed';
+      setHeading('Searched term: Top Rated');
+    } else if (type === 'newArrival') {
+      reqURL = '/buyer/products/newArrival';
+      setHeading('Searched term: New Arrival');
+    } else if (type === 'lowCost') {
+      reqURL = '/buyer/products';
+      setHeading('Searched term: Low Cost');
+    } else if (type === 'Category') {
+      reqURL = `/buyer/products/category/${params}`;
+      setHeading('Searched term: ' + params);
     }
-  ]);
+
+    await api
+      .get(reqURL)
+      .then((res) => {
+        let products = res.data.data.products;
+        if (type === 'lowCost') {
+          products.sort((a, b) => a.salePrice - b.salePrice);
+        }
+        if (type === 'newArrival') {
+          products.sort((a, b) => {
+            var dateA = new Date(a.createdAt),
+              dateB = new Date(b.createdAt);
+            return dateB - dateA;
+          });
+        }
+        setProductList(products);
+      })
+      .catch((error) => console.log('ERROR :: ', error));
+  };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   return (
     <ScrollView>
@@ -118,7 +135,7 @@ const SearchedProducts = ({ route, navigation }) => {
         }}
       >
         <Text style={{ fontFamily: FONTS.PoppinsBold, fontSize: 14 }}>
-          Products: {type}
+          {Heading}
         </Text>
       </View>
 
@@ -132,78 +149,67 @@ const SearchedProducts = ({ route, navigation }) => {
           marginBottom: 20
         }}
       >
-        {ProductList.map((el, index) => {
-          return (
-            <View
-              style={{
-                width: '48%',
-                height: 200
-              }}
-              key={index}
+        {ProductList.length > 0 &&
+          ProductList.map((el, index) => (
+            <TouchableOpacity
+              key={el._id}
+              style={[styles.productCard, ApplyMargin(index)]}
+              onPress={() =>
+                navigation.navigate('ProductPage', { prodId: el._id })
+              }
             >
+              <View style={{ alignItems: 'center' }}>
+                <Image
+                  source={{ uri: el.images }}
+                  style={{ width: 90, height: 90, marginVertical: 10 }}
+                />
+              </View>
+              <Text style={styles.productName}>{trimProdName(el.name)}</Text>
               <View
                 style={{
-                  height: 190,
-                  elevation: 1,
-                  paddingHorizontal: 10,
-                  backgroundColor: '#fff',
-                  borderRadius: 6
+                  alignItems: 'center',
+                  flexDirection: 'row'
                 }}
               >
-                <View style={{ alignItems: 'center' }}>
-                  <Image
-                    source={laptopImage}
-                    style={{ width: 110, height: 110 }}
-                  />
-                </View>
-                <Text style={styles.productName}>HP Laptip</Text>
-                <View
+                <Rating
+                  readonly={true}
+                  ratingColor="#3498db"
+                  ratingBackgroundColor="#c8c7c8"
+                  startingValue={el.avgRating}
+                  imageSize={12}
+                />
+                <Text
                   style={{
-                    alignItems: 'center',
-                    flexDirection: 'row'
+                    fontFamily: FONTS.Poppins,
+                    fontSize: 10,
+                    marginLeft: 4
                   }}
                 >
-                  <Rating
-                    readonly={true}
-                    ratingColor="#3498db"
-                    ratingBackgroundColor="#c8c7c8"
-                    startingValue={3}
-                    imageSize={12}
-                  />
-                  <Text
-                    style={{
-                      fontFamily: FONTS.Poppins,
-                      fontSize: 10,
-                      marginLeft: 4
-                    }}
-                  >
-                    {'(' + '235' + ')'}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    paddingBottom: 10
-                  }}
-                >
-                  <Text style={styles.productPrice}>{'Rs. ' + '145'}</Text>
-                  <TouchableOpacity>
-                    <Image
-                      source={addIcon}
-                      style={{
-                        width: 30,
-                        height: 30,
-                        tintColor: '#407BFF'
-                      }}
-                    />
-                  </TouchableOpacity>
-                </View>
+                  {'(' + el.totalRatingStars + ')'}
+                </Text>
               </View>
-            </View>
-          );
-        })}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: 10
+                }}
+              >
+                <Text style={styles.productPrice}>{'Rs. ' + el.salePrice}</Text>
+                <TouchableOpacity>
+                  <Image
+                    source={addIcon}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      tintColor: '#407BFF'
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          ))}
       </View>
     </ScrollView>
   );

@@ -98,7 +98,16 @@ const SubCategories = ({ route, navigation }) => {
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
         {productCategories.map((el, index) => {
           return (
-            <TouchableOpacity key={index} style={{ marginVertical: 5 }}>
+            <TouchableOpacity
+              key={index}
+              style={{ marginVertical: 5 }}
+              onPress={() =>
+                navigation.navigate('SearchedProducts', {
+                  type: 'subCategory',
+                  params: el
+                })
+              }
+            >
               <View
                 style={{
                   paddingVertical: 20,

@@ -145,7 +145,7 @@ const ReturnedOrders = ({ navigation }) => {
                   style={{
                     fontFamily: FONTS.PoppinsBold,
                     fontSize: 12,
-                    color: 'green'
+                    color: '#ff4c00'
                   }}
                 >
                   {el.status}

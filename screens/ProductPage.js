@@ -12,69 +12,78 @@ import {
   ToastAndroid,
   ScrollView
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SliderBox } from 'react-native-image-slider-box';
-import { Rating } from 'react-native-ratings';
 import api from '../axios/api';
-// Icons
+import { FONTS, COLORS } from '../constants';
+import { Rating } from 'react-native-ratings';
+import { SliderBox } from 'react-native-image-slider-box';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import backIcon from '../assets/icons/backIcon.png';
 import emptyHeartIcon from '../assets/icons/emptyHeartIcon.png';
 import FilledHeartIcon from '../assets/icons/FilledHeartIcon.png';
 import cartIcon from '../assets/icons/cartIcon.png';
-import { FONTS, COLORS } from '../constants';
-
-// Dummy Images
 import imageNotAvailable from '../assets/images/imageNotAvailable.png';
-import sellerLogo from '../assets/images/seller-logo.png';
 
 const { width, height } = Dimensions.get('window');
 
 const ProductPage = ({ route, navigation }) => {
+  var token = '';
   const refRBSheet = useRef();
   const { prodId } = route.params;
-  const [token, setToken] = useState('');
+  // const [token, setToken] = useState('');
   const [IsLikedProduct, setIsLikedProduct] = useState(false);
   const [ProductDetails, setProductDetails] = useState({
-    _id: '6133d94c010d5e2cc84487db',
-    name: 'HP Laptop',
-    description: 'testProduct',
-    category: 'Electronics',
-    subCategory: 'AC/DC Invertor',
+    _id: '',
+    name: '',
+    description: '',
+    category: '',
+    subCategory: '',
     isOnSale: false,
     discountPercentage: null,
-    warranty: '2 year',
-    images: [imageNotAvailable],
-    colors: ['green', 'black', 'purple'],
+    warranty: '',
+    images: [],
+    colors: [],
     isVisibilityEnabled: true,
     isAuthenticVendorProduct: false,
-    vendorCompanyName: 'Other',
-    vendorCategory: 'Other',
-    manufactureDate: '11/06/2003',
-    purchasePrice: 100,
-    salePrice: 120,
-    state: 'New',
-    shippingCost: 100,
+    vendorCompanyName: '',
+    vendorCategory: '',
+    manufactureDate: '',
+    avgRating: 0,
+    totalRatingStars: 0,
+    purchasePrice: 0,
+    salePrice: 0,
+    state: '',
+    shippingCost: 0,
     discountPrice: 0,
     stockAvailable: 0,
-    dimensions: '10in 10in 20in',
-    weight: '200 grams',
-    storeID: '6128c6ec00130918d0120ec4',
-    storeName: 'ABC STORE',
-    sellerID: '6128c65800130918d0120ec1',
-    sellerName: 'Haseeb Ahmed',
-    createdAt: '2021-09-04T20:38:36.583Z',
-    updatedAt: '2021-10-05T20:34:26.762Z'
+    dimensions: '',
+    weight: '',
+    storeID: '',
+    storeName: '',
+    sellerID: '',
+    sellerName: '',
+    createdAt: '',
+    updatedAt: ''
   });
+  const [StoreDetails, setStoreDetails] = useState({
+    name: '',
+    country: '',
+    city: ''
+  });
+  const [Reviews, setReviews] = useState([]);
 
+  // For add to cart
   const [SelectedColor, setSelectedColor] = useState('red');
   const [Quantity, setQuantity] = useState(1);
-  const [Reviews, setReviews] = useState([]);
 
   const retriveUserToken = async () => {
     try {
       let value = await AsyncStorage.getItem('@USER_TOKEN');
       if (value !== null) {
-        setToken(value);
+        // setToken(value);
+        token = value;
+
+        // retriving Product Info
+        getProductsDetailsById();
       }
     } catch (e) {
       console.log('Error :: Retriving token failed :: ', e);
@@ -94,6 +103,11 @@ const ProductPage = ({ route, navigation }) => {
               JSON.stringify(newArr)
             );
             setIsLikedProduct(false);
+            ToastAndroid.show(
+              'You just disliked this product!',
+              ToastAndroid.SHORT,
+              ToastAndroid.BOTTOM
+            );
           }
         });
       }
@@ -114,6 +128,11 @@ const ProductPage = ({ route, navigation }) => {
             );
             setIsLikedProduct(true);
           }
+          ToastAndroid.show(
+            'You just liked this product!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
         });
       }
     } catch (e) {
@@ -143,18 +162,21 @@ const ProductPage = ({ route, navigation }) => {
       })
       .then((res) => {
         setProductDetails(res.data.data.product);
+        setStoreDetails(res.data.data.storeDetails);
       })
-      .catch((error) => console.log('ERROR: Fetching Product Details!'));
+      .catch((error) => console.log('ERROR: Fetching Product Details!', error));
+
+    await api
+      .get(`/buyer/reviews/product/${prodId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        setReviews(res.data.data.reviews);
+      })
+      .catch((error) => {
+        console.log('ERROR: Fetching Product Reviews! ', error);
+      });
   };
-
-  useEffect(() => {
-    getProductsDetailsById();
-  }, [token]);
-
-  // Product Liked Status
-  useEffect(() => {
-    checkLikedStatus();
-  });
 
   // Token
   useEffect(() => {
@@ -198,7 +220,8 @@ const ProductPage = ({ route, navigation }) => {
                   borderRadius: 15,
                   position: 'absolute',
                   top: 20,
-                  left: 20
+                  left: 20,
+                  elevation: 1
                 }}
               >
                 <Image source={backIcon} style={styles.backButton} />
@@ -222,7 +245,8 @@ const ProductPage = ({ route, navigation }) => {
                   borderRadius: 15,
                   position: 'absolute',
                   top: 20,
-                  right: 20
+                  right: 20,
+                  elevation: 1
                 }}
               >
                 <Image
@@ -251,8 +275,7 @@ const ProductPage = ({ route, navigation }) => {
                 readonly={true}
                 ratingColor="#3498db"
                 ratingBackgroundColor="#c8c7c8"
-                // startingValue={ProductDetails.ratings.ratingValue}
-                startingValue={2}
+                startingValue={ProductDetails.avgRating}
                 imageSize={12}
               />
               <Text
@@ -262,7 +285,7 @@ const ProductPage = ({ route, navigation }) => {
                   marginLeft: 4
                 }}
               >
-                {'(231)'}
+                {'(' + ProductDetails.totalRatingStars + ')'}
               </Text>
             </View>
 
@@ -312,7 +335,7 @@ const ProductPage = ({ route, navigation }) => {
 
               <View style={styles.specsRow}>
                 <Text style={styles.specsText}>Seller:</Text>
-                <Text style={styles.specsText}>{ProductDetails.storeName}</Text>
+                <Text style={styles.specsText}>{StoreDetails.name}</Text>
               </View>
 
               <View style={styles.specsRow}>
@@ -366,61 +389,85 @@ const ProductPage = ({ route, navigation }) => {
                 </Text>
               </View>
 
-              {/* {Reviews.map((el, index) => (
-                <View style={{ paddingTop: 10 }} key={index}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between'
-                    }}
-                  >
-                    <View style={{ flexDirection: 'row' }}>
-                      <Text style={styles.specsText}>{el.buyerName}</Text>
-                      <Text style={[styles.specsText, { marginHorizontal: 4 }]}>
-                        -
-                      </Text>
-                      <Text style={styles.specsText}>
-                        {new Date(el.createdAt).toLocaleDateString()}
-                      </Text>
-                    </View>
-                    <View>
-                      <Rating
-                        readonly={true}
-                        ratingColor="#3498db"
-                        ratingBackgroundColor="#c8c7c8"
-                        startingValue={el.rating}
-                        imageSize={12}
-                      />
-                    </View>
-                  </View>
-
-                  <View>
-                    <Text
+              {Reviews.length > 0 ? (
+                Reviews.map((el, index) => (
+                  <View style={{ paddingTop: 10 }} key={index}>
+                    <View
                       style={{
-                        fontFamily: FONTS.Poppins,
-                        fontSize: FONTS.Paragraph3,
-                        marginBottom: 10
+                        flexDirection: 'row',
+                        justifyContent: 'space-between'
                       }}
                     >
-                      {el.comment}
-                    </Text>
-                  </View>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text style={styles.specsText}>{el.buyerName}</Text>
+                        <Text
+                          style={[styles.specsText, { marginHorizontal: 4 }]}
+                        >
+                          -
+                        </Text>
+                        <Text style={styles.specsText}>
+                          {new Date(el.createdAt).toLocaleDateString()}
+                        </Text>
+                      </View>
+                      <View>
+                        <Rating
+                          readonly={true}
+                          ratingColor="#3498db"
+                          ratingBackgroundColor="#c8c7c8"
+                          startingValue={el.rating}
+                          imageSize={12}
+                        />
+                      </View>
+                    </View>
 
-                  <View style={{ flexDirection: 'row' }}>
-                    {el.pictures.map((el, index) => (
-                      <Image
-                        key={index}
-                        source={el}
+                    <View>
+                      <Text
                         style={{
-                          width: 60,
-                          height: 60,
-                          marginRight: 8
+                          fontFamily: FONTS.Poppins,
+                          fontSize: FONTS.Paragraph3,
+                          marginBottom: 10
                         }}
-                      />
-                    ))}
+                      >
+                        {el.comment}
+                      </Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row' }}>
+                      {el.pictures.length > 0 ? (
+                        el.pictures.map((el, index) => (
+                          <Image
+                            key={index}
+                            source={{ uri: el }}
+                            style={{
+                              width: 60,
+                              height: 60,
+                              marginRight: 8,
+                              resizeMode: 'center'
+                            }}
+                          />
+                        ))
+                      ) : (
+                        <Image
+                          source={imageNotAvailable}
+                          style={{
+                            width: 60,
+                            height: 60
+                          }}
+                        />
+                      )}
+                    </View>
                   </View>
-                </View>
-              ))} */}
+                ))
+              ) : (
+                <Text
+                  style={[
+                    styles.specsText,
+                    { fontSize: 14, fontStyle: 'italic', marginTop: 5 }
+                  ]}
+                >
+                  There are no reviews on this product!
+                </Text>
+              )}
             </View>
 
             {/* Seller Details */}
@@ -441,14 +488,16 @@ const ProductPage = ({ route, navigation }) => {
                   onPress={() => navigation.navigate('Store')}
                 >
                   <Image
-                    source={sellerLogo}
+                    source={
+                      StoreDetails.logo
+                        ? { uri: StoreDetails.logo }
+                        : imageNotAvailable
+                    }
                     style={{
                       width: 60,
                       height: 60,
                       borderRadius: 30,
-                      marginRight: 10,
-                      borderWidth: 2,
-                      borderColor: 'black'
+                      marginRight: 10
                     }}
                   />
                   <View>
@@ -458,7 +507,7 @@ const ProductPage = ({ route, navigation }) => {
                         fontSize: FONTS.Paragraph2
                       }}
                     >
-                      {ProductDetails.storeName}
+                      {StoreDetails.name}
                     </Text>
                     <Text
                       style={{
@@ -466,7 +515,7 @@ const ProductPage = ({ route, navigation }) => {
                         fontSize: FONTS.Paragraph3
                       }}
                     >
-                      Islamabad, Pakistan
+                      {StoreDetails.city + ', ' + StoreDetails.country}
                     </Text>
                   </View>
                 </TouchableOpacity>
