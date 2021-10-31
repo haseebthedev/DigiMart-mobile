@@ -160,7 +160,7 @@ const SearchedProducts = ({ route, navigation }) => {
             >
               <View style={{ alignItems: 'center' }}>
                 <Image
-                  source={{ uri: el.images }}
+                  source={{ uri: el.images[0] }}
                   style={{ width: 90, height: 90, marginVertical: 10 }}
                 />
               </View>

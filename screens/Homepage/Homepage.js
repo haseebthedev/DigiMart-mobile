@@ -495,7 +495,7 @@ const Homepage = ({ navigation }) => {
             >
               <View style={{ alignItems: 'center' }}>
                 <Image
-                  source={{ uri: el.images }}
+                  source={{ uri: el.images[0] }}
                   style={{ width: 90, height: 90, marginVertical: 10 }}
                 />
               </View>
@@ -613,7 +613,7 @@ const Homepage = ({ navigation }) => {
               >
                 <View style={{ alignItems: 'center' }}>
                   <Image
-                    source={{ uri: el.images }}
+                    source={{ uri: el.images[0] }}
                     style={{ width: 90, height: 90, marginVertical: 10 }}
                   />
                 </View>
@@ -679,9 +679,11 @@ const styles = StyleSheet.create({
   },
   productCard: {
     width: 155,
+    paddingHorizontal: 10,
+    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: 'rgba(220,220,220, 1)',
-    paddingHorizontal: 10
+    borderColor: 'rgba(220,220,220, .7)',
+    borderRadius: 6
   },
   productName: {
     fontFamily: FONTS.Poppins,

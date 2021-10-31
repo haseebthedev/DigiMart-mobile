@@ -38,7 +38,7 @@ const Account = ({ navigation }) => {
   // Counting Stores Followed
   const countStoresFollowed = () => {
     try {
-      AsyncStorage.getItem('@STORES_FOLLOWED').then((value) => {
+      AsyncStorage.getItem('@FOLLOW_STORES').then((value) => {
         if (value !== null) {
           let dArr = JSON.parse(value);
           setStoresFollowed(dArr.length);

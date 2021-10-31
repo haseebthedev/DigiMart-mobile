@@ -65,7 +65,8 @@ const StackScreens = () => {
 
   return (
     <Stack.Navigator
-      initialRouteName={UserState === null ? 'Layout' : 'Login'}
+      // initialRouteName={UserState === null ? 'Layout' : 'Login'}
+      initialRouteName={'Login'}
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Login" component={Login} />
@@ -79,8 +80,6 @@ const StackScreens = () => {
       <Stack.Screen name="AllCategories" component={AllCategories} />
       <Stack.Screen name="SubCategories" component={SubCategories} />
       <Stack.Screen name="SearchedProducts" component={SearchedProducts} />
-
-      {/* Accounts */}
       {/* <Stack.Screen name="Account" component={Account} /> */}
       <Stack.Screen name="LikedProducts" component={LikedProducts} />
       <Stack.Screen name="StoresFollowed" component={StoresFollowed} />

@@ -55,6 +55,8 @@ const Login = ({ navigation }) => {
           text1: 'Wrong Credentials',
           text2: 'Either email or password is invalid!'
         });
+        console.log('email', email);
+        console.log('password', password);
       });
   };
 
@@ -77,14 +79,14 @@ const Login = ({ navigation }) => {
       <TextInput
         placeholder="Email"
         style={styles.inputField}
-        onChange={setLoginEmail}
+        onChangeText={(text) => setLoginEmail(text)}
         value={LoginEmail}
       />
       <TextInput
         placeholder="Password"
         secureTextEntry
         style={styles.inputField}
-        onChange={setLoginPass}
+        onChangeText={(text) => setLoginPass(text)}
         value={LoginPass}
       />
       <TouchableOpacity style={styles.button} onPress={handlerLogin}>

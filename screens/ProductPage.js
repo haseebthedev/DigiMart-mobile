@@ -26,11 +26,11 @@ import imageNotAvailable from '../assets/images/imageNotAvailable.png';
 const { width, height } = Dimensions.get('window');
 
 const ProductPage = ({ route, navigation }) => {
-  var token = '';
   const refRBSheet = useRef();
   const { prodId } = route.params;
-  // const [token, setToken] = useState('');
+  const [token, setToken] = useState('');
   const [IsLikedProduct, setIsLikedProduct] = useState(false);
+  const [IsStoreFollowed, setIsStoreFollowed] = useState(false);
   const [ProductDetails, setProductDetails] = useState({
     _id: '',
     name: '',
@@ -65,6 +65,7 @@ const ProductPage = ({ route, navigation }) => {
     updatedAt: ''
   });
   const [StoreDetails, setStoreDetails] = useState({
+    _id: '',
     name: '',
     country: '',
     city: ''
@@ -79,9 +80,7 @@ const ProductPage = ({ route, navigation }) => {
     try {
       let value = await AsyncStorage.getItem('@USER_TOKEN');
       if (value !== null) {
-        // setToken(value);
-        token = value;
-
+        setToken(value);
         // retriving Product Info
         getProductsDetailsById();
       }
@@ -155,6 +154,22 @@ const ProductPage = ({ route, navigation }) => {
     }
   };
 
+  const checkStoreFollowStatus = async () => {
+    let value = await AsyncStorage.getItem('@FOLLOW_STORES');
+    console.log('checking store follow...');
+    if (value !== null) {
+      let dArr = JSON.parse(value);
+      let status = false;
+      for (let i = 0; i < dArr.length; i++) {
+        if (dArr[i]._id === StoreDetails._id) {
+          status = true;
+          break;
+        }
+      }
+      setIsStoreFollowed(status);
+    }
+  };
+
   const getProductsDetailsById = async () => {
     await api
       .get(`/buyer/product/${prodId}`, {
@@ -163,6 +178,9 @@ const ProductPage = ({ route, navigation }) => {
       .then((res) => {
         setProductDetails(res.data.data.product);
         setStoreDetails(res.data.data.storeDetails);
+
+        // retriving Store Follow status
+        checkStoreFollowStatus();
       })
       .catch((error) => console.log('ERROR: Fetching Product Details!', error));
 
@@ -176,6 +194,94 @@ const ProductPage = ({ route, navigation }) => {
       .catch((error) => {
         console.log('ERROR: Fetching Product Reviews! ', error);
       });
+  };
+
+  const addStoreInFollowList = async () => {
+    try {
+      // Delete here
+      if (IsStoreFollowed === true) {
+        AsyncStorage.getItem('@FOLLOW_STORES').then(async (value) => {
+          if (value !== null) {
+            let dArr = JSON.parse(value);
+            let newArr = dArr.filter((el) => el._id !== StoreDetails._id);
+            await AsyncStorage.setItem(
+              '@FOLLOW_STORES',
+              JSON.stringify(newArr)
+            );
+            setIsStoreFollowed(false);
+            ToastAndroid.show(
+              'You just unfollowed this store!',
+              ToastAndroid.SHORT,
+              ToastAndroid.BOTTOM
+            );
+          }
+        });
+      }
+      // Add here
+      else {
+        AsyncStorage.getItem('@FOLLOW_STORES').then(async (value) => {
+          if (value !== null) {
+            let dArr = JSON.parse(value);
+            dArr.push(StoreDetails);
+            await AsyncStorage.setItem('@FOLLOW_STORES', JSON.stringify(dArr));
+            setIsStoreFollowed(true);
+          } else {
+            let newArr = [];
+            newArr.push(StoreDetails);
+            await AsyncStorage.setItem(
+              '@FOLLOW_STORES',
+              JSON.stringify(newArr)
+            );
+            setIsStoreFollowed(true);
+          }
+          ToastAndroid.show(
+            'You just followed this store!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        });
+      }
+    } catch (e) {
+      console.log('Error :: Saving Product failed :: ', e);
+    }
+  };
+
+  const followStore = async () => {
+    var reqURL = '';
+
+    if (IsStoreFollowed === true) {
+      reqURL = '/buyer/store/Unsubscribe';
+    } else {
+      reqURL = '/buyer/store/subscribe';
+    }
+
+    await api
+      .patch(
+        reqURL,
+        {
+          storeId: StoreDetails._id
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      .then((res) => {
+        if (IsStoreFollowed === true) {
+          ToastAndroid.show(
+            'You just unfollowed this store!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        } else {
+          ToastAndroid.show(
+            'You just followed this store!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        }
+        addStoreInFollowList();
+      })
+      .catch((error) => console.log('ERROR:', error));
   };
 
   // Token
@@ -519,13 +625,17 @@ const ProductPage = ({ route, navigation }) => {
                     </Text>
                   </View>
                 </TouchableOpacity>
-                <View
+                <TouchableOpacity
                   style={{
                     paddingHorizontal: 15,
                     paddingVertical: 4,
                     borderWidth: 1,
                     borderColor: 'black',
                     borderRadius: 4
+                  }}
+                  onPress={() => {
+                    followStore();
+                    // setIsStoreFollowed(!IsStoreFollowed);
                   }}
                 >
                   <Text
@@ -534,9 +644,9 @@ const ProductPage = ({ route, navigation }) => {
                       fontSize: FONTS.Paragraph3
                     }}
                   >
-                    Follow
+                    {IsStoreFollowed === true ? 'Unfollow' : 'Follow'}
                   </Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           </View>

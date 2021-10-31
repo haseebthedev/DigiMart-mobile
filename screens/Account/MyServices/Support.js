@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,74 @@ import {
   TouchableOpacity,
   TextInput
 } from 'react-native';
+import api from '../../../axios/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import backIcon from '../../../assets/icons/backIcon.png';
 import { Picker } from '@react-native-picker/picker';
-import reportProblemImage from '../../../assets/images/reportProblemImage.png';
-const { width, height } = Dimensions.get('screen');
 
 const Support = ({ navigation }) => {
+  const [token, setToken] = useState('');
+
+  const [storeId, setStoreId] = useState('6128c6ec00130918d0120ec4');
+  const [orderId, setOrderId] = useState('');
+  const [storeName, setStoreName] = useState('');
+  const [subject, setSubject] = useState('');
+  const [description, setDescription] = useState('');
+  const [screenShot, setScreenShot] = useState('');
+
+  const retriveToken = () => {
+    try {
+      AsyncStorage.getItem('@USER_TOKEN').then((value) => {
+        if (value !== null) {
+          setToken(value);
+        }
+      });
+    } catch (e) {
+      console.log('Error :: Retriving token failed :: ', e);
+    }
+  };
+
+  useEffect(() => {
+    retriveToken();
+  }, []);
+
+  const contactSupport = async () => {
+    await api
+      .post(
+        '/buyer/problem/report/order',
+        {
+          storeId,
+          orderId,
+          storeName,
+          subject,
+          description,
+          screenShot
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      .then((res) => {
+        Toast.show({
+          type: 'success',
+          text1: 'SUCCESS!',
+          text2: 'Your report has been sent!',
+          onShow: () => {
+            setStoreId('');
+            setOrderId('');
+            setStoreName('');
+            setSubject('');
+            setDescription('');
+            setScreenShot('');
+          }
+        });
+      })
+      .catch((error) =>
+        console.log('ERROR: Contacting Support failed.', error)
+      );
+  };
+
   return (
     <View style={styles.container}>
       <Text
@@ -65,13 +126,33 @@ const Support = ({ navigation }) => {
           </Text>
         </View>
 
-        <TextInput placeholder="Order ID" style={styles.inputField} />
-        <TextInput placeholder="Store Name" style={styles.inputField} />
-        <TextInput placeholder="Subject of Issue" style={styles.inputField} />
+        <TextInput
+          placeholder="Order ID"
+          style={styles.inputField}
+          onChangeText={(text) => setOrderId(text)}
+        />
+
+        <TextInput
+          placeholder="Store ID"
+          style={styles.inputField}
+          onChangeText={(text) => setStoreId(text)}
+        />
+
+        <TextInput
+          placeholder="Store Name"
+          style={styles.inputField}
+          onChangeText={(text) => setStoreName(text)}
+        />
+        <TextInput
+          placeholder="Subject of Issue"
+          style={styles.inputField}
+          onChangeText={(text) => setSubject(text)}
+        />
         <TextInput
           placeholder="Description"
           multiline
           style={styles.inputField}
+          onChangeText={(text) => setDescription(text)}
         />
         <View
           style={{
@@ -91,7 +172,7 @@ const Support = ({ navigation }) => {
             style={{
               fontFamily: FONTS.PoppinsBold,
               fontSize: 22,
-              marginRight: 8,
+              marginRight: 5,
               color: '#407BFF'
             }}
           >
@@ -101,7 +182,7 @@ const Support = ({ navigation }) => {
             Upload Image / Screenshot
           </Text>
         </View>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={contactSupport}>
           <Text style={styles.loginButton}>SEND</Text>
         </TouchableOpacity>
       </View>

@@ -36,7 +36,7 @@ const Tab = createMaterialBottomTabNavigator();
 
 const Layout = ({ navigation }) => {
   const [UserToken, setUserToken] = useState('');
-  const [UserProfile, setUserProfile] = useState('');
+  const [UserProfile, setUserProfile] = useState(undefined);
   const [Username, setUsername] = useState('');
   const [UserEmail, setUserEmail] = useState('');
 
@@ -109,7 +109,7 @@ const Layout = ({ navigation }) => {
           <View style={{ alignItems: 'center' }}>
             <Image
               source={
-                UserProfile.length > 0 ? { uri: UserProfile } : defaultUser
+                UserProfile !== undefined ? { uri: UserProfile } : defaultUser
               }
               style={{
                 width: 75,
@@ -248,7 +248,7 @@ const Layout = ({ navigation }) => {
             <TouchableOpacity>
               <Image
                 source={
-                  UserProfile.length > 0 ? { uri: UserProfile } : defaultUser
+                  UserProfile !== undefined ? { uri: UserProfile } : defaultUser
                 }
                 style={{
                   width: 30,

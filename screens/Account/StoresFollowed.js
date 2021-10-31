@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   FlatList,
   TouchableNativeFeedback
 } from 'react-native';
+import api from '../../axios/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
 import unfollowStoreIcon from '../../assets/icons/unfollowStoreIcon.png';
 import productImage from '../../assets/images/laptop-image.png';
@@ -18,35 +20,47 @@ import backIcon from '../../assets/icons/backIcon.png';
 const { width, height } = Dimensions.get('screen');
 
 const StoresFollowed = ({ navigation }) => {
+  const [token, setToken] = useState('');
   const [selectedStore, setselectedStore] = useState();
   const [UnfollowStoreModal, setUnfollowStoreModal] = useState(false);
-  const [storesList, setStoresList] = useState([
-    {
-      id: 1,
-      image: productImage,
-      name: 'ABC Store'
-    },
-    {
-      id: 2,
-      image: productImage,
-      name: 'DATA inc.'
-    },
-    {
-      id: 3,
-      image: productImage,
-      name: 'Google PK'
-    },
-    {
-      id: 4,
-      image: productImage,
-      name: 'Apple Pk'
-    }
-  ]);
+  const [storesList, setStoresList] = useState([]);
 
-  // Unfollow Store
-  const unfollowStore = () => {
-    let newArr = storesList.filter((el) => el.id !== selectedStore);
+  const retriveUserToken = async () => {
+    try {
+      let value = await AsyncStorage.getItem('@USER_TOKEN');
+      if (value !== null) {
+        setToken(value);
+        retriveFollowedStores();
+      }
+    } catch (e) {
+      console.log('Error :: Retriving token failed :: ', e);
+    }
+  };
+
+  const retriveFollowedStores = () => {
+    AsyncStorage.getItem('@FOLLOW_STORES').then((value) => {
+      if (value !== null) {
+        setStoresList(JSON.parse(value));
+      }
+    });
+  };
+
+  // Unfollow Store from list
+  const unfollowStore = async () => {
+    let newArr = storesList.filter((el) => el._id !== selectedStore);
     setStoresList(newArr);
+    await AsyncStorage.setItem('@FOLLOW_STORES', JSON.stringify(newArr));
+    await api
+      .patch(
+        '/buyer/store/Unsubscribe',
+        {
+          storeId: selectedStore
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      .catch((error) => console.log('ERROR:', error));
   };
 
   // Store Card
@@ -100,7 +114,7 @@ const StoresFollowed = ({ navigation }) => {
             marginRight: 20
           }}
           onPress={() => {
-            setselectedStore(item.id);
+            setselectedStore(item._id);
             setUnfollowStoreModal(true);
           }}
         >
@@ -112,6 +126,10 @@ const StoresFollowed = ({ navigation }) => {
       </View>
     );
   };
+
+  useEffect(() => {
+    retriveUserToken();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -154,7 +172,7 @@ const StoresFollowed = ({ navigation }) => {
       <FlatList
         data={storesList}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
       />
 
       {/* Delete Product Modal */}
