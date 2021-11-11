@@ -3,6 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { FONTS, COLORS } from '../constants';
+import api from '../axios/api';
+
+import { UserContext } from '../contexts/UserContext';
 
 // icons
 import pendingOrderIcon from '../assets/icons/pendingOrderIcon.png';
@@ -18,10 +21,10 @@ import reportProbIcon from '../assets/icons/reportProbIcon.png';
 import settingIcon from '../assets/icons/settingsIcon.png';
 
 const Account = ({ navigation }) => {
+  const { user } = UserContext();
   const [LikedProducts, setLikedProducts] = useState(0);
   const [StoresFollowed, setStoresFollowed] = useState(0);
 
-  // Counting Liked Products
   const countLikedProducts = () => {
     try {
       AsyncStorage.getItem('@LIKED_PRODUCTS').then((value) => {
@@ -35,28 +38,22 @@ const Account = ({ navigation }) => {
     }
   };
 
-  // Counting Stores Followed
-  const countStoresFollowed = () => {
-    try {
-      AsyncStorage.getItem('@FOLLOW_STORES').then((value) => {
-        if (value !== null) {
-          let dArr = JSON.parse(value);
-          setStoresFollowed(dArr.length);
-        }
-      });
-    } catch (error) {
-      console.log('ERROR :: ', error);
-    }
+  const countStoresFollowed = async () => {
+    await api
+      .get('/buyer/stores/subscribed', {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
+      .then((res) => {
+        setStoresFollowed(res.data.data.subscribedStores.length);
+      })
+      .catch((e) => console.log('ERROR retriving sunscribed stores. ', e));
   };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      // The screen is focused
-      // Call any action
       countLikedProducts();
       countStoresFollowed();
     });
-    // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
 

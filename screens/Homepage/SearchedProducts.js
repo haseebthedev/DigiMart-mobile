@@ -11,7 +11,6 @@ import {
 import api from '../../axios/api';
 import { Rating } from 'react-native-ratings';
 import { FONTS } from '../../constants/index';
-import imageNotAvailable from '../../assets/images/imageNotAvailable.png';
 import addIcon from '../../assets/icons/addIcon.png';
 import backIcon from '../../assets/icons/backIcon.png';
 import Toast from 'react-native-toast-message';
@@ -86,6 +85,10 @@ const SearchedProducts = ({ route, navigation }) => {
 
   useEffect(() => {
     getProducts();
+
+    return () => {
+      setProductList([]);
+    };
   }, []);
 
   return (
@@ -160,7 +163,7 @@ const SearchedProducts = ({ route, navigation }) => {
             >
               <View style={{ alignItems: 'center' }}>
                 <Image
-                  source={{ uri: el.images[0] }}
+                  source={{ uri: el.images }}
                   style={{ width: 90, height: 90, marginVertical: 10 }}
                 />
               </View>

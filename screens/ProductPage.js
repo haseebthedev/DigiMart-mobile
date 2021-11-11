@@ -28,9 +28,7 @@ const { width, height } = Dimensions.get('window');
 const ProductPage = ({ route, navigation }) => {
   const refRBSheet = useRef();
   const { prodId } = route.params;
-  const [token, setToken] = useState('');
   const [IsLikedProduct, setIsLikedProduct] = useState(false);
-  const [IsStoreFollowed, setIsStoreFollowed] = useState(false);
   const [ProductDetails, setProductDetails] = useState({
     _id: '',
     name: '',
@@ -75,19 +73,6 @@ const ProductPage = ({ route, navigation }) => {
   // For add to cart
   const [SelectedColor, setSelectedColor] = useState('red');
   const [Quantity, setQuantity] = useState(1);
-
-  const retriveUserToken = async () => {
-    try {
-      let value = await AsyncStorage.getItem('@USER_TOKEN');
-      if (value !== null) {
-        setToken(value);
-        // retriving Product Info
-        getProductsDetailsById();
-      }
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
-  };
 
   const addProductInLiked = async (product) => {
     try {
@@ -144,8 +129,9 @@ const ProductPage = ({ route, navigation }) => {
     if (value !== null) {
       let dArr = JSON.parse(value);
       let status = false;
+      console.log('checking like status...');
       for (let i = 0; i < dArr.length; i++) {
-        if (dArr[i]._id === ProductDetails._id) {
+        if (dArr[i]._id == prodId) {
           status = true;
           break;
         }
@@ -154,40 +140,17 @@ const ProductPage = ({ route, navigation }) => {
     }
   };
 
-  const checkStoreFollowStatus = async () => {
-    let value = await AsyncStorage.getItem('@FOLLOW_STORES');
-    console.log('checking store follow...');
-    if (value !== null) {
-      let dArr = JSON.parse(value);
-      let status = false;
-      for (let i = 0; i < dArr.length; i++) {
-        if (dArr[i]._id === StoreDetails._id) {
-          status = true;
-          break;
-        }
-      }
-      setIsStoreFollowed(status);
-    }
-  };
-
   const getProductsDetailsById = async () => {
     await api
-      .get(`/buyer/product/${prodId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      .get(`/buyer/product/${prodId}`)
       .then((res) => {
         setProductDetails(res.data.data.product);
         setStoreDetails(res.data.data.storeDetails);
-
-        // retriving Store Follow status
-        checkStoreFollowStatus();
       })
       .catch((error) => console.log('ERROR: Fetching Product Details!', error));
 
     await api
-      .get(`/buyer/reviews/product/${prodId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      .get(`/buyer/reviews/product/${prodId}`)
       .then((res) => {
         setReviews(res.data.data.reviews);
       })
@@ -196,97 +159,8 @@ const ProductPage = ({ route, navigation }) => {
       });
   };
 
-  const addStoreInFollowList = async () => {
-    try {
-      // Delete here
-      if (IsStoreFollowed === true) {
-        AsyncStorage.getItem('@FOLLOW_STORES').then(async (value) => {
-          if (value !== null) {
-            let dArr = JSON.parse(value);
-            let newArr = dArr.filter((el) => el._id !== StoreDetails._id);
-            await AsyncStorage.setItem(
-              '@FOLLOW_STORES',
-              JSON.stringify(newArr)
-            );
-            setIsStoreFollowed(false);
-            ToastAndroid.show(
-              'You just unfollowed this store!',
-              ToastAndroid.SHORT,
-              ToastAndroid.BOTTOM
-            );
-          }
-        });
-      }
-      // Add here
-      else {
-        AsyncStorage.getItem('@FOLLOW_STORES').then(async (value) => {
-          if (value !== null) {
-            let dArr = JSON.parse(value);
-            dArr.push(StoreDetails);
-            await AsyncStorage.setItem('@FOLLOW_STORES', JSON.stringify(dArr));
-            setIsStoreFollowed(true);
-          } else {
-            let newArr = [];
-            newArr.push(StoreDetails);
-            await AsyncStorage.setItem(
-              '@FOLLOW_STORES',
-              JSON.stringify(newArr)
-            );
-            setIsStoreFollowed(true);
-          }
-          ToastAndroid.show(
-            'You just followed this store!',
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM
-          );
-        });
-      }
-    } catch (e) {
-      console.log('Error :: Saving Product failed :: ', e);
-    }
-  };
-
-  const followStore = async () => {
-    var reqURL = '';
-
-    if (IsStoreFollowed === true) {
-      reqURL = '/buyer/store/Unsubscribe';
-    } else {
-      reqURL = '/buyer/store/subscribe';
-    }
-
-    await api
-      .patch(
-        reqURL,
-        {
-          storeId: StoreDetails._id
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      )
-      .then((res) => {
-        if (IsStoreFollowed === true) {
-          ToastAndroid.show(
-            'You just unfollowed this store!',
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM
-          );
-        } else {
-          ToastAndroid.show(
-            'You just followed this store!',
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM
-          );
-        }
-        addStoreInFollowList();
-      })
-      .catch((error) => console.log('ERROR:', error));
-  };
-
-  // Token
   useEffect(() => {
-    retriveUserToken();
+    getProductsDetailsById();
     checkLikedStatus();
   }, []);
 
@@ -356,9 +230,7 @@ const ProductPage = ({ route, navigation }) => {
                 }}
               >
                 <Image
-                  source={
-                    IsLikedProduct === true ? FilledHeartIcon : emptyHeartIcon
-                  }
+                  source={IsLikedProduct ? FilledHeartIcon : emptyHeartIcon}
                   style={styles.likeButton}
                 />
               </View>
@@ -633,10 +505,7 @@ const ProductPage = ({ route, navigation }) => {
                     borderColor: 'black',
                     borderRadius: 4
                   }}
-                  onPress={() => {
-                    followStore();
-                    // setIsStoreFollowed(!IsStoreFollowed);
-                  }}
+                  onPress={() => navigation.navigate('Store')}
                 >
                   <Text
                     style={{
@@ -644,7 +513,7 @@ const ProductPage = ({ route, navigation }) => {
                       fontSize: FONTS.Paragraph3
                     }}
                   >
-                    {IsStoreFollowed === true ? 'Unfollow' : 'Follow'}
+                    VIEW
                   </Text>
                 </TouchableOpacity>
               </View>

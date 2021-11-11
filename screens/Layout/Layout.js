@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
+import { UserContext } from '../../contexts/UserContext';
 
 // Icons...
 import menu from '../../assets/icons/menuIcon.png';
@@ -31,11 +32,12 @@ import Homepage from '../Homepage/Homepage';
 import Messages from '../Messages';
 import Cart from '../Cart';
 import Account from '../Account';
+import api from '../../axios/api';
 
 const Tab = createMaterialBottomTabNavigator();
 
 const Layout = ({ navigation }) => {
-  const [UserToken, setUserToken] = useState('');
+  const { user } = UserContext();
   const [UserProfile, setUserProfile] = useState(undefined);
   const [Username, setUsername] = useState('');
   const [UserEmail, setUserEmail] = useState('');
@@ -68,33 +70,22 @@ const Layout = ({ navigation }) => {
     }).start();
   };
 
-  const retriveUserToken = async () => {
-    try {
-      let value = await AsyncStorage.getItem('@USER_TOKEN');
-      if (value !== null) {
-        setUserToken(value);
-      }
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
-  };
-
   const retriveUserData = async () => {
-    try {
-      let res = await AsyncStorage.getItem('@USER_DATA');
-      if (res != null) {
-        let data = JSON.parse(res);
-        setUserProfile(data.profilePic);
-        setUsername(data.name);
-        setUserEmail(data.email);
-      }
-    } catch (e) {
-      console.log('Error :: Retriving data failed :: ', e);
-    }
+    await api
+      .get('/buyer/me', {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
+      .then((res) => {
+        const myDetails = res.data.data.buyer[0];
+        console.log('myDetails', myDetails);
+        setUserProfile(myDetails.profilePic);
+        setUsername(myDetails.name);
+        setUserEmail(myDetails.email);
+      })
+      .catch((e) => console.log('ERROR: Fetching profile data.'));
   };
 
   useEffect(() => {
-    retriveUserToken();
     retriveUserData();
   }, []);
 
@@ -325,20 +316,12 @@ const Layout = ({ navigation }) => {
 
 // For Drawer
 const TabButton = (currentTab, setCurrentTab, title, image, navigation) => {
-  const deletingUserToken = async () => {
-    try {
-      await AsyncStorage.removeItem('@USER_TOKEN');
-    } catch (error) {
-      console.log('ERROR signing out :: ', error);
-    }
-  };
-
   return (
     <TouchableOpacity
       onPress={() => {
         if (title === 'Login') {
           navigation.navigate('Login');
-          deletingUserToken();
+          // deletingUserToken();
         } else {
           setCurrentTab(title);
           navigation.navigate(title);

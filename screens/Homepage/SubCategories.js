@@ -54,6 +54,10 @@ const SubCategories = ({ route, navigation }) => {
 
   useEffect(() => {
     getAllSubCategories();
+
+    return () => {
+      setProductCategories([]);
+    };
   }, [token]);
 
   return (

@@ -16,11 +16,12 @@ import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import backIcon from '../../../assets/icons/backIcon.png';
 import myImage from '../../../assets/images/imageNotAvailable.png';
 import uploadIcon from '../../../assets/icons/uploadIcon.png';
+import { UserContext } from '../../../contexts/UserContext';
 
 const { width, height } = Dimensions.get('screen');
 
 const AccountInfo = ({ navigation }) => {
-  const [token, setToken] = useState('');
+  const { user } = UserContext();
 
   const [profileData, setProfileData] = useState({
     profilePic: null,
@@ -30,22 +31,10 @@ const AccountInfo = ({ navigation }) => {
     birthday: ''
   });
 
-  const retriveToken = () => {
-    try {
-      AsyncStorage.getItem('@USER_TOKEN').then((value) => {
-        if (value !== null) {
-          setToken(value);
-        }
-      });
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
-  };
-
   const getUserInfo = async () => {
     await api
       .get('/buyer/me', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${user.token}` }
       })
       .then((res) => {
         const { profilePic, name, email, phoneNumber, birthday } =
@@ -94,12 +83,8 @@ const AccountInfo = ({ navigation }) => {
   };
 
   useEffect(() => {
-    retriveToken();
-  }, []);
-
-  useEffect(() => {
     getUserInfo();
-  }, [token]);
+  }, []);
 
   return (
     <View style={styles.container}>

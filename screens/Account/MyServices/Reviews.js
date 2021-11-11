@@ -18,6 +18,7 @@ import backIcon from '../../../assets/icons/backIcon.png';
 import editIcon from '../../../assets/icons/editIcon.png';
 import deleteIcon from '../../../assets/icons/deleteIcon.png';
 import productImage from '../../../assets/images/laptop-image.png';
+import { UserContext } from '../../../contexts/UserContext';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -32,27 +33,15 @@ function trimName(name) {
 }
 
 const Reviews = ({ navigation }) => {
-  const [token, setToken] = useState('');
+  const { user } = UserContext();
   const [reviewsList, setReviewsList] = useState([]);
   const [selectedReview, setselectedReview] = useState();
   const [DeleteReviewModal, setDeleteReviewModal] = useState(false);
 
-  const retriveToken = () => {
-    try {
-      AsyncStorage.getItem('@USER_TOKEN').then((value) => {
-        if (value !== null) {
-          setToken(value);
-        }
-      });
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
-  };
-
   const retriveReviews = async () => {
     await api
       .get('/buyer/reviews/view', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${user.token}` }
       })
       .then((res) => {
         setReviewsList(res.data.data.reviews);
@@ -61,12 +50,8 @@ const Reviews = ({ navigation }) => {
   };
 
   useEffect(() => {
-    retriveToken();
-  }, []);
-
-  useEffect(() => {
     retriveReviews();
-  }, [token]);
+  }, []);
 
   const deleteReview = async () => {
     await api

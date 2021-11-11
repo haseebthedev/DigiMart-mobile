@@ -11,26 +11,16 @@ import api from '../../../axios/api';
 import { DataTable } from 'react-native-paper';
 import { FONTS } from '../../../constants/index';
 import backIcon from '../../../assets/icons/backIcon.png';
+import { UserContext } from '../../../contexts/UserContext';
 
 const CancelledOrders = ({ navigation }) => {
-  const [token, setToken] = useState('');
+  const { user } = UserContext();
   const [orderDetails, setOrderDetails] = useState([]);
-
-  const retriveUserToken = async () => {
-    try {
-      let value = await AsyncStorage.getItem('@USER_TOKEN');
-      if (value !== null) {
-        setToken(value);
-      }
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
-  };
 
   const getCancelledOrders = async () => {
     await api
       .get(`/buyer/orders/Cancelled`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${user.token}` }
       })
       .then((res) => {
         setOrderDetails(res.data.data.orders);
@@ -38,14 +28,9 @@ const CancelledOrders = ({ navigation }) => {
       .catch((error) => console.log('ERROR: Fetching Order Details!'));
   };
 
-  // Token
-  useEffect(() => {
-    retriveUserToken();
-  }, []);
-
   useEffect(() => {
     getCancelledOrders();
-  }, [token]);
+  }, []);
 
   function formatDate(d) {
     date = new Date(d);
@@ -73,7 +58,7 @@ const CancelledOrders = ({ navigation }) => {
           marginBottom: 30
         }}
       >
-        ORDERS (RETURNED)
+        ORDERS (CANCELLED)
       </Text>
 
       {/* Back Button */}

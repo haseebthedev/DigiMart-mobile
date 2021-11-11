@@ -11,26 +11,16 @@ import api from '../../../axios/api';
 import { DataTable } from 'react-native-paper';
 import { FONTS } from '../../../constants/index';
 import backIcon from '../../../assets/icons/backIcon.png';
+import { UserContext } from '../../../contexts/UserContext';
 
 const PendingOrders = ({ navigation }) => {
-  const [token, setToken] = useState('');
+  const { user } = UserContext();
   const [orderDetails, setOrderDetails] = useState([]);
-
-  const retriveUserToken = async () => {
-    try {
-      let value = await AsyncStorage.getItem('@USER_TOKEN');
-      if (value !== null) {
-        setToken(value);
-      }
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
-  };
 
   const getPendingOrders = async () => {
     await api
       .get(`/buyer/orders/Pending`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${user.token}` }
       })
       .then((res) => {
         setOrderDetails(res.data.data.orders);
@@ -38,14 +28,9 @@ const PendingOrders = ({ navigation }) => {
       .catch((error) => console.log('ERROR: Fetching Order Details!'));
   };
 
-  // Token
-  useEffect(() => {
-    retriveUserToken();
-  }, []);
-
   useEffect(() => {
     getPendingOrders();
-  }, [token]);
+  }, []);
 
   function formatDate(d) {
     date = new Date(d);

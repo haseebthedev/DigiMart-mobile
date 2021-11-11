@@ -16,40 +16,31 @@ import { FONTS, COLORS, IMAGES } from '../../constants/index';
 import unfollowStoreIcon from '../../assets/icons/unfollowStoreIcon.png';
 import productImage from '../../assets/images/laptop-image.png';
 import backIcon from '../../assets/icons/backIcon.png';
+import { UserContext } from '../../contexts/UserContext';
 
 const { width, height } = Dimensions.get('screen');
 
 const StoresFollowed = ({ navigation }) => {
-  const [token, setToken] = useState('');
+  const { user } = UserContext();
   const [selectedStore, setselectedStore] = useState();
   const [UnfollowStoreModal, setUnfollowStoreModal] = useState(false);
   const [storesList, setStoresList] = useState([]);
 
-  const retriveUserToken = async () => {
-    try {
-      let value = await AsyncStorage.getItem('@USER_TOKEN');
-      if (value !== null) {
-        setToken(value);
-        retriveFollowedStores();
-      }
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
+  const retriveFollowedStores = async () => {
+    await api
+      .get('/buyer/stores/subscribed', {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
+      .then((res) => {
+        setStoresList(res.data.data.subscribedStores);
+      })
+      .catch((e) => console.log('ERROR retriving Sunscribed Stores. ', e));
   };
 
-  const retriveFollowedStores = () => {
-    AsyncStorage.getItem('@FOLLOW_STORES').then((value) => {
-      if (value !== null) {
-        setStoresList(JSON.parse(value));
-      }
-    });
-  };
-
-  // Unfollow Store from list
   const unfollowStore = async () => {
     let newArr = storesList.filter((el) => el._id !== selectedStore);
     setStoresList(newArr);
-    await AsyncStorage.setItem('@FOLLOW_STORES', JSON.stringify(newArr));
+
     await api
       .patch(
         '/buyer/store/Unsubscribe',
@@ -57,13 +48,20 @@ const StoresFollowed = ({ navigation }) => {
           storeId: selectedStore
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${user.token}` }
         }
       )
       .catch((error) => console.log('ERROR:', error));
   };
 
-  // Store Card
+  useEffect(() => {
+    retriveFollowedStores();
+
+    return () => {
+      setStoresList([]);
+    };
+  }, []);
+
   const renderItem = ({ item }) => {
     return (
       <View
@@ -126,10 +124,6 @@ const StoresFollowed = ({ navigation }) => {
       </View>
     );
   };
-
-  useEffect(() => {
-    retriveUserToken();
-  }, []);
 
   return (
     <View style={styles.container}>

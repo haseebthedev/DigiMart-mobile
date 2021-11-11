@@ -495,7 +495,7 @@ const Homepage = ({ navigation }) => {
             >
               <View style={{ alignItems: 'center' }}>
                 <Image
-                  source={{ uri: el.images[0] }}
+                  source={{ uri: el.images }}
                   style={{ width: 90, height: 90, marginVertical: 10 }}
                 />
               </View>
@@ -613,7 +613,7 @@ const Homepage = ({ navigation }) => {
               >
                 <View style={{ alignItems: 'center' }}>
                   <Image
-                    source={{ uri: el.images[0] }}
+                    source={{ uri: el.images }}
                     style={{ width: 90, height: 90, marginVertical: 10 }}
                   />
                 </View>

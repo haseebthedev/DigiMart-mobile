@@ -10,31 +10,16 @@ import {
 } from 'react-native';
 import api from '../../../axios/api';
 import Toast from 'react-native-toast-message';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import backIcon from '../../../assets/icons/backIcon.png';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import reportProblemImage from '../../../assets/images/reportProblemImage.png';
+import { UserContext } from '../../../contexts/UserContext';
 
 const ReportProblem = ({ navigation }) => {
-  const [token, setToken] = useState('');
+  const { user } = UserContext();
+
   const [subject, SetSubject] = useState('');
   const [description, SetDescription] = useState('');
-
-  const retriveToken = () => {
-    try {
-      AsyncStorage.getItem('@USER_TOKEN').then((value) => {
-        if (value !== null) {
-          setToken(value);
-        }
-      });
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
-  };
-
-  useEffect(() => {
-    retriveToken();
-  }, []);
 
   const sendReport = async () => {
     await api
@@ -46,7 +31,7 @@ const ReportProblem = ({ navigation }) => {
           screenShot: ''
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${user.token}` }
         }
       )
       .then((res) => {

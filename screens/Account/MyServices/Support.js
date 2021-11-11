@@ -14,32 +14,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import backIcon from '../../../assets/icons/backIcon.png';
 import { Picker } from '@react-native-picker/picker';
+import { UserContext } from '../../../contexts/UserContext';
 
 const Support = ({ navigation }) => {
-  const [token, setToken] = useState('');
-
+  const { user } = UserContext();
   const [storeId, setStoreId] = useState('6128c6ec00130918d0120ec4');
   const [orderId, setOrderId] = useState('');
   const [storeName, setStoreName] = useState('');
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [screenShot, setScreenShot] = useState('');
-
-  const retriveToken = () => {
-    try {
-      AsyncStorage.getItem('@USER_TOKEN').then((value) => {
-        if (value !== null) {
-          setToken(value);
-        }
-      });
-    } catch (e) {
-      console.log('Error :: Retriving token failed :: ', e);
-    }
-  };
-
-  useEffect(() => {
-    retriveToken();
-  }, []);
 
   const contactSupport = async () => {
     await api
@@ -54,7 +38,7 @@ const Support = ({ navigation }) => {
           screenShot
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${user.token}` }
         }
       )
       .then((res) => {

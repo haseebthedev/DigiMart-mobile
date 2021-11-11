@@ -56,6 +56,10 @@ const AllCategories = ({ navigation }) => {
 
   useEffect(() => {
     getAllCategories();
+
+    return () => {
+      setProductCategories([]);
+    };
   }, [token]);
 
   return (
