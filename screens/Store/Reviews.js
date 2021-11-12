@@ -64,7 +64,8 @@ const Reviews = ({ navigation }) => {
           <Text
             style={{
               fontFamily: FONTS.PoppinsBold,
-              fontSize: 20
+              fontSize: 20,
+              marginBottom: 10
             }}
           >
             Reviews
@@ -72,16 +73,17 @@ const Reviews = ({ navigation }) => {
         </View>
 
         {/* Reviews */}
-        <View style={{}}>
+        <View>
           {ProductDetails.reviews.map((el, index) => (
             <View
               style={{
-                paddingHorizontal: 20,
+                paddingHorizontal: 15,
                 paddingVertical: 10,
                 backgroundColor: '#fff',
                 marginBottom: 10,
                 borderRadius: 6,
-                elevation: 1
+                elevation: 1,
+                marginHorizontal: 20
               }}
               key={index}
             >

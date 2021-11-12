@@ -70,19 +70,20 @@ const Layout = ({ navigation }) => {
     }).start();
   };
 
-  const retriveUserData = async () => {
-    await api
+  const retriveUserData = () => {
+    api
       .get('/buyer/me', {
-        headers: { Authorization: `Bearer ${user.token}` }
+        headers: {
+          Authorization: 'Bearer ' + user.token
+        }
       })
       .then((res) => {
         const myDetails = res.data.data.buyer[0];
-        console.log('myDetails', myDetails);
         setUserProfile(myDetails.profilePic);
         setUsername(myDetails.name);
         setUserEmail(myDetails.email);
       })
-      .catch((e) => console.log('ERROR: Fetching profile data.'));
+      .catch((e) => console.log('ERROR: Fetching profile data.', e));
   };
 
   useEffect(() => {

@@ -54,7 +54,7 @@ const SearchedProducts = ({ route, navigation }) => {
       reqURL = '/buyer/products/topReviewed';
       setHeading('Searched term: Top Rated');
     } else if (type === 'newArrival') {
-      reqURL = '/buyer/products/newArrival';
+      reqURL = '/buyer/products/topReviewed';
       setHeading('Searched term: New Arrival');
     } else if (type === 'lowCost') {
       reqURL = '/buyer/products';

@@ -129,7 +129,6 @@ const ProductPage = ({ route, navigation }) => {
     if (value !== null) {
       let dArr = JSON.parse(value);
       let status = false;
-      console.log('checking like status...');
       for (let i = 0; i < dArr.length; i++) {
         if (dArr[i]._id == prodId) {
           status = true;

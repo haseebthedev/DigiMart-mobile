@@ -4,17 +4,16 @@ import {
   Text,
   Image,
   StyleSheet,
-  Dimensions,
   TouchableNativeFeedback,
   TouchableOpacity,
   TextInput
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import api from '../../../axios/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import backIcon from '../../../assets/icons/backIcon.png';
-import { Picker } from '@react-native-picker/picker';
 import { UserContext } from '../../../contexts/UserContext';
+import { Picker } from '@react-native-picker/picker';
 
 const Support = ({ navigation }) => {
   const { user } = UserContext();

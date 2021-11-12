@@ -7,9 +7,8 @@ import {
   Dimensions,
   TouchableOpacity,
   TouchableNativeFeedback,
-  TextInput
+  TextInput,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import api from '../../../axios/api';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
@@ -48,9 +47,7 @@ const AccountInfo = ({ navigation }) => {
           birthday
         });
       })
-      .catch((e) => {
-        console.log('Error :: Retriving User failed :: ', e);
-      });
+      .catch((e) => console.log('Error: Retriving User failed. ', e));
   };
 
   const UpdateProfile = async () => {
@@ -61,7 +58,7 @@ const AccountInfo = ({ navigation }) => {
           ...profileData
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${user.token}` }
         }
       )
       .then(() => {
@@ -76,7 +73,7 @@ const AccountInfo = ({ navigation }) => {
         Toast.show({
           type: 'error',
           text1: 'Update Failed !',
-          text2: e,
+          text2: e.toString(),
           position: 'bottom'
         });
       });
