@@ -56,7 +56,6 @@ const StackScreens = () => {
       // initialRouteName={user.token === null ? 'Login' : 'Layout'}
       screenOptions={{ headerShown: false }}
     >
-      {console.log('token', user.token)}
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
       {/* <Stack.Screen name="Messages" component={Messages} /> */}

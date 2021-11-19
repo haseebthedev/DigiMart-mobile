@@ -41,15 +41,13 @@ const Layout = ({ navigation }) => {
   const [UserProfile, setUserProfile] = useState(undefined);
   const [Username, setUsername] = useState('');
   const [UserEmail, setUserEmail] = useState('');
-
-  // State
   const [currentTab, setCurrentTab] = useState('Homepage');
   const [showMenu, setShowMenu] = useState(false);
-  // Animated Properties
+
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
   const closeButtonOffset = useRef(new Animated.Value(0)).current;
-  // Animation Functions
+
   const drawerAnimation = () => {
     Animated.timing(scaleValue, {
       toValue: showMenu ? 1 : 0.88,
@@ -70,11 +68,11 @@ const Layout = ({ navigation }) => {
     }).start();
   };
 
-  const retriveUserData = () => {
-    api
+  const retriveUserData = async () => {
+    await api
       .get('/buyer/me', {
         headers: {
-          Authorization: 'Bearer ' + user.token
+          Authorization: `Bearer ${user.token}`
         }
       })
       .then((res) => {

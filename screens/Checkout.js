@@ -12,6 +12,9 @@ import {
   TouchableNativeFeedback,
   StatusBar
 } from 'react-native';
+import api from '../axios/api';
+import { UserContext } from '../contexts/UserContext';
+import { CartContext } from '../contexts/CartContext';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 const { width, height } = Dimensions.get('screen');
 
@@ -23,12 +26,105 @@ import deliveryIcon from '../assets/icons/deliveryIcon.png';
 import okIcon from '../assets/icons/okIcon.png';
 import paymentIcon from '../assets/icons/paymentIcon.png';
 import orderSuccessIcon from '../assets/icons/orderSuccessIcon.png';
-import deleteIcon from '../assets/icons/deleteIcon.png';
 import backIcon from '../assets/icons/backIcon.png';
+import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
 
-const Cart = ({ navigation }) => {
-  const [Quantity, setQuantity] = useState(1);
+const Cart = ({ route, navigation }) => {
+  const { user } = UserContext();
+  const { cartList, ADD_ITEM } = CartContext();
+  const { totalQuantity, totalDiscount, subTotalPrice, shippingFee } =
+    route.params;
   const [CheckOutModal, setCheckOutModal] = useState(false);
+
+  const [deliveryAddress, setDeliveryAddress] = useState('Rawalpindi');
+  const [paymentMethod, setPaymentMethod] = useState('Cash On Delivery');
+  const [deliveryInstructions, setDeliveryInstructions] = useState('Nothing.');
+  const [couponCode, setCouponCode] = useState('BESTBUY');
+
+  const calAmount = () => {
+    let amount = subTotalPrice - totalDiscount;
+    amount += shippingFee;
+    return amount;
+  };
+
+  function deliveryDate(d) {
+    var date = new Date();
+    var dd = date.getDate() + 4;
+    var mm = date.getMonth() + 1;
+    var yyyy = date.getFullYear();
+    if (dd < 10) {
+      dd = '0' + dd;
+    }
+    if (mm < 10) {
+      mm = '0' + mm;
+    }
+    return (d = dd + '-' + mm + '-' + yyyy);
+  }
+
+  const placeOrder = async () => {
+    const AllStores = [];
+
+    // Getting All Stores
+    cartList.map((el) => {
+      if (!AllStores.includes(el.storeName)) {
+        AllStores.push(el.storeName);
+      }
+    });
+
+    for (let i = 0; i < AllStores.length; i++) {
+      const products = [];
+      for (let j = 0; j < cartList.length; j++) {
+        if (AllStores[i] === cartList[j].storeName) {
+          products.push({
+            productId: cartList[j]._id,
+            name: cartList[j].title,
+            salePrice: cartList[j].salePrice,
+            discount: cartList[j].discount,
+            discountedPrice: cartList[j].discountedPrice,
+            quantity: cartList[j].quantity,
+            color: cartList[j].color
+          });
+
+          console.log('running...');
+        }
+      }
+
+      await api
+        .post(
+          '/buyer/product/order',
+          {
+            products: products,
+            name: 'Haseeb Ahmed',
+            email: 'sheikh.ameen252@gmail.com',
+            contactNumber: '+923359425690',
+            deliveryAddress: 'B1339, rawalpindi',
+            city: 'rawalpindi',
+            couponCode: 'DIGI123',
+            totalDiscount: totalDiscount,
+            subTotalPrice: subTotalPrice,
+            totalPrice: subTotalPrice - totalDiscount + shippingFee,
+            shippingFee: shippingFee,
+            deliveryInstructions: 'Please wear mask while delivery.',
+            totalQuantity: totalQuantity,
+            paymentMethod: 'Cash on delivery'
+          },
+          { headers: { Authorization: `Bearer ${user.token}` } }
+        )
+        .then((res) => {
+          ADD_ITEM([]);
+        })
+        .catch((error) => {
+          console.log('ERROR: ', error);
+        });
+    }
+
+    ToastAndroid.show(
+      'Order has been placed!',
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM
+    );
+    setCheckOutModal(true);
+  };
 
   return (
     <View style={styles.container}>
@@ -170,7 +266,7 @@ const Cart = ({ navigation }) => {
                   color: 'grey'
                 }}
               >
-                Est. Arrival: 30 Oct 2021
+                Est. Arrival: {deliveryDate()}
               </Text>
             </View>
           </View>
@@ -203,7 +299,7 @@ const Cart = ({ navigation }) => {
             </View>
             <View style={{ marginLeft: 10 }}>
               <Text style={{ fontFamily: FONTS.Poppins, marginTop: 5 }}>
-                Total Charges: Rs. 2499
+                Total Charges: Rs. {subTotalPrice}
               </Text>
               <Text
                 style={{
@@ -212,7 +308,7 @@ const Cart = ({ navigation }) => {
                   color: 'grey'
                 }}
               >
-                Item Quantity: x18
+                Item Quantity: x{totalQuantity}
               </Text>
             </View>
           </View>
@@ -269,7 +365,7 @@ const Cart = ({ navigation }) => {
           >
             Total:{' '}
             <Text style={{ fontFamily: FONTS.PoppinsBold, color: '#407BFF' }}>
-              Rs. {Math.floor(Math.random() * 5000)}
+              Rs. {calAmount()}
             </Text>
           </Text>
           <Text
@@ -280,9 +376,7 @@ const Cart = ({ navigation }) => {
             }}
           >
             Discount:{' '}
-            <Text style={{ color: '#407BFF' }}>
-              Rs. {Math.floor(Math.random() * 100)}
-            </Text>
+            <Text style={{ color: '#407BFF' }}>Rs. {totalDiscount}</Text>
           </Text>
         </View>
 
@@ -293,7 +387,7 @@ const Cart = ({ navigation }) => {
             backgroundColor: '#407BFF',
             borderRadius: 8
           }}
-          onPress={() => setCheckOutModal(true)}
+          onPress={placeOrder}
         >
           <Text
             style={{

@@ -12,6 +12,7 @@ import {
   ToastAndroid,
   ScrollView
 } from 'react-native';
+import { CartContext } from '../contexts/CartContext';
 import api from '../axios/api';
 import { FONTS, COLORS } from '../constants';
 import { Rating } from 'react-native-ratings';
@@ -28,6 +29,7 @@ const { width, height } = Dimensions.get('window');
 const ProductPage = ({ route, navigation }) => {
   const refRBSheet = useRef();
   const { prodId } = route.params;
+  const { cartList, ADD_ITEM } = CartContext();
   const [IsLikedProduct, setIsLikedProduct] = useState(false);
   const [ProductDetails, setProductDetails] = useState({
     _id: '',
@@ -156,6 +158,54 @@ const ProductPage = ({ route, navigation }) => {
       .catch((error) => {
         console.log('ERROR: Fetching Product Reviews! ', error);
       });
+  };
+
+  const addItemToCart = () => {
+    let cartItem = {
+      brand: ProductDetails.vendorCompanyName,
+      category: ProductDetails.category,
+      salePrice: ProductDetails.salePrice,
+      discountedPrice: ProductDetails.discountPrice,
+      discount: ProductDetails.discountPercentage,
+      image:
+        ProductDetails.images.length > 0
+          ? ProductDetails.images[0]
+          : imageNotAvailable,
+      quantity: Quantity,
+      rating: ProductDetails.rating,
+      shippingCost: ProductDetails.shippingCost,
+      stockAvailable: ProductDetails.stockAvailable,
+      storeName: StoreDetails.name,
+      title: ProductDetails.name,
+      totalRatingStars: ProductDetails.totalRatingStars,
+      dimensions: ProductDetails.dimensions,
+      color: SelectedColor,
+      _id: ProductDetails._id
+    };
+
+    let prevList = cartList;
+    let isAlreadyAdded = false;
+    for (let i = 0; i < prevList.length; i++) {
+      if (prevList[i]._id === ProductDetails._id) {
+        isAlreadyAdded = true;
+        ToastAndroid.show(
+          'This product is aready added in Cart!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+        break;
+      }
+    }
+
+    if (!isAlreadyAdded) {
+      ADD_ITEM([...prevList, cartItem]);
+      ToastAndroid.show(
+        'Product has been added into Cart!',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+    refRBSheet.current.close();
   };
 
   useEffect(() => {
@@ -546,14 +596,14 @@ const ProductPage = ({ route, navigation }) => {
             source={cartIcon}
             style={{ width: 20, height: 20, marginTop: -4, marginRight: 5 }}
           />
-          <View
+          <Text
             style={{
               fontSize: FONTS.Paragraph2,
               fontFamily: FONTS.Poppins
             }}
           >
-            <Text>Add to Cart</Text>
-          </View>
+            Add to Cart
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -695,6 +745,7 @@ const ProductPage = ({ route, navigation }) => {
               marginTop: 20,
               borderRadius: 6
             }}
+            onPress={addItemToCart}
           >
             <Text style={{ fontFamily: FONTS.PoppinsBold, color: '#fff' }}>
               Add to Cart

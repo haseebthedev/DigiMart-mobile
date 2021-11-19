@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -9,42 +9,46 @@ import {
   Modal,
   FlatList
 } from 'react-native';
+import { CartContext } from '../contexts/CartContext';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 import deleteIcon from '../assets/icons/deleteIcon.png';
 import productImage from '../assets/images/laptop-image.png';
 const { width, height } = Dimensions.get('screen');
 
 const Cart = ({ navigation }) => {
+  const { cartList, ADD_ITEM } = CartContext();
+  const [productList, setproductList] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState();
   const [DeleteProductModal, setDeleteProductModal] = useState(false);
-  const [productList, setproductList] = useState([
-    {
-      id: 1,
-      image: productImage,
-      name: 'HP Laptop 15',
-      Quantity: 7,
-      price: 1280
-    },
-    {
-      id: 2,
-      image: productImage,
-      name: 'HP Laptop 21',
-      Quantity: 2,
-      price: 2120
-    },
-    {
-      id: 3,
-      image: productImage,
-      name: 'HP Laptop 24',
-      Quantity: 4,
-      price: 5400
+
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  const [totalDiscount, setTotalDiscount] = useState(0);
+  const [subTotalPrice, setSubTotalPrice] = useState(0);
+  const [shippingFee, setShippingFee] = useState(0);
+
+  const calculatePrices = () => {
+    let disc = 0;
+    let subTotal = 0;
+    let shipping = 0;
+    let quantity = 0;
+
+    for (let i = 0; i < productList.length; i++) {
+      disc += productList[i].discountedPrice;
+      subTotal += productList[i].salePrice * productList[i].quantity;
+      shipping += productList[i].shippingCost;
+      quantity += productList[i].quantity;
     }
-  ]);
+    setSubTotalPrice(subTotal);
+    setShippingFee(shipping);
+    setTotalDiscount(disc);
+    setTotalQuantity(quantity);
+  };
 
   // Delete Product from Cart
   const deleteProduct = () => {
-    let newArr = productList.filter((el) => el.id !== selectedProduct);
+    let newArr = productList.filter((el) => el._id !== selectedProduct);
     setproductList(newArr);
+    ADD_ITEM(newArr);
   };
 
   const calQty = (type, qty) => {
@@ -60,23 +64,33 @@ const Cart = ({ navigation }) => {
   };
 
   const handleQuantity = (id, type) => {
-    let prevQty;
+    let prevProduct;
 
     productList.map((el) => {
-      if (el.id === id) {
-        prevQty = el;
+      if (el._id === id) {
+        prevProduct = el;
       }
     });
 
-    let newQty = {
-      ...prevQty,
-      // Quantity: type === 'INC' ? prevQty.Quantity + 1 : prevQty.Quantity - 1
-      Quantity: calQty(type, prevQty.Quantity)
+    let newProd = {
+      ...prevProduct,
+      quantity: calQty(type, prevProduct.quantity)
     };
 
-    let cartList = productList.map((el) => (el.id === id ? newQty : el));
-    setproductList(cartList);
+    let newCart = productList.map((el) => (el._id === id ? newProd : el));
+    setproductList(newCart);
+    ADD_ITEM(newCart);
   };
+
+  function trimProdName(name) {
+    let res = '';
+    if (name.length > 16) {
+      res = name.toString().substring(0, 16) + '...';
+    } else {
+      res = name;
+    }
+    return res;
+  }
 
   // Product Card
   const renderItem = ({ item }) => {
@@ -112,7 +126,7 @@ const Cart = ({ navigation }) => {
                 fontSize: FONTS.Paragraph2
               }}
             >
-              {item.name}
+              {trimProdName(item.title)}
             </Text>
             <View
               style={{
@@ -132,7 +146,7 @@ const Cart = ({ navigation }) => {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}
-                onPress={() => handleQuantity(item.id, 'DEC')}
+                onPress={() => handleQuantity(item._id, 'DEC')}
               >
                 <Text style={{ fontSize: 18 }}>-</Text>
               </TouchableOpacity>
@@ -152,7 +166,7 @@ const Cart = ({ navigation }) => {
                     fontSize: FONTS.Paragraph3
                   }}
                 >
-                  {item.Quantity}
+                  {item.quantity}
                 </Text>
               </View>
               <TouchableOpacity
@@ -167,7 +181,7 @@ const Cart = ({ navigation }) => {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}
-                onPress={() => handleQuantity(item.id, 'INC')}
+                onPress={() => handleQuantity(item._id, 'INC')}
               >
                 <Text style={{ fontSize: 18 }}>+</Text>
               </TouchableOpacity>
@@ -189,7 +203,7 @@ const Cart = ({ navigation }) => {
             right: 10
           }}
           onPress={() => {
-            setSelectedProduct(item.id);
+            setSelectedProduct(item._id);
             setDeleteProductModal(true);
           }}
         >
@@ -215,20 +229,29 @@ const Cart = ({ navigation }) => {
               fontSize: FONTS.Paragraph2
             }}
           >
-            Rs. {item.price}
+            Rs. {item.salePrice}
           </Text>
         </View>
       </View>
     );
   };
 
+  useEffect(() => {
+    setproductList(cartList);
+
+    return () => setproductList([]);
+  }, [cartList]);
+
+  useEffect(() => {
+    calculatePrices();
+  });
+
   return (
     <View style={styles.container}>
-      {/* Product List */}
       <FlatList
         data={productList}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
       />
 
       {/* Checkout Button */}
@@ -254,16 +277,14 @@ const Cart = ({ navigation }) => {
             }}
           >
             Shipping:{' '}
-            <Text style={{ color: '#407BFF' }}>
-              Rs. {Math.floor(Math.random() * 100)}
-            </Text>
+            <Text style={{ color: '#407BFF' }}>Rs. {shippingFee}</Text>
           </Text>
           <Text
             style={{ fontFamily: FONTS.Poppins, fontSize: FONTS.Paragraph2 }}
           >
             Total:{' '}
             <Text style={{ fontFamily: FONTS.PoppinsBold, color: '#407BFF' }}>
-              Rs. {Math.floor(Math.random() * 5000)}
+              Rs. {subTotalPrice}
             </Text>
           </Text>
         </View>
@@ -275,7 +296,14 @@ const Cart = ({ navigation }) => {
             backgroundColor: '#407BFF',
             borderRadius: 8
           }}
-          onPress={() => navigation.navigate('Checkout')}
+          onPress={() =>
+            navigation.navigate('Checkout', {
+              totalQuantity: totalQuantity,
+              totalDiscount: totalDiscount,
+              subTotalPrice: subTotalPrice,
+              shippingFee: shippingFee
+            })
+          }
         >
           <Text
             style={{
@@ -392,7 +420,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center'
-    // justifyContent: 'center'
   }
 });
 
