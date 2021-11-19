@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
-
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { UserContext } from '../contexts/UserContext';
 
 // Screens
 import Register from '.././screens/Register';
@@ -40,24 +40,11 @@ import AccountInfo from '.././screens/Account/Settings/AccountInfo';
 import AddressBook from '.././screens/Account/Settings/AddressBook';
 import FAQ from '.././screens/Account/Settings/FAQ';
 import PrivacyPolicy from '.././screens/Account/Settings/PrivacyPolicy';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator();
 
 const StackScreens = () => {
-  const [UserState, setUserState] = useState(null);
-
-  const fetchUserState = () => {
-    AsyncStorage.getItem('@USER_TOKEN').then((value) => {
-      if (value !== null) {
-        setUserState(value);
-      }
-    });
-  };
-
-  useEffect(() => {
-    fetchUserState();
-  });
+  const { user } = UserContext();
 
   useEffect(() => {
     SplashScreen.hide();
@@ -65,10 +52,11 @@ const StackScreens = () => {
 
   return (
     <Stack.Navigator
-      // initialRouteName={UserState === null ? 'Layout' : 'Login'}
       initialRouteName={'Layout'}
+      // initialRouteName={user.token === null ? 'Login' : 'Layout'}
       screenOptions={{ headerShown: false }}
     >
+      {console.log('token', user.token)}
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
       {/* <Stack.Screen name="Messages" component={Messages} /> */}

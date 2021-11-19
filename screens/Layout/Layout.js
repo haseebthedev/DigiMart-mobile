@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Animated,
@@ -86,7 +86,7 @@ const Layout = ({ navigation }) => {
       .catch((e) => console.log('ERROR: Fetching profile data.', e));
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     retriveUserData();
   }, []);
 

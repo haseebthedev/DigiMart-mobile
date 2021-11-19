@@ -6,27 +6,20 @@ const Context = createContext({});
 export const UserContext = () => useContext(Context);
 
 const ContextProvider = ({ children }) => {
-  const [user, setUser] = useState({
-    token:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTE5MDFjZjY0ZDQ0MTNiZDQ4MGIyNDciLCJpYXQiOjE2MzY2NTk5NzQsImV4cCI6MTYzNzI2NDc3NH0.htrBHSEDiOzMV9HPzVuef24gZwp4xOj0oAaUgctoEwQ'
-  });
+  const [user, setUser] = useState({ token: null });
 
   // Manipulation functions
   const ADD_USER = (payload) => {
-    setUser({ token: payload.token });
+    setUser({ token: payload });
   };
 
   const SIGN_OUT = () => {
-    setUser({ token: '' });
+    setUser({ token: null });
   };
 
   async function fetchData() {
-    // let data = await AsyncStorage.getItem('DIGI-MART:USER');
-    // setUser(JSON.parse(data));
-    setUser({
-      token:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTE5MDFjZjY0ZDQ0MTNiZDQ4MGIyNDciLCJpYXQiOjE2MzY2NTk5NzQsImV4cCI6MTYzNzI2NDc3NH0.htrBHSEDiOzMV9HPzVuef24gZwp4xOj0oAaUgctoEwQ'
-    });
+    let data = await AsyncStorage.getItem('DIGI-MART:USER');
+    setUser(JSON.parse(data));
   }
 
   // Fetching Data

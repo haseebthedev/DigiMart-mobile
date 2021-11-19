@@ -10,27 +10,12 @@ import {
 import Toast from 'react-native-toast-message';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 import api from '../axios/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../contexts/UserContext';
 
 const Login = ({ navigation }) => {
+  const { ADD_USER } = UserContext();
   const [LoginEmail, setLoginEmail] = useState('sheikh.ameen252@gmail.com');
   const [LoginPass, setLoginPass] = useState('ameen321');
-
-  const storeUserToken = async (token) => {
-    try {
-      await AsyncStorage.setItem('@USER_TOKEN', token);
-    } catch (e) {
-      console.log('Error :: Saving token failed :: ', e);
-    }
-  };
-
-  const storeUserData = async (data) => {
-    try {
-      await AsyncStorage.setItem('@USER_DATA', JSON.stringify(data));
-    } catch (e) {
-      console.log('Error :: Saving data failed :: ', e);
-    }
-  };
 
   const handlerLogin = async () => {
     await api
@@ -41,8 +26,7 @@ const Login = ({ navigation }) => {
           text1: 'Login Successfully!',
           text2: 'Redirecting to Homepage...',
           onShow: () => {
-            storeUserToken(res.data.data.token);
-            storeUserData(res.data.data.buyer);
+            ADD_USER(res.data.data.token);
           },
           onHide: () => {
             navigation.navigate('Layout');
@@ -55,8 +39,6 @@ const Login = ({ navigation }) => {
           text1: 'Wrong Credentials',
           text2: 'Either email or password is invalid!'
         });
-        console.log('email', email);
-        console.log('password', password);
       });
   };
 
