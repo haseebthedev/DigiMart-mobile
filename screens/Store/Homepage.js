@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,60 +15,37 @@ import laptopImage from '../../assets/images/laptop-image.png';
 import banner2 from '../../assets/images/banner2.png';
 
 import addIcon from '../../assets/icons/addIcon.png';
+import api from '../../axios/api';
 
 const { width, height } = Dimensions.get('screen');
 
-const Homepage = ({ navigation }) => {
-  const [ProductList] = useState([
-    {
-      id: 1,
-      name: 'HP Laptop 15',
-      price: '100',
-      colors: '2 Colors',
-      ratings: 4.6,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 2,
-      name: 'HP Laptop',
-      price: '230',
-      colors: '5 Colors',
-      ratings: 2,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 3,
-      name: 'HP Laptop',
-      price: '340',
-      colors: '12 Colors',
-      ratings: 5,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 4,
-      name: 'HP Laptop',
-      price: '500',
-      colors: '9 Colors',
-      ratings: 4,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 5,
-      name: 'HP Laptop',
-      price: '6000',
-      colors: '4 Colors',
-      ratings: 3.5,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 6,
-      name: 'HP Laptop',
-      price: '2300',
-      colors: '12 Colors',
-      ratings: 2,
-      image: require('../../assets/images/laptop-image.png')
+const Homepage = ({ route, navigation }) => {
+  const { storeId } = route.params;
+
+  const [OnSaleProducts, SetOnSaleProducts] = useState([]);
+  const [ForYouProducts, SetForYouProducts] = useState([]);
+
+  function trimProdName(name) {
+    let res = '';
+    if (name.length > 14) {
+      res = name.toString().substring(0, 13) + '...';
+    } else {
+      res = name;
     }
-  ]);
+    return res;
+  }
+
+  useEffect(() => {
+    api
+      .get(`/buyer/data/store/${storeId}/mobile`)
+      .then((res) => {
+        let HotDeals = res.data.data.OnSaleProducts;
+        let LatestProducts = res.data.data.ForYouProducts;
+        SetOnSaleProducts(HotDeals);
+        SetForYouProducts(LatestProducts);
+      })
+      .catch((error) => console.log('Error: ', error));
+  }, []);
 
   return (
     <View>
@@ -90,27 +67,28 @@ const Homepage = ({ navigation }) => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20, height: 195 }}
+            contentContainerStyle={{ paddingHorizontal: 20 }}
           >
-            {ProductList.map((el, index) => (
+            {OnSaleProducts.map((el, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
                   styles.productCard,
-                  { elevation: 1, flex: 1, height: 190 },
-                  index !== ProductList.length - 1
+                  index !== OnSaleProducts.length - 1
                     ? { marginRight: 10 }
                     : { marginRight: 0 }
                 ]}
-                onPress={() => navigation.navigate('ProductPage')}
+                onPress={() =>
+                  navigation.navigate('ProductPage', { prodId: el._id })
+                }
               >
                 <View style={{ alignItems: 'center' }}>
                   <Image
-                    source={laptopImage}
-                    style={{ width: 110, height: 110 }}
+                    source={{ uri: el.images }}
+                    style={{ width: 90, height: 90, marginVertical: 10 }}
                   />
                 </View>
-                <Text style={styles.productName}>{el.name}</Text>
+                <Text style={styles.productName}>{trimProdName(el.name)}</Text>
                 <View
                   style={{
                     alignItems: 'center',
@@ -121,7 +99,7 @@ const Homepage = ({ navigation }) => {
                     readonly={true}
                     ratingColor="#3498db"
                     ratingBackgroundColor="#c8c7c8"
-                    startingValue={el.ratings}
+                    startingValue={el.avgRating}
                     imageSize={12}
                   />
                   <Text
@@ -131,7 +109,7 @@ const Homepage = ({ navigation }) => {
                       marginLeft: 4
                     }}
                   >
-                    {'(' + el.ratings + ')'}
+                    {'(' + el.totalRatingStars + ')'}
                   </Text>
                 </View>
                 <View
@@ -142,7 +120,9 @@ const Homepage = ({ navigation }) => {
                     paddingBottom: 10
                   }}
                 >
-                  <Text style={styles.productPrice}>{'Rs. ' + el.price}</Text>
+                  <Text style={styles.productPrice}>
+                    {'Rs. ' + el.salePrice}
+                  </Text>
                   <TouchableOpacity>
                     <Image
                       source={addIcon}
@@ -183,38 +163,38 @@ const Homepage = ({ navigation }) => {
             marginTop: 10,
             marginBottom: 10,
             paddingHorizontal: 20
-            // alignItems: 'center'
           }}
         >
           <Text style={{ fontFamily: FONTS.PoppinsBold, fontSize: 20 }}>
-            Latest Products
+            For You
           </Text>
         </View>
         <View style={{ marginBottom: 20 }}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20, height: 195 }}
+            contentContainerStyle={{ paddingHorizontal: 20 }}
           >
-            {ProductList.map((el, index) => (
+            {ForYouProducts.map((el, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
                   styles.productCard,
-                  { elevation: 1, flex: 1, height: 190 },
-                  index !== ProductList.length - 1
+                  index !== ForYouProducts.length - 1
                     ? { marginRight: 10 }
                     : { marginRight: 0 }
                 ]}
-                onPress={() => navigation.navigate('ProductPage')}
+                onPress={() =>
+                  navigation.navigate('ProductPage', { prodId: el._id })
+                }
               >
                 <View style={{ alignItems: 'center' }}>
                   <Image
-                    source={laptopImage}
-                    style={{ width: 110, height: 110 }}
+                    source={{ uri: el.images }}
+                    style={{ width: 90, height: 90, marginVertical: 10 }}
                   />
                 </View>
-                <Text style={styles.productName}>{el.name}</Text>
+                <Text style={styles.productName}>{trimProdName(el.name)}</Text>
                 <View
                   style={{
                     alignItems: 'center',
@@ -225,7 +205,7 @@ const Homepage = ({ navigation }) => {
                     readonly={true}
                     ratingColor="#3498db"
                     ratingBackgroundColor="#c8c7c8"
-                    startingValue={el.ratings}
+                    startingValue={el.avgRating}
                     imageSize={12}
                   />
                   <Text
@@ -235,7 +215,7 @@ const Homepage = ({ navigation }) => {
                       marginLeft: 4
                     }}
                   >
-                    {'(' + el.ratings + ')'}
+                    {'(' + el.totalRatingStars + ')'}
                   </Text>
                 </View>
                 <View
@@ -246,7 +226,9 @@ const Homepage = ({ navigation }) => {
                     paddingBottom: 10
                   }}
                 >
-                  <Text style={styles.productPrice}>{'Rs. ' + el.price}</Text>
+                  <Text style={styles.productPrice}>
+                    {'Rs. ' + el.salePrice}
+                  </Text>
                   <TouchableOpacity>
                     <Image
                       source={addIcon}

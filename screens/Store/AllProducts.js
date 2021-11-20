@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,60 +9,34 @@ import {
 } from 'react-native';
 import { Rating } from 'react-native-ratings';
 import { FONTS } from '../../constants/index';
-import laptopImage from '../../assets/images/laptop-image.png';
 import addIcon from '../../assets/icons/addIcon.png';
+import imageNotAvailable from '../../assets/images/imageNotAvailable.png';
+import api from '../../axios/api';
 
-const AllProducts = ({ navigation }) => {
-  const [ProductList] = useState([
-    {
-      id: 1,
-      name: 'HP Laptop 15',
-      price: '100',
-      colors: '2 Colors',
-      ratings: 4.6,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 2,
-      name: 'HP Laptop',
-      price: '230',
-      colors: '5 Colors',
-      ratings: 2,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 3,
-      name: 'HP Laptop',
-      price: '340',
-      colors: '12 Colors',
-      ratings: 5,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 4,
-      name: 'HP Laptop',
-      price: '500',
-      colors: '9 Colors',
-      ratings: 4,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 5,
-      name: 'HP Laptop',
-      price: '6000',
-      colors: '4 Colors',
-      ratings: 3.5,
-      image: require('../../assets/images/laptop-image.png')
-    },
-    {
-      id: 6,
-      name: 'HP Laptop',
-      price: '2300',
-      colors: '12 Colors',
-      ratings: 2,
-      image: require('../../assets/images/laptop-image.png')
+const AllProducts = ({ route, navigation }) => {
+  const { storeId } = route.params;
+
+  const [ProductList, setProductList] = useState([]);
+
+  function trimProdName(name) {
+    let res = '';
+    if (name.length > 14) {
+      res = name.toString().substring(0, 13) + '...';
+    } else {
+      res = name;
     }
-  ]);
+    return res;
+  }
+
+  useEffect(() => {
+    api
+      .get(`/buyer/products/store/${storeId}`)
+      .then((res) => {
+        let products = res.data.data.products;
+        setProductList(products);
+      })
+      .catch((error) => console.log('Error: ', error));
+  }, []);
 
   return (
     <View>
@@ -110,11 +84,15 @@ const AllProducts = ({ navigation }) => {
                 >
                   <View style={{ alignItems: 'center' }}>
                     <Image
-                      source={laptopImage}
-                      style={{ width: 110, height: 110 }}
+                      source={
+                        el.images ? { uri: el.images } : imageNotAvailable
+                      }
+                      style={{ width: 90, height: 90, marginVertical: 10 }}
                     />
                   </View>
-                  <Text style={styles.productName}>HP Laptip</Text>
+                  <Text style={styles.productName}>
+                    {trimProdName(el.name)}
+                  </Text>
                   <View
                     style={{
                       alignItems: 'center',
@@ -125,7 +103,7 @@ const AllProducts = ({ navigation }) => {
                       readonly={true}
                       ratingColor="#3498db"
                       ratingBackgroundColor="#c8c7c8"
-                      startingValue={3}
+                      startingValue={el.avgRating}
                       imageSize={12}
                     />
                     <Text
@@ -135,7 +113,7 @@ const AllProducts = ({ navigation }) => {
                         marginLeft: 4
                       }}
                     >
-                      {'(' + '235' + ')'}
+                      {'(' + el.totalRatingStars + ')'}
                     </Text>
                   </View>
                   <View
@@ -146,7 +124,9 @@ const AllProducts = ({ navigation }) => {
                       paddingBottom: 10
                     }}
                   >
-                    <Text style={styles.productPrice}>{'Rs. ' + '145'}</Text>
+                    <Text style={styles.productPrice}>
+                      {'Rs. ' + el.salePrice}
+                    </Text>
                     <TouchableOpacity>
                       <Image
                         source={addIcon}

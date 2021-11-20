@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,8 @@ import {
   Dimensions,
   TouchableOpacity,
   Modal,
-  FlatList
+  FlatList,
+  ToastAndroid
 } from 'react-native';
 import { CartContext } from '../contexts/CartContext';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
@@ -21,26 +22,27 @@ const Cart = ({ navigation }) => {
   const [selectedProduct, setSelectedProduct] = useState();
   const [DeleteProductModal, setDeleteProductModal] = useState(false);
 
-  const [totalQuantity, setTotalQuantity] = useState(0);
-  const [totalDiscount, setTotalDiscount] = useState(0);
   const [subTotalPrice, setSubTotalPrice] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [totalQuantity, setTotalQuantity] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);
 
   const calculatePrices = () => {
-    let disc = 0;
     let subTotal = 0;
     let shipping = 0;
     let quantity = 0;
 
     for (let i = 0; i < productList.length; i++) {
-      disc += productList[i].discountedPrice;
-      subTotal += productList[i].salePrice * productList[i].quantity;
+      subTotal +=
+        productList[i].discountedPrice > 0
+          ? productList[i].discountedPrice * productList[i].quantity
+          : productList[i].salePrice * productList[i].quantity;
       shipping += productList[i].shippingCost;
       quantity += productList[i].quantity;
     }
     setSubTotalPrice(subTotal);
+    setTotalPrice(subTotal + shipping);
     setShippingFee(shipping);
-    setTotalDiscount(disc);
     setTotalQuantity(quantity);
   };
 
@@ -51,9 +53,18 @@ const Cart = ({ navigation }) => {
     ADD_ITEM(newArr);
   };
 
-  const calQty = (type, qty) => {
+  const calQty = (type, qty, stock) => {
     if (type === 'INC') {
-      return qty + 1;
+      if (stock > qty) {
+        return qty + 1;
+      } else {
+        ToastAndroid.show(
+          'Not enough stock!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+        return qty;
+      }
     } else {
       if (qty > 1) {
         return qty - 1;
@@ -63,7 +74,7 @@ const Cart = ({ navigation }) => {
     }
   };
 
-  const handleQuantity = (id, type) => {
+  const handleQuantity = (id, type, stockAvailable) => {
     let prevProduct;
 
     productList.map((el) => {
@@ -74,7 +85,7 @@ const Cart = ({ navigation }) => {
 
     let newProd = {
       ...prevProduct,
-      quantity: calQty(type, prevProduct.quantity)
+      quantity: calQty(type, prevProduct.quantity, stockAvailable)
     };
 
     let newCart = productList.map((el) => (el._id === id ? newProd : el));
@@ -146,7 +157,9 @@ const Cart = ({ navigation }) => {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}
-                onPress={() => handleQuantity(item._id, 'DEC')}
+                onPress={() =>
+                  handleQuantity(item._id, 'DEC', item.stockAvailable)
+                }
               >
                 <Text style={{ fontSize: 18 }}>-</Text>
               </TouchableOpacity>
@@ -181,7 +194,9 @@ const Cart = ({ navigation }) => {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}
-                onPress={() => handleQuantity(item._id, 'INC')}
+                onPress={() =>
+                  handleQuantity(item._id, 'INC', item.stockAvailable)
+                }
               >
                 <Text style={{ fontSize: 18 }}>+</Text>
               </TouchableOpacity>
@@ -282,9 +297,9 @@ const Cart = ({ navigation }) => {
           <Text
             style={{ fontFamily: FONTS.Poppins, fontSize: FONTS.Paragraph2 }}
           >
-            Total:{' '}
+            Total Price:{' '}
             <Text style={{ fontFamily: FONTS.PoppinsBold, color: '#407BFF' }}>
-              Rs. {subTotalPrice}
+              Rs. {Math.floor(subTotalPrice)}
             </Text>
           </Text>
         </View>
@@ -298,9 +313,9 @@ const Cart = ({ navigation }) => {
           }}
           onPress={() =>
             navigation.navigate('Checkout', {
-              totalQuantity: totalQuantity,
-              totalDiscount: totalDiscount,
               subTotalPrice: subTotalPrice,
+              totalPrice: totalPrice,
+              totalQuantity: totalQuantity,
               shippingFee: shippingFee
             })
           }

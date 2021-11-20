@@ -56,7 +56,7 @@ const Reviews = ({ navigation }) => {
   const deleteReview = async () => {
     await api
       .delete(`/buyer/product/review/${selectedReview}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${user.token}` }
       })
       .then((res) => {
         let newRevs = reviewsList.filter((el) => el._id !== selectedReview);

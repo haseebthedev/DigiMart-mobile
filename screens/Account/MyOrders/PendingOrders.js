@@ -4,7 +4,8 @@ import {
   Text,
   Image,
   StyleSheet,
-  TouchableNativeFeedback
+  TouchableNativeFeedback,
+  ScrollView
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../../axios/api';
@@ -47,7 +48,7 @@ const PendingOrders = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text
         style={{
           fontFamily: FONTS.PoppinsBold,
@@ -140,7 +141,7 @@ const PendingOrders = ({ navigation }) => {
           ))}
         </DataTable>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

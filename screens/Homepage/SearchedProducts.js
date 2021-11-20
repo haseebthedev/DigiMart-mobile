@@ -86,9 +86,9 @@ const SearchedProducts = ({ route, navigation }) => {
   useEffect(() => {
     getProducts();
 
-    return () => {
-      setProductList([]);
-    };
+    // return () => {
+    //   setProductList([]);
+    // };
   }, []);
 
   return (

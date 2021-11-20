@@ -160,12 +160,31 @@ const ProductPage = ({ route, navigation }) => {
       });
   };
 
+  const QuantityHandler = (type) => {
+    if (type === 'INC') {
+      if (Quantity < ProductDetails.stockAvailable) {
+        setQuantity((prev) => prev + 1);
+      } else {
+        ToastAndroid.show(
+          'Not enough stock!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+    } else {
+      if (Quantity > 1) {
+        setQuantity((prev) => prev - 1);
+      }
+    }
+  };
+
   const addItemToCart = () => {
     let cartItem = {
       brand: ProductDetails.vendorCompanyName,
       category: ProductDetails.category,
       salePrice: ProductDetails.salePrice,
-      discountedPrice: ProductDetails.discountPrice,
+      discountedPrice:
+        ProductDetails.discountPrice > 0 ? ProductDetails.discountPrice : 0,
       discount: ProductDetails.discountPercentage,
       image:
         ProductDetails.images.length > 0
@@ -512,7 +531,11 @@ const ProductPage = ({ route, navigation }) => {
               >
                 <TouchableOpacity
                   style={{ flexDirection: 'row', alignItems: 'center' }}
-                  onPress={() => navigation.navigate('Store')}
+                  onPress={() =>
+                    navigation.navigate('Store', {
+                      storeId: StoreDetails._id
+                    })
+                  }
                 >
                   <Image
                     source={
@@ -554,7 +577,11 @@ const ProductPage = ({ route, navigation }) => {
                     borderColor: 'black',
                     borderRadius: 4
                   }}
-                  onPress={() => navigation.navigate('Store')}
+                  onPress={() =>
+                    navigation.navigate('Store', {
+                      storeId: StoreDetails._id
+                    })
+                  }
                 >
                   <Text
                     style={{
@@ -702,7 +729,7 @@ const ProductPage = ({ route, navigation }) => {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}
-                onPress={() => setQuantity((prev) => prev - 1)}
+                onPress={() => QuantityHandler('DEC')}
               >
                 <Text style={{ fontSize: 18 }}>-</Text>
               </TouchableOpacity>
@@ -730,7 +757,7 @@ const ProductPage = ({ route, navigation }) => {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}
-                onPress={() => setQuantity((prev) => prev + 1)}
+                onPress={() => QuantityHandler('INC')}
               >
                 <Text style={{ fontSize: 18 }}>+</Text>
               </TouchableOpacity>

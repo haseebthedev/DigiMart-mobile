@@ -30,6 +30,10 @@ const CancelledOrders = ({ navigation }) => {
 
   useEffect(() => {
     getCancelledOrders();
+
+    return () => {
+      setOrderDetails([]);
+    };
   }, []);
 
   function formatDate(d) {

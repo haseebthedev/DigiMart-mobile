@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,17 +13,40 @@ import addIcon from '../../assets/icons/addIcon.png';
 import chatIcon from '../../assets/icons/chatIcon.png';
 import storeImage from '../../assets/images/google-logo.png';
 import backBtnIcon from '../../assets/icons/backIcon.png';
+import imageNotAvailable from '../../assets/images/imageNotAvailable.png';
 
 // screens
 import Homepage from './Homepage';
 import AllProducts from './AllProducts';
 import Reviews from './Reviews';
 import About from './About';
+import api from '../../axios/api';
 
 const { width } = Dimensions.get('screen');
 const Tab = createMaterialTopTabNavigator();
 
-const Store = ({ navigation }) => {
+const Store = ({ route, navigation }) => {
+  const { storeId } = route.params;
+
+  const [storeDetails, setStoreDetails] = useState({
+    name: '',
+    countOfStoreSubscribers: 0,
+    sumOfRatings: ''
+  });
+
+  useEffect(() => {
+    api
+      .get(`/buyer/data/store/${storeId}/mobile`)
+      .then((res) => {
+        let name = res.data.data.storeDetails.name;
+        let logo = res.data.data.storeDetails.logo;
+        let countOfStoreSubscribers = res.data.data.countOfStoreSubscribers;
+        let sumOfRatings = res.data.data.sumOfRatings;
+        setStoreDetails({ name, logo, countOfStoreSubscribers, sumOfRatings });
+      })
+      .catch((error) => console.log('Error: ', error));
+  }, []);
+
   return (
     <React.Fragment>
       <StatusBar backgroundColor="#407BFF" />
@@ -49,7 +72,13 @@ const Store = ({ navigation }) => {
             />
           </TouchableOpacity>
           <Image
-            source={storeImage}
+            source={
+              storeDetails.logo
+                ? {
+                    uri: storeDetails.logo
+                  }
+                : imageNotAvailable
+            }
             style={{
               width: 40,
               height: 40,
@@ -66,7 +95,7 @@ const Store = ({ navigation }) => {
                 fontSize: 16
               }}
             >
-              Google Inc.
+              {storeDetails.name}
             </Text>
             <Text
               style={{
@@ -76,7 +105,10 @@ const Store = ({ navigation }) => {
                 marginTop: -5
               }}
             >
-              165 Products - 3425 Followers
+              {storeDetails.sumOfRatings +
+                ' Ratings - ' +
+                storeDetails.countOfStoreSubscribers +
+                ' Followers'}
             </Text>
           </View>
         </View>
@@ -126,10 +158,26 @@ const Store = ({ navigation }) => {
           }
         }}
       >
-        <Tab.Screen name="Home page" component={Homepage} />
-        <Tab.Screen name="All Products" component={AllProducts} />
-        <Tab.Screen name="Reviews" component={Reviews} />
-        <Tab.Screen name="About" component={About} />
+        <Tab.Screen
+          name="Home page"
+          component={Homepage}
+          initialParams={{ storeId: storeId }}
+        />
+        <Tab.Screen
+          name="All Products"
+          component={AllProducts}
+          initialParams={{ storeId: storeId }}
+        />
+        <Tab.Screen
+          name="Reviews"
+          component={Reviews}
+          initialParams={{ storeId: storeId }}
+        />
+        <Tab.Screen
+          name="About"
+          component={About}
+          initialParams={{ storeId: storeId }}
+        />
       </Tab.Navigator>
     </React.Fragment>
   );

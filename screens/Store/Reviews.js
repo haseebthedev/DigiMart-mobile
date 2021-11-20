@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,46 +9,21 @@ import {
 } from 'react-native';
 import { Rating } from 'react-native-ratings';
 import { FONTS } from '../../constants/index';
+import api from '../../axios/api';
 
-import reviewImage from '../../assets/images/laptop-image.png';
+const Reviews = ({ route, navigation }) => {
+  const { storeId } = route.params;
+  const [StoreReviews, setStoreReviews] = useState([]);
 
-const Reviews = ({ navigation }) => {
-  const [ProductDetails] = useState({
-    title: 'HP Laptop 2021',
-    ratings: {
-      ratingValue: '4.3',
-      ratingCount: 234
-    },
-    category: 'Electronics',
-    subCategory: 'AC/DC Invertor',
-    description:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. \n\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-    price: '120.00',
-    warranty: '2 years',
-    state: 'New',
-    shippingCost: 120,
-    stockAvailable: 20,
-    storeName: 'GUCCI Pakistan',
-    colors: ['red', 'green', 'blue'],
-    reviews: [
-      {
-        id: 1,
-        pictures: [reviewImage, reviewImage, reviewImage],
-        buyerName: 'Haseeb Ahmed',
-        comment: 'Product is nice.',
-        rating: 4.3,
-        createdAt: '2021-08-16T11:19:11.787+00:00'
-      },
-      {
-        id: 2,
-        pictures: [reviewImage, reviewImage],
-        buyerName: 'M. Ameen',
-        comment: 'This Product is very cheap!',
-        rating: 4.7,
-        createdAt: '2021-08-16T11:19:11.787+00:00'
-      }
-    ]
-  });
+  useEffect(() => {
+    api
+      .get(`/buyer/reviews/store/${storeId}`)
+      .then((res) => {
+        let reviews = res.data.data.reviews;
+        setStoreReviews(reviews);
+      })
+      .catch((error) => console.log('Error: ', error));
+  }, []);
 
   return (
     <View>
@@ -74,7 +49,7 @@ const Reviews = ({ navigation }) => {
 
         {/* Reviews */}
         <View>
-          {ProductDetails.reviews.map((el, index) => (
+          {StoreReviews.map((el, index) => (
             <View
               style={{
                 paddingHorizontal: 15,
@@ -127,17 +102,21 @@ const Reviews = ({ navigation }) => {
               </View>
 
               <View style={{ flexDirection: 'row' }}>
-                {el.pictures.map((el, index) => (
-                  <Image
-                    key={index}
-                    source={el}
-                    style={{
-                      width: 60,
-                      height: 60,
-                      marginRight: 8
-                    }}
-                  />
-                ))}
+                {el.pictures.length > 0 ? (
+                  el.pictures.map((el, index) => (
+                    <Image
+                      key={index}
+                      source={{ uri: el }}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        marginRight: 8
+                      }}
+                    />
+                  ))
+                ) : (
+                  <View />
+                )}
               </View>
             </View>
           ))}
