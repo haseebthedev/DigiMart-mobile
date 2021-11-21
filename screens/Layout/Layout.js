@@ -217,7 +217,7 @@ const Layout = ({ navigation }) => {
                 }}
               />
             </TouchableOpacity>
-            <View
+            <TouchableOpacity
               style={{
                 width: 240,
                 height: 30,
@@ -227,6 +227,7 @@ const Layout = ({ navigation }) => {
                 borderRadius: 5,
                 justifyContent: 'center'
               }}
+              onPress={() => navigation.navigate('SearchAndFilter')}
             >
               <Image
                 source={searchIcon}
@@ -238,7 +239,7 @@ const Layout = ({ navigation }) => {
                   left: 10
                 }}
               />
-              <TextInput
+              {/* <TextInput
                 placeholder="Search in Digimart"
                 style={{
                   fontSize: 12,
@@ -246,8 +247,17 @@ const Layout = ({ navigation }) => {
                   marginBottom: -10,
                   fontFamily: FONTS.Poppins
                 }}
-              />
-            </View>
+              /> */}
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontFamily: FONTS.Poppins,
+                  color: 'grey'
+                }}
+              >
+                Search in DigiMart
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity>
               <Image
                 source={

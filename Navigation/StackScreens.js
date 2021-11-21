@@ -40,6 +40,7 @@ import AccountInfo from '.././screens/Account/Settings/AccountInfo';
 import AddressBook from '.././screens/Account/Settings/AddressBook';
 import FAQ from '.././screens/Account/Settings/FAQ';
 import PrivacyPolicy from '.././screens/Account/Settings/PrivacyPolicy';
+import SearchAndFilter from '.././screens/SearchAndFilter/SearchAndFilter';
 
 const Stack = createNativeStackNavigator();
 
@@ -52,7 +53,7 @@ const StackScreens = () => {
 
   return (
     <Stack.Navigator
-      initialRouteName={'Layout'}
+      initialRouteName={'Login'}
       // initialRouteName={user.token === null ? 'Login' : 'Layout'}
       screenOptions={{ headerShown: false }}
     >
@@ -85,6 +86,7 @@ const StackScreens = () => {
       <Stack.Screen name="FAQ" component={FAQ} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
       <Stack.Screen name="Store" component={Store} />
+      <Stack.Screen name="SearchAndFilter" component={SearchAndFilter} />
     </Stack.Navigator>
   );
 };
