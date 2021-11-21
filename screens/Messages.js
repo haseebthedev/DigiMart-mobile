@@ -18,74 +18,76 @@ import searchIcon from '../assets/icons/searchIcon.png';
 import startChatIcon from '../assets/icons/startChatIcon.png';
 
 const Messages = ({ navigation }) => {
-  const [Conversions, setConversions] = useState([
-    {
-      id: 1,
-      name: 'Haseeb Ahmed',
-      lastSentText: 'Hi, My problem is still there!',
-      lastChatTime: '8:10 AM'
-    },
-    {
-      id: 2,
-      name: 'Ali',
-      lastSentText: 'Yooo... Where are you guys?',
-      lastChatTime: '8:11 AM'
-    },
-    {
-      id: 3,
-      name: 'Sir Tehseen Riaz Abbasi',
-      lastSentText: 'Sir. Are you coming to Uni?',
-      lastChatTime: '3:11 PM'
-    },
-    {
-      id: 4,
-      name: 'Hamza Abbasi',
-      lastSentText: 'Bro, send the Assignment # 2!',
-      lastChatTime: '7:43 AM'
-    },
-    {
-      id: 5,
-      name: 'Shahwaiz',
-      lastSentText: 'Hi, My problem is still there!',
-      lastChatTime: '8:10 AM'
-    },
-    {
-      id: 6,
-      name: 'Muhammad Ameen',
-      lastSentText: 'Yooo... Where are you guys?',
-      lastChatTime: '8:11 AM'
-    },
-    {
-      id: 7,
-      name: 'Jamal Saeed',
-      lastSentText: 'Sir. Are you coming to Uni?',
-      lastChatTime: '3:11 PM'
-    },
-    {
-      id: 8,
-      name: 'Faizan Bhatti',
-      lastSentText: 'Bro, send the Assignment # 2!',
-      lastChatTime: '7:43 AM'
-    },
-    {
-      id: 9,
-      name: 'Muhammad Ameen',
-      lastSentText: 'Yooo... Where are you guys?',
-      lastChatTime: '8:11 AM'
-    },
-    {
-      id: 10,
-      name: 'Jamal Saeed',
-      lastSentText: 'Sir. Are you coming to Uni?',
-      lastChatTime: '3:11 PM'
-    }
-  ]);
+  // const [Conversions, setConversions] = useState([
+  //   {
+  //     _id: 1,
+  //     name: 'Haseeb Ahmed',
+  //     lastSentText: 'Hi, My problem is still there!',
+  //     lastChatTime: '8:10 AM'
+  //   }
+  //   {
+  //     _id: 2,
+  //     name: 'Ali',
+  //     lastSentText: 'Yooo... Where are you guys?',
+  //     lastChatTime: '8:11 AM'
+  //   },
+  //   {
+  //     _id: 3,
+  //     name: 'Sir Tehseen Riaz Abbasi',
+  //     lastSentText: 'Sir. Are you coming to Uni?',
+  //     lastChatTime: '3:11 PM'
+  //   },
+  //   {
+  //     _id: 4,
+  //     name: 'Hamza Abbasi',
+  //     lastSentText: 'Bro, send the Assignment # 2!',
+  //     lastChatTime: '7:43 AM'
+  //   },
+  //   {
+  //     _id: 5,
+  //     name: 'Shahwaiz',
+  //     lastSentText: 'Hi, My problem is still there!',
+  //     lastChatTime: '8:10 AM'
+  //   },
+  //   {
+  //     _id: 6,
+  //     name: 'Muhammad Ameen',
+  //     lastSentText: 'Yooo... Where are you guys?',
+  //     lastChatTime: '8:11 AM'
+  //   },
+  //   {
+  //     _id: 7,
+  //     name: 'Jamal Saeed',
+  //     lastSentText: 'Sir. Are you coming to Uni?',
+  //     lastChatTime: '3:11 PM'
+  //   },
+  //   {
+  //     _id: 8,
+  //     name: 'Faizan Bhatti',
+  //     lastSentText: 'Bro, send the Assignment # 2!',
+  //     lastChatTime: '7:43 AM'
+  //   },
+  //   {
+  //     _id: 9,
+  //     name: 'Muhammad Ameen',
+  //     lastSentText: 'Yooo... Where are you guys?',
+  //     lastChatTime: '8:11 AM'
+  //   },
+  //   {
+  //     _id: 10,
+  //     name: 'Jamal Saeed',
+  //     lastSentText: 'Sir. Are you coming to Uni?',
+  //     lastChatTime: '3:11 PM'
+  //   }
+  // ]);
+
+  const [Conversions, setConversions] = useState([]);
 
   // Contact Item
   const renderItem = ({ item }) => {
     return (
       <TouchableOpacity
-        key={item.id}
+        key={item._id}
         style={{
           marginVertical: 10,
           flexDirection: 'row',
@@ -97,7 +99,7 @@ const Messages = ({ navigation }) => {
         <View>
           <Image
             source={{
-              uri: `https://randomuser.me/api/portraits/med/men/${item.id}.jpg`
+              uri: `https://randomuser.me/api/portraits/med/men/${item._id}.jpg`
             }}
             style={{
               width: 50,
@@ -187,7 +189,7 @@ const Messages = ({ navigation }) => {
       <FlatList
         data={Conversions}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
       />
 
       {/* New Message Button */}

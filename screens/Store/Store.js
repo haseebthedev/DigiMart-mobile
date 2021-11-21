@@ -5,11 +5,14 @@ import {
   Image,
   Dimensions,
   StatusBar,
-  TouchableOpacity
+  TouchableOpacity,
+  ToastAndroid
 } from 'react-native';
+import { UserContext } from '../../contexts/UserContext';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { FONTS } from '../../constants/index';
 import addIcon from '../../assets/icons/addIcon.png';
+import unFollowIcon from '../../assets/icons/unFollowIcon.png';
 import chatIcon from '../../assets/icons/chatIcon.png';
 import storeImage from '../../assets/images/google-logo.png';
 import backBtnIcon from '../../assets/icons/backIcon.png';
@@ -27,6 +30,7 @@ const Tab = createMaterialTopTabNavigator();
 
 const Store = ({ route, navigation }) => {
   const { storeId } = route.params;
+  const { user } = UserContext();
 
   const [storeDetails, setStoreDetails] = useState({
     name: '',
@@ -34,7 +38,28 @@ const Store = ({ route, navigation }) => {
     sumOfRatings: ''
   });
 
-  useEffect(() => {
+  const [storeFollowed, setStoreFollowed] = useState(false);
+
+  const getStoreFollowStatus = () => {
+    api
+      .get('/buyer/stores/subscribed', {
+        headers: {
+          Authorization: `Bearer ${user.token}`
+        }
+      })
+      .then((res) => {
+        const subStores = res.data.data.subscribedStores;
+
+        subStores.map((el) => {
+          if (el._id === storeId) {
+            setStoreFollowed(true);
+          }
+        });
+      })
+      .catch((error) => console.log('Error: ', errors));
+  };
+
+  const loadStoreDetails = () => {
     api
       .get(`/buyer/data/store/${storeId}/mobile`)
       .then((res) => {
@@ -45,6 +70,57 @@ const Store = ({ route, navigation }) => {
         setStoreDetails({ name, logo, countOfStoreSubscribers, sumOfRatings });
       })
       .catch((error) => console.log('Error: ', error));
+  };
+
+  const FollowUnfollowStore = () => {
+    if (storeFollowed === true) {
+      api
+        .patch(
+          '/buyer/store/Unsubscribe',
+          {
+            storeId: storeId
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`
+            }
+          }
+        )
+        .then((res) => {
+          setStoreFollowed(false);
+          ToastAndroid.show(
+            'You are not following this Store anymore!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        });
+    } else {
+      api
+        .patch(
+          '/buyer/store/subscribe',
+          {
+            storeId: storeId
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`
+            }
+          }
+        )
+        .then((res) => {
+          setStoreFollowed(true);
+          ToastAndroid.show(
+            'You are now following this Store!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        });
+    }
+  };
+
+  useEffect(() => {
+    getStoreFollowStatus();
+    loadStoreDetails();
   }, []);
 
   return (
@@ -113,9 +189,12 @@ const Store = ({ route, navigation }) => {
           </View>
         </View>
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity style={{ alignItems: 'center', marginRight: 15 }}>
+          <TouchableOpacity
+            style={{ alignItems: 'center', marginRight: 15 }}
+            onPress={FollowUnfollowStore}
+          >
             <Image
-              source={addIcon}
+              source={storeFollowed ? unFollowIcon : addIcon}
               style={{ width: 24, height: 24, tintColor: '#fff' }}
             />
             <Text
@@ -125,10 +204,14 @@ const Store = ({ route, navigation }) => {
                 fontSize: 10
               }}
             >
-              FOLLOW
+              {storeFollowed ? 'UNFOLLOW' : 'FOLLOW'}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={{ alignItems: 'center' }}>
+
+          <TouchableOpacity
+            style={{ alignItems: 'center' }}
+            onPress={() => navigation.navigate('Messages')}
+          >
             <Image
               source={chatIcon}
               style={{ width: 24, height: 24, tintColor: '#fff' }}
