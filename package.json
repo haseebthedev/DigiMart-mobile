@@ -30,7 +30,8 @@
     "react-native-splash-screen": "^3.2.0",
     "react-native-tab-view": "^3.1.1",
     "react-native-toast-message": "^1.6.0",
-    "react-native-vector-icons": "^8.1.0"
+    "react-native-vector-icons": "^8.1.0",
+    "socket.io-client": "^4.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

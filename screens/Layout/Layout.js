@@ -43,6 +43,7 @@ const Layout = ({ navigation }) => {
   const [UserEmail, setUserEmail] = useState('');
   const [currentTab, setCurrentTab] = useState('Homepage');
   const [showMenu, setShowMenu] = useState(false);
+  const [MessageCount, setMessageCount] = useState(0);
 
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
@@ -68,6 +69,17 @@ const Layout = ({ navigation }) => {
     }).start();
   };
 
+  const retriveMessageCount = async () => {
+    await api
+      .get(`/buyer/chat/conversations/seller-to-buyer`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
+      .then((res) => {
+        setMessageCount(res.data.recentConversation.length);
+      })
+      .catch((error) => console.log(error));
+  };
+
   const retriveUserData = async () => {
     await api
       .get('/buyer/me', {
@@ -86,6 +98,7 @@ const Layout = ({ navigation }) => {
 
   useLayoutEffect(() => {
     retriveUserData();
+    retriveMessageCount();
   }, []);
 
   return (
@@ -279,7 +292,7 @@ const Layout = ({ navigation }) => {
                   style={{ width: 25, height: 25, tintColor: color }}
                 />
               ),
-              tabBarBadge: 13
+              tabBarBadge: MessageCount
             }}
           />
           <Tab.Screen

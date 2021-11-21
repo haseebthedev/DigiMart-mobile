@@ -8,7 +8,7 @@ import Register from '.././screens/Register';
 import Login from '.././screens/Login';
 import Layout from '.././screens/Layout/Layout';
 import ProductPage from '.././screens/ProductPage';
-// import Messages from '.././screens/Messages';
+import Messages from '.././screens/Messages';
 // import Cart from '.././screens/Cart';
 import Checkout from '.././screens/Checkout';
 import Chat from '.././screens/Messages/Chat';

@@ -1,108 +1,158 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Dimensions,
-  StatusBar,
   Image,
   TouchableOpacity,
   TextInput,
-  ScrollView,
-  KeyboardAvoidingView,
-  FlatList
+  FlatList,
+  Modal
 } from 'react-native';
 const { width, height } = Dimensions.get('screen');
-import { FONTS, COLOLRS, IMAGES } from '../../constants/index';
+import { FONTS, COLORS, IMAGES } from '../../constants/index';
+import { UserContext } from '../../contexts/UserContext';
+import api from '../../axios/api';
 
 // Images and Icons
-import myImage from '../../assets/images/myImage.jpg';
+import imageNotAvailable from '../../assets/images/imageNotAvailable.png';
 import backBtnIcon from '../../assets/icons/backIcon.png';
 import kebabIcon from '../../assets/icons/kebabMenuIcon.png';
 import sendMessageIcon from '../../assets/icons/sendMessageIcon.png';
+import deleteIcon from '../../assets/icons/deleteIcon.png';
 
-const Chat = ({ navigation }) => {
-  const [MyId, setMyId] = useState(1);
-  const [Messages, SetMessages] = useState([
-    {
-      id: 1,
-      message: 'Hi, My Name is Haseeb. Merci!',
-      lastChatTime: '8:10 AM'
-    },
-    {
-      id: 2,
-      message: 'Hello Haseeb, I am Customer Support.',
-      lastChatTime: '8:11 AM'
-    },
-    {
-      id: 1,
-      message:
-        'Why is this problem. It should be resolved as soon as possible.',
-      lastChatTime: '8:11 AM'
-    },
-    {
-      id: 2,
-      message: 'Sir, We are doing everything on our side resolve this!',
-      lastChatTime: '8:12 AM'
-    },
-    {
-      id: 1,
-      message:
-        'Why is this problem. It should be resolved as soon as possible.',
-      lastChatTime: '8:11 AM'
-    },
-    {
-      id: 2,
-      message: 'Sir, We are doing everything on our side resolve this!',
-      lastChatTime: '8:12 AM'
-    },
-    {
-      id: 1,
-      message:
-        'Why is this problem. It should be resolved as soon as possible.',
-      lastChatTime: '8:11 AM'
-    },
-    {
-      id: 2,
-      message: 'Sir, We are doing everything on our side resolve this!',
-      lastChatTime: '8:12 AM'
-    },
-    {
-      id: 2,
-      message: 'Sir, We are doing everything on our side resolve this!',
-      lastChatTime: '8:12 AM'
-    },
-    {
-      id: 1,
-      message:
-        'Why is this problem. It should be resolved as soon as possible.',
-      lastChatTime: '8:11 AM'
-    },
-    {
-      id: 2,
-      message: 'Sir, We are doing everything on our side resolve this!',
-      lastChatTime: '8:12 AM'
-    }
-  ]);
+// socket io
+import io from 'socket.io-client';
+const SERVER = 'https://digi-mart-server.herokuapp.com';
 
-  // Message Item
+const Chat = ({ route, navigation }) => {
+  const { chatWith } = route.params;
+  const { user } = UserContext();
+
+  const socket = io(SERVER);
+  const token = user.token;
+  const userId = user._id;
+
+  const [messageText, setMessageText] = useState('');
+  const [userName, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [selectedChat, setSelectedChat] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [ChatRecieverUser, setChatRecieverUser] = useState([]);
+  const [DeleteChatModal, setDeleteChatModal] = useState(false);
+
+  //for opening conversation
+  const HandleConversationOfUser = async (conversation) => {
+    setUsername(conversation.conversationUser.name);
+    setEmail(conversation.conversationUser.email);
+
+    //This is for user u want to chat with, send roomId of chat and userId
+    socket.emit('subscribe', {
+      room: conversation.chatRoomId,
+      otherUserId:
+        conversation.conversationUser != null
+          ? conversation.conversationUser._id
+          : ChatRecieverUser._id
+    });
+
+    //get conversation
+    await api
+      .get(`/buyer/chat/${conversation.chatRoomId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        setSelectedChat(conversation);
+        setMessages(res.data.conversation);
+        setChatRecieverUser(res.data.chatReciever);
+      })
+      .catch((error) => console.log('ERROR: ', error));
+  };
+
+  // For Sending Message
+  const SendMessage = () => {
+    socket.emit('subscribe', {
+      room: selectedChat.chatRoomId,
+      otherUserId: selectedChat.conversationUser._id
+    });
+
+    //This is to send message to user
+    socket.emit('chat', {
+      currentLoggedInUserId: userId,
+      roomId: messages[0].chatRoomId,
+      messageText
+    });
+
+    setMessageText('');
+  };
+
+  const updateChatMessageAndConversation = () => {
+    socket.on('message', (data) => {
+      //if that conversation is opened then set messages else not
+      if (selectedChat.chatRoomId === data.message.chatRoomId) {
+        let temp = messages;
+        temp.push(data.message);
+        setMessages([...temp]);
+      }
+    });
+  };
+
+  //delete selected chat room
+  const deleteSelectedChatRoom = async () => {
+    await api
+      .delete(`/buyer/chat/room/${selectedChat.chatRoomId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        api
+          .get(`/buyer/chat/conversations/seller-to-buyer`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          .then(() => navigation.goBack())
+          .catch((error) => console.log(error));
+      })
+      .catch((error) => console.log(error));
+    setSelectedChat([]);
+  };
+
+  useEffect(() => {
+    updateChatMessageAndConversation();
+  }, [socket]);
+
+  useEffect(() => {
+    HandleConversationOfUser(chatWith);
+  }, []);
+
+  // ========================================================
+
+  const getTimeInCorrectFormat = (timeString) => {
+    timeString = new Date(timeString).toISOString();
+    const timeString12hr = new Date(timeString).toLocaleTimeString(
+      {},
+      { timeZone: 'UTC', hour12: true, hour: 'numeric', minute: 'numeric' }
+    );
+    return timeString12hr;
+  };
+
   const renderItem = ({ item }) => {
     return (
       <View style={{ paddingHorizontal: 10 }}>
         <View
           style={{
-            alignItems: item.id === MyId ? 'flex-end' : 'flex-start',
+            alignItems:
+              item.postedByUser === userId ? 'flex-end' : 'flex-start',
             margin: 8
           }}
         >
           <View
             style={{
-              backgroundColor: item.id === MyId ? '#a6c1ff' : '#fff',
-              width: width * 0.7,
+              backgroundColor:
+                item.postedByUser === userId ? '#a6c1ff' : '#fff',
+              width: 240,
               paddingHorizontal: 10,
               paddingVertical: 6,
-              borderRadius: 8,
-              elevation: 2
+              borderRadius: 6,
+              elevation: 1
             }}
           >
             <Text
@@ -110,7 +160,8 @@ const Chat = ({ navigation }) => {
                 fontFamily: FONTS.Poppins
               }}
             >
-              {item.message}
+              {/* {item.message} */}
+              {item.message.messageText}
             </Text>
             <Text
               style={{
@@ -122,7 +173,8 @@ const Chat = ({ navigation }) => {
                 fontSize: 12
               }}
             >
-              {item.lastChatTime}
+              {/* {item.createdAt.split('T')[0]} */}
+              {getTimeInCorrectFormat(item.createdAt)}
             </Text>
           </View>
         </View>
@@ -132,8 +184,6 @@ const Chat = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#407BFF" />
-
       {/* Top Header */}
       <View
         style={{
@@ -156,7 +206,11 @@ const Chat = ({ navigation }) => {
             />
           </TouchableOpacity>
           <Image
-            source={myImage}
+            source={
+              ChatRecieverUser.profilePic
+                ? { uri: ChatRecieverUser.profilePic }
+                : imageNotAvailable
+            }
             style={{
               width: 40,
               height: 40,
@@ -173,7 +227,7 @@ const Chat = ({ navigation }) => {
                 fontSize: 16
               }}
             >
-              Haseeb Ahmed
+              {userName}
             </Text>
             <Text
               style={{
@@ -183,16 +237,19 @@ const Chat = ({ navigation }) => {
                 marginTop: -5
               }}
             >
-              haseeb@gmail.com
+              {email}
             </Text>
           </View>
         </View>
-        <View>
+        <TouchableOpacity
+          style={{ padding: 10 }}
+          onPress={() => setDeleteChatModal(!DeleteChatModal)}
+        >
           <Image
-            source={kebabIcon}
+            source={deleteIcon}
             style={{ width: 24, height: 24, tintColor: '#fff' }}
           />
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Messages Area */}
@@ -202,11 +259,12 @@ const Chat = ({ navigation }) => {
           flexDirection: 'column-reverse',
           paddingTop: 60
         }}
-        data={Messages}
+        data={messages}
         renderItem={renderItem}
-        keyExtractor={() => Math.random() * 1}
+        keyExtractor={(item) => item._id}
       />
 
+      {/* Send Message here */}
       <View
         style={{
           // backgroundColor: '#fff',
@@ -232,6 +290,8 @@ const Chat = ({ navigation }) => {
             paddingVertical: 9,
             elevation: 1
           }}
+          value={messageText}
+          onChangeText={(text) => setMessageText(text)}
         />
 
         <TouchableOpacity
@@ -245,17 +305,7 @@ const Chat = ({ navigation }) => {
             marginLeft: 5,
             elevation: 2
           }}
-          onPress={() =>
-            SetMessages((prevMsg) => [
-              ...prevMsg,
-              {
-                id: 1,
-                message:
-                  'Sir, We are doing everything on our side resolve this!',
-                lastChatTime: '8:12 AM'
-              }
-            ])
-          }
+          onPress={() => SendMessage()}
         >
           <Image
             source={sendMessageIcon}
@@ -267,6 +317,103 @@ const Chat = ({ navigation }) => {
           />
         </TouchableOpacity>
       </View>
+
+      {/* Delete Chat Modal */}
+      <Modal
+        transparent={true}
+        animationType={'fade'}
+        visible={DeleteChatModal}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: '#fff',
+              width: width * 0.8,
+              padding: 30,
+              elevation: 10,
+              alignItems: 'center',
+              borderRadius: 4
+            }}
+          >
+            <Image
+              source={deleteIcon}
+              style={{
+                width: 60,
+                height: 60,
+                tintColor: 'red',
+                marginBottom: 30
+              }}
+            />
+            <Text
+              style={{
+                fontFamily: FONTS.PoppinsBold,
+                fontSize: FONTS.Paragraph1,
+                marginBottom: 10
+              }}
+            >
+              Are You Sure?
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.Poppins,
+                fontSize: FONTS.Paragraph2,
+                textAlign: 'center',
+                color: 'grey'
+              }}
+            >
+              This will delete your entire Chat with this seller!
+            </Text>
+            <View style={{ flexDirection: 'row', marginTop: 30 }}>
+              <TouchableOpacity
+                style={{
+                  paddingHorizontal: 15,
+                  paddingVertical: 10,
+                  marginRight: 5
+                }}
+                onPress={() => setDeleteChatModal(false)}
+              >
+                <Text
+                  style={{
+                    fontFamily: FONTS.Poppins,
+                    fontSize: FONTS.Paragraph2
+                  }}
+                >
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  paddingHorizontal: 15,
+                  paddingVertical: 10,
+                  backgroundColor: 'red',
+                  borderRadius: 4,
+                  marginLeft: 5
+                }}
+                onPress={() => {
+                  deleteSelectedChatRoom();
+                  setDeleteChatModal(false);
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: FONTS.Poppins,
+                    fontSize: FONTS.Paragraph2,
+                    color: '#fff'
+                  }}
+                >
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

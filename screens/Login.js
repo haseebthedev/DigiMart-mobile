@@ -26,7 +26,7 @@ const Login = ({ navigation }) => {
           text1: 'Login Successfully!',
           text2: 'Redirecting to Homepage...',
           onShow: () => {
-            ADD_USER(res.data.data.token);
+            ADD_USER(res.data.data.buyer._id, res.data.data.token);
           },
           onHide: () => {
             navigation.navigate('Layout');
