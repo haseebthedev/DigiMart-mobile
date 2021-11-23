@@ -1,12 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ToastAndroid,
-} from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, ToastAndroid } from 'react-native';
+import { HelperText, TextInput, Button } from 'react-native-paper';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 import api from '../axios/api';
 import { UserContext } from '../contexts/UserContext';
@@ -17,28 +11,53 @@ const Login = ({ navigation }) => {
   const [LoginPass, setLoginPass] = useState('ameen321');
   const [Loading, setLoading] = useState(false);
 
-  const handlerLogin = async () => {
-    setLoading(true);
+  const [IFerrors, setIFerrors] = useState({
+    LoginEmailError: ''
+  });
 
-    await api
-      .post('/buyer/login', { email: LoginEmail, password: LoginPass })
-      .then((res) => {
-        ToastAndroid.show(
-          'Login Success! Redirecting to Homepage',
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM
-        );
-        ADD_USER(res.data.data.buyer._id, res.data.data.token);
-        navigation.navigate('Layout');
-      })
-      .catch((error) => {
-        ToastAndroid.show(
-          'Either email or password is invalid!',
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM
-        );
-      });
-    setLoading(false);
+  const InputValidation = () => {
+    const errors = {};
+    var hasError = false;
+
+    // email
+    var mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (LoginEmail.match(mailFormat)) {
+      errors.LoginEmailError = '';
+    } else {
+      hasError = true;
+      errors.LoginEmailError = 'Entered Email address is invalid!';
+    }
+
+    setIFerrors({ ...IFerrors, ...errors });
+    return hasError;
+  };
+
+  const handlerLogin = async () => {
+    var errorExists = InputValidation();
+
+    if (errorExists === false) {
+      setLoading(true);
+
+      await api
+        .post('/buyer/login', { email: LoginEmail, password: LoginPass })
+        .then((res) => {
+          ToastAndroid.show(
+            'Login Success! Redirecting to Homepage',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+          ADD_USER(res.data.data.buyer._id, res.data.data.token);
+          navigation.navigate('Layout');
+        })
+        .catch((error) => {
+          ToastAndroid.show(
+            'Either email or password is invalid!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        });
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,8 +82,18 @@ const Login = ({ navigation }) => {
         mode="outlined"
         onChangeText={(text) => setLoginEmail(text)}
         value={LoginEmail}
-        style={{ marginHorizontal: 20, marginBottom: 20 }}
+        style={{
+          marginHorizontal: 20
+        }}
       />
+      <HelperText
+        type="error"
+        visible={IFerrors.LoginEmailError.length > 0 ? true : false}
+        style={{ marginHorizontal: 20, marginBottom: 10 }}
+      >
+        {IFerrors.LoginEmailError}
+      </HelperText>
+
       <TextInput
         label="Password"
         secureTextEntry

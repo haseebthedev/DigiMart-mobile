@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import * as ImagePicker from 'react-native-image-picker';
 import {
   View,
   Text,
   Image,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
   TouchableNativeFeedback,
-  ToastAndroid
+  ToastAndroid,
+  TouchableOpacity
 } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import { HelperText, TextInput, Button } from 'react-native-paper';
 import api from '../../../axios/api';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import backIcon from '../../../assets/icons/backIcon.png';
@@ -29,6 +30,103 @@ const AccountInfo = ({ navigation }) => {
     phoneNumber: '',
     birthday: ''
   });
+
+  const [IFerrors, setIFerrors] = useState({
+    nameError: '',
+    emailError: '',
+    phoneNumberError: '',
+    birthdayError: ''
+  });
+
+  const InputValidation = () => {
+    const errors = {};
+    var hasError = false;
+
+    // name
+    if (profileData.name.length > 2) {
+      errors.nameError = '';
+    } else {
+      hasError = true;
+      errors.nameError = 'Entered Name is invalid!';
+    }
+
+    // email
+    var mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (profileData.email.match(mailFormat)) {
+      errors.emailError = '';
+    } else {
+      hasError = true;
+      errors.emailError = 'Entered Email address is invalid!';
+    }
+
+    // phone
+    var phoneFormat = /^(\+92)?[0-9]{10}$/;
+    if (profileData.phoneNumber.match(phoneFormat)) {
+      errors.phoneNumberError = '';
+    } else {
+      hasError = true;
+      errors.phoneNumberError = 'Entered Phone Number is Invalid!';
+    }
+
+    // date of birth
+    if (profileData.birthday.length >= 10) {
+      errors.birthdayError = '';
+    } else {
+      hasError = true;
+      errors.birthdayError = 'Entered Date of Birth is Invalid!';
+    }
+
+    setIFerrors({ ...IFerrors, ...errors });
+    return hasError;
+  };
+
+  const cloudinaryUpload = (photo) => {
+    const data = new FormData();
+    data.append('file', photo);
+    data.append('upload_preset', 'ddyaz57o');
+
+    fetch(`https://api.cloudinary.com/v1_1/dbsd56hgh/image/upload`, {
+      method: 'post',
+      body: data
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setProfileData({ ...profileData, profilePic: data.secure_url });
+      })
+      .catch((e) => {
+        console.log('An Error Occured While Uploading', e);
+      });
+  };
+
+  const launchImageLibrary = () => {
+    const options = {
+      title: 'Select Photo',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images'
+      }
+    };
+
+    ImagePicker.launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        const uri = response.assets[0].uri;
+        const type = response.assets[0].type;
+        const name = response.assets[0].fileName;
+        const source = {
+          uri,
+          type,
+          name
+        };
+        cloudinaryUpload(source);
+      }
+    });
+  };
 
   const getUserInfo = async () => {
     await api
@@ -57,30 +155,34 @@ const AccountInfo = ({ navigation }) => {
   };
 
   const UpdateProfile = async () => {
-    await api
-      .patch(
-        '/buyer/me',
-        {
-          ...profileData
-        },
-        {
-          headers: { Authorization: `Bearer ${user.token}` }
-        }
-      )
-      .then(() => {
-        ToastAndroid.show(
-          'Profile Updated Successfully!',
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM
-        );
-      })
-      .catch((e) => {
-        ToastAndroid.show(
-          `Error: ${e}`,
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM
-        );
-      });
+    var errorExists = InputValidation();
+
+    if (errorExists === false) {
+      await api
+        .patch(
+          '/buyer/me',
+          {
+            ...profileData
+          },
+          {
+            headers: { Authorization: `Bearer ${user.token}` }
+          }
+        )
+        .then(() => {
+          ToastAndroid.show(
+            'Profile Updated Successfully!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        })
+        .catch((e) => {
+          ToastAndroid.show(
+            `Error: ${e}`,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        });
+    }
   };
 
   useEffect(() => {
@@ -124,6 +226,7 @@ const AccountInfo = ({ navigation }) => {
         </View>
       </TouchableNativeFeedback>
 
+      {/* Profile Pic */}
       <View
         style={{
           flexDirection: 'row',
@@ -144,7 +247,7 @@ const AccountInfo = ({ navigation }) => {
             borderColor: '#fff'
           }}
         />
-        <View
+        <TouchableOpacity
           style={{
             position: 'absolute',
             bottom: 0,
@@ -157,13 +260,15 @@ const AccountInfo = ({ navigation }) => {
             alignItems: 'center',
             elevation: 2
           }}
+          onPress={launchImageLibrary}
         >
           <Image
             source={uploadIcon}
             style={{ width: 20, height: 20, tintColor: COLORS.PRIMARY }}
           />
-        </View>
+        </TouchableOpacity>
       </View>
+
       <View style={{ marginTop: 40, width: width - 40 }}>
         <TextInput
           label="Name"
@@ -172,8 +277,15 @@ const AccountInfo = ({ navigation }) => {
             setProfileData({ ...profileData, name: text })
           }
           value={profileData.name}
-          style={{ marginHorizontal: 10, marginBottom: 20 }}
+          style={styles.userInput}
         />
+        <HelperText
+          type="error"
+          visible={IFerrors.nameError.length > 0 ? true : false}
+          style={styles.errorText}
+        >
+          {IFerrors.nameError}
+        </HelperText>
 
         <TextInput
           label="Email"
@@ -182,8 +294,15 @@ const AccountInfo = ({ navigation }) => {
             setProfileData({ ...profileData, email: text })
           }
           value={profileData.email}
-          style={{ marginHorizontal: 10, marginBottom: 20 }}
+          style={styles.userInput}
         />
+        <HelperText
+          type="error"
+          visible={IFerrors.emailError.length > 0 ? true : false}
+          style={styles.errorText}
+        >
+          {IFerrors.emailError}
+        </HelperText>
 
         <TextInput
           label="Phone #"
@@ -193,8 +312,15 @@ const AccountInfo = ({ navigation }) => {
             setProfileData({ ...profileData, phoneNumber: text })
           }
           value={profileData.phoneNumber}
-          style={{ marginHorizontal: 10, marginBottom: 20 }}
+          style={styles.userInput}
         />
+        <HelperText
+          type="error"
+          visible={IFerrors.phoneNumberError.length > 0 ? true : false}
+          style={styles.errorText}
+        >
+          {IFerrors.phoneNumberError}
+        </HelperText>
 
         <TextInput
           label="Date of Birth"
@@ -203,8 +329,15 @@ const AccountInfo = ({ navigation }) => {
             setProfileData({ ...profileData, birthday: text })
           }
           value={profileData.birthday}
-          style={{ marginHorizontal: 10, marginBottom: 40 }}
+          style={styles.userInput}
         />
+        <HelperText
+          type="error"
+          visible={IFerrors.birthdayError.length > 0 ? true : false}
+          style={styles.errorText}
+        >
+          {IFerrors.birthdayError}
+        </HelperText>
       </View>
 
       <Button
@@ -227,28 +360,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center'
   },
-  userInput: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e1e1e1',
-    marginBottom: 10,
-    fontFamily: FONTS.Poppins,
-    fontSize: FONTS.Paragraph2
-  },
-  button: {
-    paddingHorizontal: 40,
-    paddingVertical: 10,
-    backgroundColor: COLORS.PRIMARY,
-    borderRadius: 8,
-    marginTop: 20
-  },
-  loginButton: {
-    fontSize: FONTS.Paragraph1,
-    fontFamily: FONTS.PoppinsBold,
-    color: '#fff'
-  }
+  userInput: { marginHorizontal: 10 },
+  errorText: { marginHorizontal: 10, marginBottom: 0 }
 });
 
 export default AccountInfo;

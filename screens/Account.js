@@ -46,7 +46,7 @@ const Account = ({ navigation }) => {
       .then((res) => {
         setStoresFollowed(res.data.data.subscribedStores.length);
       })
-      .catch((e) => console.log('ERROR retriving sunscribed stores. ', e));
+      .catch((e) => console.log('ERROR retriving Subscribed stores. ', e));
   };
 
   useEffect(() => {

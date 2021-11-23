@@ -6,51 +6,150 @@ import {
   StyleSheet,
   TouchableNativeFeedback,
   TouchableOpacity,
-  TextInput
+  ToastAndroid,
+  LogBox
 } from 'react-native';
+import * as ImagePicker from 'react-native-image-picker';
+import { HelperText, TextInput, Button } from 'react-native-paper';
 import api from '../../../axios/api';
-import Toast from 'react-native-toast-message';
-import backIcon from '../../../assets/icons/backIcon.png';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
-import reportProblemImage from '../../../assets/images/reportProblemImage.png';
 import { UserContext } from '../../../contexts/UserContext';
 
+// images
+import backIcon from '../../../assets/icons/backIcon.png';
+import unFollowStoreIcon from '../../../assets/icons/unfollowStoreIcon.png';
+import reportProblemImage from '../../../assets/images/reportProblemImage.png';
+
 const ReportProblem = ({ navigation }) => {
+  LogBox.ignoreAllLogs(); //Ignore all warning log notifications
+
   const { user } = UserContext();
 
   const [subject, SetSubject] = useState('');
   const [description, SetDescription] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [screenShot, SetScreenShot] = useState(null);
+
+  const [IFerrors, setIFerrors] = useState({
+    subjectError: '',
+    descriptionError: ''
+  });
+
+  const InputValidation = () => {
+    const errors = {};
+    var hasError = false;
+
+    // Subject
+    if (subject.length > 0) {
+      errors.subjectError = '';
+    } else {
+      hasError = true;
+      errors.subjectError = 'Please enter a valid Subject!';
+    }
+
+    // Description
+    if (description.length > 0) {
+      errors.descriptionError = '';
+    } else {
+      hasError = true;
+      errors.descriptionError = 'Please enter a valid Description!';
+    }
+
+    setIFerrors({ ...IFerrors, ...errors });
+    return hasError;
+  };
+
+  const cloudinaryUpload = (photo) => {
+    const data = new FormData();
+    data.append('file', photo);
+    data.append('upload_preset', 'ddyaz57o');
+
+    fetch(`https://api.cloudinary.com/v1_1/dbsd56hgh/image/upload`, {
+      method: 'post',
+      body: data
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        SetScreenShot(data.secure_url);
+        setIsUploading(false);
+      })
+      .catch((e) => {
+        console.log('An Error Occured While Uploading', e);
+        setIsUploading(false);
+      });
+  };
+
+  const launchImageLibrary = () => {
+    setIsUploading(true);
+
+    const options = {
+      title: 'Select Photo',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images'
+      }
+    };
+
+    ImagePicker.launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        const uri = response.assets[0].uri;
+        const type = response.assets[0].type;
+        const name = response.assets[0].fileName;
+        const source = {
+          uri,
+          type,
+          name
+        };
+        cloudinaryUpload(source);
+      }
+    });
+  };
 
   const sendReport = async () => {
-    await api
-      .post(
-        '/buyer/reportProblem',
-        {
-          subject,
-          description,
-          screenShot: ''
-        },
-        {
-          headers: { Authorization: `Bearer ${user.token}` }
-        }
-      )
-      .then((res) => {
-        Toast.show({
-          type: 'success',
-          text1: 'SUCCESS!',
-          text2: 'Your report has been sent!',
-          onShow: () => {
-            SetSubject('');
-            SetDescription('');
+    var errorExists = InputValidation();
+
+    if (errorExists === false) {
+      await api
+        .post(
+          '/buyer/reportProblem',
+          {
+            subject,
+            description,
+            screenShot
+          },
+          {
+            headers: { Authorization: `Bearer ${user.token}` }
           }
+        )
+        .then((res) => {
+          ToastAndroid.show(
+            'Your report has been sent!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+
+          SetSubject('');
+          SetDescription('');
+          SetScreenShot(null);
+        })
+        .catch((error) => {
+          ToastAndroid.show(
+            'Something went wrong!',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
         });
-      })
-      .catch((error) => console.log('ERROR: Reporting Problem failed.'));
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Toast ref={(ref) => Toast.setRef(ref)} />
       <Text
         style={{
           fontFamily: FONTS.PoppinsBold,
@@ -92,6 +191,7 @@ const ReportProblem = ({ navigation }) => {
         <View style={{ marginBottom: 50, alignItems: 'center' }}>
           <Image source={reportProblemImage} />
         </View>
+
         <View style={{ alignItems: 'center', marginBottom: 10 }}>
           <Text
             style={{
@@ -102,50 +202,98 @@ const ReportProblem = ({ navigation }) => {
             Share the details with us!
           </Text>
         </View>
+
         <TextInput
-          placeholder="Subject"
-          style={styles.inputField}
+          label="Subject"
+          mode="outlined"
           onChangeText={(text) => SetSubject(text)}
           value={subject}
+          style={styles.userInput}
         />
+        <HelperText
+          type="error"
+          visible={IFerrors.subjectError.length > 0 ? true : false}
+          style={styles.errorText}
+        >
+          {IFerrors.subjectError}
+        </HelperText>
+
         <TextInput
-          placeholder="Description"
-          multiline
-          style={styles.inputField}
+          label="Description"
+          mode="outlined"
           onChangeText={(text) => SetDescription(text)}
           value={description}
+          style={styles.userInput}
         />
-        <View
+        <HelperText
+          type="error"
+          visible={IFerrors.descriptionError.length > 0 ? true : false}
+          style={styles.errorText}
+        >
+          {IFerrors.descriptionError}
+        </HelperText>
+
+        <Button
+          icon="plus"
+          mode="outlined"
+          disabled={isUploading}
           style={{
             marginHorizontal: 20,
-            paddingLeft: 15,
-            paddingVertical: 10,
-            borderColor: '#e1e1e1',
-            borderWidth: 1,
-            borderRadius: 8,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
+            paddingVertical: 5,
+            marginTop: 5,
             marginBottom: 20
           }}
+          onPress={launchImageLibrary}
         >
-          <Text
-            style={{
-              fontFamily: FONTS.PoppinsBold,
-              fontSize: 22,
-              marginRight: 8,
-              color: '#407BFF'
-            }}
-          >
-            +
-          </Text>
-          <Text style={{ fontFamily: FONTS.Poppins, color: 'grey' }}>
-            Upload Image / Screenshot
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.button} onPress={sendReport}>
-          <Text style={styles.loginButton}>SEND</Text>
-        </TouchableOpacity>
+          Upload Image
+        </Button>
+
+        {
+          <View style={{ marginHorizontal: 20, alignItems: 'center' }}>
+            {screenShot !== null ? (
+              <View style={{ alignItems: 'center' }}>
+                <Image
+                  source={{ uri: screenShot }}
+                  style={{
+                    width: 60,
+                    height: 60,
+                    marginBottom: 5,
+                    borderWidth: 2,
+                    borderColor: '#e1e1e1'
+                  }}
+                />
+                <TouchableOpacity onPress={() => SetScreenShot(null)}>
+                  <Image
+                    source={unFollowStoreIcon}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      marginBottom: 20
+                    }}
+                    tintColor="grey"
+                  />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View></View>
+            )}
+          </View>
+        }
+
+        <Button
+          icon="send"
+          mode="contained"
+          style={{
+            marginHorizontal: 20,
+            paddingVertical: 5
+          }}
+          labelStyle={{
+            fontSize: FONTS.Paragraph1
+          }}
+          onPress={sendReport}
+        >
+          SEND
+        </Button>
       </View>
     </View>
   );
@@ -155,31 +303,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  inputField: {
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e1e1e1',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    fontFamily: FONTS.Poppins,
-    fontSize: FONTS.Paragraph1,
-    paddingTop: 15
-  },
-  button: {
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.PRIMARY,
-    borderRadius: 8,
-    marginHorizontal: 20,
-    marginTop: 10
-  },
-  loginButton: {
-    fontSize: 18,
-    fontFamily: FONTS.PoppinsBold,
-    color: '#fff'
-  }
+  userInput: { marginHorizontal: 20 },
+  errorText: { marginHorizontal: 20, marginBottom: 0 }
 });
 
 export default ReportProblem;

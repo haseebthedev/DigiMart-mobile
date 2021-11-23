@@ -45,7 +45,7 @@ import SearchAndFilter from '.././screens/SearchAndFilter/SearchAndFilter';
 const Stack = createNativeStackNavigator();
 
 const StackScreens = () => {
-  const { user } = UserContext();
+  // const { user } = UserContext();
 
   useEffect(() => {
     SplashScreen.hide();
