@@ -26,7 +26,7 @@ const AddressBook = ({ navigation }) => {
   const [ChangeAddressModal, setChangeAddressModal] = useState(false);
   const [AddressDetails, setAddressDetails] = useState({
     buyerId: '328072sfdgfydst40',
-    address: '...'
+    address: 'LOADING...'
   });
 
   const getMyAddress = () => {

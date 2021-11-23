@@ -7,9 +7,9 @@ import {
   Dimensions,
   TouchableOpacity,
   TouchableNativeFeedback,
-  TextInput,
+  ToastAndroid
 } from 'react-native';
-import Toast from 'react-native-toast-message';
+import { TextInput, Button } from 'react-native-paper';
 import api from '../../../axios/api';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import backIcon from '../../../assets/icons/backIcon.png';
@@ -47,7 +47,13 @@ const AccountInfo = ({ navigation }) => {
           birthday
         });
       })
-      .catch((e) => console.log('Error: Retriving User failed. ', e));
+      .catch((e) => {
+        ToastAndroid.show(
+          `Error: ${e}`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      });
   };
 
   const UpdateProfile = async () => {
@@ -62,20 +68,18 @@ const AccountInfo = ({ navigation }) => {
         }
       )
       .then(() => {
-        Toast.show({
-          type: 'success',
-          text1: 'SUCCESS',
-          text2: 'Profile Updated Successfully!',
-          position: 'bottom'
-        });
+        ToastAndroid.show(
+          'Profile Updated Successfully!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
       })
       .catch((e) => {
-        Toast.show({
-          type: 'error',
-          text1: 'Update Failed !',
-          text2: e.toString(),
-          position: 'bottom'
-        });
+        ToastAndroid.show(
+          `Error: ${e}`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
       });
   };
 
@@ -85,8 +89,6 @@ const AccountInfo = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Toast ref={(ref) => Toast.setRef(ref)} />
-
       <Text
         style={{
           fontFamily: FONTS.PoppinsBold,
@@ -164,42 +166,58 @@ const AccountInfo = ({ navigation }) => {
       </View>
       <View style={{ marginTop: 40, width: width - 40 }}>
         <TextInput
-          placeholder="Name"
-          style={styles.userInput}
-          value={profileData.name}
+          label="Name"
+          mode="outlined"
           onChangeText={(text) =>
             setProfileData({ ...profileData, name: text })
           }
+          value={profileData.name}
+          style={{ marginHorizontal: 10, marginBottom: 20 }}
         />
+
         <TextInput
-          placeholder="Email"
-          style={styles.userInput}
-          value={profileData.email}
+          label="Email"
+          mode="outlined"
           onChangeText={(text) =>
             setProfileData({ ...profileData, email: text })
           }
+          value={profileData.email}
+          style={{ marginHorizontal: 10, marginBottom: 20 }}
         />
+
         <TextInput
-          placeholder="Phone #"
-          style={styles.userInput}
+          label="Phone #"
+          mode="outlined"
           keyboardType="number-pad"
-          value={profileData.phoneNumber}
           onChangeText={(text) =>
             setProfileData({ ...profileData, phoneNumber: text })
           }
+          value={profileData.phoneNumber}
+          style={{ marginHorizontal: 10, marginBottom: 20 }}
         />
+
         <TextInput
-          placeholder="Date of Birth"
-          style={styles.userInput}
-          value={profileData.birthday}
+          label="Date of Birth"
+          mode="outlined"
           onChangeText={(text) =>
             setProfileData({ ...profileData, birthday: text })
           }
+          value={profileData.birthday}
+          style={{ marginHorizontal: 10, marginBottom: 40 }}
         />
       </View>
-      <TouchableOpacity style={styles.button} onPress={UpdateProfile}>
-        <Text style={styles.loginButton}>UPDATE</Text>
-      </TouchableOpacity>
+
+      <Button
+        mode="contained"
+        style={{
+          marginHorizontal: 20,
+          paddingVertical: 5
+        }}
+        labelStyle={{ fontSize: FONTS.Paragraph1 }}
+        onPress={UpdateProfile}
+      >
+        UPDATE PROFILE
+      </Button>
     </View>
   );
 };

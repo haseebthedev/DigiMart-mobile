@@ -124,7 +124,7 @@ const Cart = ({ navigation }) => {
           {/* Product Image */}
           <View style={{ padding: 10 }}>
             <Image
-              source={productImage}
+              source={{ uri: item.image }}
               style={{ width: 50, height: 50, margin: 8 }}
             />
           </View>
@@ -244,7 +244,8 @@ const Cart = ({ navigation }) => {
               fontSize: FONTS.Paragraph2
             }}
           >
-            Rs. {item.salePrice}
+            Rs.{' '}
+            {item.discountedPrice > 0 ? item.discountedPrice : item.salePrice}
           </Text>
         </View>
       </View>
@@ -435,6 +436,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center'
+    // backgroundColor: ''
   }
 });
 

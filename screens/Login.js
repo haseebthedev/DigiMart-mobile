@@ -4,10 +4,9 @@ import {
   Text,
   Image,
   StyleSheet,
-  TextInput,
-  TouchableOpacity
+  ToastAndroid,
 } from 'react-native';
-import Toast from 'react-native-toast-message';
+import { TextInput, Button } from 'react-native-paper';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 import api from '../axios/api';
 import { UserContext } from '../contexts/UserContext';
@@ -16,39 +15,39 @@ const Login = ({ navigation }) => {
   const { ADD_USER } = UserContext();
   const [LoginEmail, setLoginEmail] = useState('sheikh.ameen252@gmail.com');
   const [LoginPass, setLoginPass] = useState('ameen321');
+  const [Loading, setLoading] = useState(false);
 
   const handlerLogin = async () => {
+    setLoading(true);
+
     await api
       .post('/buyer/login', { email: LoginEmail, password: LoginPass })
       .then((res) => {
-        Toast.show({
-          type: 'success',
-          text1: 'Login Successfully!',
-          text2: 'Redirecting to Homepage...',
-          onShow: () => {
-            ADD_USER(res.data.data.buyer._id, res.data.data.token);
-          },
-          onHide: () => {
-            navigation.navigate('Layout');
-          }
-        });
+        ToastAndroid.show(
+          'Login Success! Redirecting to Homepage',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+        ADD_USER(res.data.data.buyer._id, res.data.data.token);
+        navigation.navigate('Layout');
       })
       .catch((error) => {
-        Toast.show({
-          type: 'error',
-          text1: 'Wrong Credentials',
-          text2: 'Either email or password is invalid!'
-        });
+        ToastAndroid.show(
+          'Either email or password is invalid!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
       });
+    setLoading(false);
   };
 
   return (
     <View style={styles.container}>
-      <Toast ref={(ref) => Toast.setRef(ref)} />
-      <View style={{ marginTop: 80, marginBottom: 50, alignItems: 'center' }}>
+      <View style={{ marginTop: 80, marginBottom: 30, alignItems: 'center' }}>
         <Image source={IMAGES.loginIllustration} style={styles.loginImage} />
       </View>
-      <View style={{ alignItems: 'center', marginBottom: 10 }}>
+
+      <View style={{ alignItems: 'center', marginBottom: 20 }}>
         <Text
           style={{
             fontSize: FONTS.subhead4,
@@ -58,22 +57,37 @@ const Login = ({ navigation }) => {
           Login to your Account
         </Text>
       </View>
+
       <TextInput
-        placeholder="Email"
-        style={styles.inputField}
+        label="Email"
+        mode="outlined"
         onChangeText={(text) => setLoginEmail(text)}
         value={LoginEmail}
+        style={{ marginHorizontal: 20, marginBottom: 20 }}
       />
       <TextInput
-        placeholder="Password"
+        label="Password"
         secureTextEntry
-        style={styles.inputField}
+        mode="outlined"
+        style={{ marginHorizontal: 20, marginBottom: 30 }}
         onChangeText={(text) => setLoginPass(text)}
         value={LoginPass}
       />
-      <TouchableOpacity style={styles.button} onPress={handlerLogin}>
-        <Text style={styles.loginButton}>LOGIN</Text>
-      </TouchableOpacity>
+
+      <Button
+        icon="login"
+        mode="contained"
+        loading={Loading}
+        style={{
+          marginHorizontal: 20,
+          paddingVertical: 5
+        }}
+        labelStyle={{ fontSize: FONTS.Paragraph1 }}
+        disabled={Loading}
+        onPress={handlerLogin}
+      >
+        LOGIN
+      </Button>
 
       <View
         style={{
@@ -110,32 +124,6 @@ const styles = StyleSheet.create({
     borderColor: '#407BFF',
     borderWidth: 4,
     zIndex: -10
-  },
-  inputField: {
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e1e1e1',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    fontFamily: FONTS.Poppins,
-    fontSize: FONTS.Paragraph1,
-    paddingTop: 15
-  },
-  button: {
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.PRIMARY,
-    borderRadius: 8,
-    marginHorizontal: 20,
-    marginTop: 10
-  },
-  loginButton: {
-    fontSize: FONTS.Paragraph1,
-    fontFamily: FONTS.Poppins,
-    color: '#fff',
-    fontWeight: 'bold'
   }
 });
 

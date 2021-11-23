@@ -39,10 +39,14 @@ const Cart = ({ route, navigation }) => {
     route.params;
   const [originalPrice, setOriginalPrice] = useState(0);
   const [profileData, setProfileData] = useState({
-    email: '',
-    phoneNumber: '',
-    address: ''
+    email: 'Loading...',
+    phoneNumber: 'Loading...',
+    address: 'Loading...'
   });
+
+  const STRIPE_KEY =
+    'pk_test_51JxX22SD2TonFhJ3PRyA2XmA9KpKuTdaqkAg48q6jXXGOCOWxsUr7kPT0vybSDvzATWCXmCJmG0qMJ00p8eEEnD2004le4oDS1';
+
   const [ChangeAddressModal, setChangeAddressModal] = useState(false);
   const [CheckOutModal, setCheckOutModal] = useState(false);
   const [ChangeDeliveryMethod, setChangeDeliveryMethod] = useState(false);
