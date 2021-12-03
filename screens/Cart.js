@@ -13,7 +13,7 @@ import {
 import { CartContext } from '../contexts/CartContext';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 import deleteIcon from '../assets/icons/deleteIcon.png';
-import productImage from '../assets/images/laptop-image.png';
+import emptyCart from '../assets/images/emptyCart.png';
 const { width, height } = Dimensions.get('screen');
 
 const Cart = ({ navigation }) => {
@@ -264,74 +264,93 @@ const Cart = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={productList}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-      />
-
-      {/* Checkout Button */}
-      <View
-        style={{
-          width,
-          height: 70,
-          backgroundColor: 'white',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexDirection: 'row',
-          paddingHorizontal: 20,
-          position: 'absolute',
-          bottom: 0
-        }}
-      >
-        <View style={{ alignItems: 'flex-end' }}>
-          <Text
-            style={{
-              color: 'grey',
-              fontFamily: FONTS.Poppins,
-              fontSize: FONTS.Paragraph3
-            }}
-          >
-            Shipping:{' '}
-            <Text style={{ color: '#407BFF' }}>Rs. {shippingFee}</Text>
-          </Text>
-          <Text
-            style={{ fontFamily: FONTS.Poppins, fontSize: FONTS.Paragraph2 }}
-          >
-            Total Price:{' '}
-            <Text style={{ fontFamily: FONTS.PoppinsBold, color: '#407BFF' }}>
-              Rs. {Math.floor(subTotalPrice)}
-            </Text>
+      {productList.length > 0 ? (
+        <FlatList
+          data={productList}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+        />
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <Image source={emptyCart} style={{ width: 160, height: 160 }} />
+          <Text style={{ fontFamily: FONTS.Poppins, marginTop: 0 }}>
+            Your Cart is empty!
           </Text>
         </View>
+      )}
 
-        <TouchableOpacity
+      {/* Checkout Button */}
+      {productList.length > 0 ? (
+        <View
           style={{
-            paddingHorizontal: 25,
-            paddingVertical: 8,
-            backgroundColor: '#407BFF',
-            borderRadius: 8
+            width,
+            height: 70,
+            backgroundColor: 'white',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexDirection: 'row',
+            paddingHorizontal: 20,
+            position: 'absolute',
+            bottom: 0
           }}
-          onPress={() =>
-            navigation.navigate('Checkout', {
-              subTotalPrice: subTotalPrice,
-              totalPrice: totalPrice,
-              totalQuantity: totalQuantity,
-              shippingFee: shippingFee
-            })
-          }
         >
-          <Text
+          <View style={{ alignItems: 'flex-end' }}>
+            <Text
+              style={{
+                color: 'grey',
+                fontFamily: FONTS.Poppins,
+                fontSize: FONTS.Paragraph3
+              }}
+            >
+              Shipping:{' '}
+              <Text style={{ color: '#407BFF' }}>Rs. {shippingFee}</Text>
+            </Text>
+            <Text
+              style={{ fontFamily: FONTS.Poppins, fontSize: FONTS.Paragraph2 }}
+            >
+              Total Price:{' '}
+              <Text style={{ fontFamily: FONTS.PoppinsBold, color: '#407BFF' }}>
+                Rs. {Math.floor(subTotalPrice)}
+              </Text>
+            </Text>
+          </View>
+
+          <TouchableOpacity
             style={{
-              color: '#fff',
-              fontFamily: FONTS.PoppinsBold,
-              fontSize: FONTS.Paragraph2
+              paddingHorizontal: 25,
+              paddingVertical: 8,
+              backgroundColor: '#407BFF',
+              borderRadius: 8
             }}
+            onPress={() =>
+              navigation.navigate('Checkout', {
+                subTotalPrice: subTotalPrice,
+                totalPrice: totalPrice,
+                totalQuantity: totalQuantity,
+                shippingFee: shippingFee
+              })
+            }
           >
-            Check Out
-          </Text>
-        </TouchableOpacity>
-      </View>
+            <Text
+              style={{
+                color: '#fff',
+                fontFamily: FONTS.PoppinsBold,
+                fontSize: FONTS.Paragraph2
+              }}
+            >
+              Check Out
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View></View>
+      )}
 
       {/* Delete Product Modal */}
       <Modal

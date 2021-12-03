@@ -25,23 +25,20 @@ const Support = ({ navigation }) => {
 
   const { user } = UserContext();
 
-  const [stores, setStores] = useState([]);
-  const [storeId, setStoreId] = useState('6128c6ec00130918d0120ec4');
-  const [orderId, setOrderId] = useState('DM-rTb2RrtJ');
-
+  const [MyOrderList, setMyOrderList] = useState([]);
   const [showDropDown, setShowDropDown] = useState(false);
-  const [storeName, setStoreName] = useState('ABC Store');
-
-  const [subject, setSubject] = useState('Late order Delivery');
-  const [description, setDescription] = useState(
-    'The order was delivered late'
-  );
+  const [storeDetails, setStoreDetails] = useState({
+    orderId: '',
+    storeId: '',
+    storeName: ''
+  });
+  const [subject, setSubject] = useState('');
+  const [description, setDescription] = useState('');
   const [screenShot, SetScreenShot] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const [IFerrors, setIFerrors] = useState({
     orderIdError: '',
-    storeNameError: '',
     subjectError: '',
     descriptionError: ''
   });
@@ -51,19 +48,11 @@ const Support = ({ navigation }) => {
     var hasError = false;
 
     // Order id
-    if (orderId.length > 0) {
+    if (storeDetails.orderId.length > 0) {
       errors.orderIdError = '';
     } else {
       hasError = true;
-      errors.orderIdError = 'Entered Order ID is invalid!';
-    }
-
-    // Store Name
-    if (storeName.length > 0) {
-      errors.storeNameError = '';
-    } else {
-      hasError = true;
-      errors.storeNameError = 'Please Select a Store!';
+      errors.orderIdError = 'Please Select an Order!';
     }
 
     // Subject
@@ -146,9 +135,9 @@ const Support = ({ navigation }) => {
         .post(
           '/buyer/problem/report/order',
           {
-            storeID: storeId,
-            orderID: orderId,
-            storeName,
+            storeID: storeDetails.storeId,
+            orderID: storeDetails.orderId,
+            storeName: storeDetails.storeName,
             subject,
             description,
             screenShot
@@ -166,23 +155,60 @@ const Support = ({ navigation }) => {
             ToastAndroid.BOTTOM
           );
 
-          setStoreId('');
-          setOrderId('');
-          setStoreName('');
+          setStoreDetails({
+            orderId: '',
+            storeId: '',
+            storeName: ''
+          });
           setSubject('');
           setDescription('');
           SetScreenShot(null);
         })
         .catch((error) => {
           ToastAndroid.show(
-            'Something went wrong!',
+            `Error: ${JSON.stringify(error.response.data.error.message)}`,
             ToastAndroid.SHORT,
             ToastAndroid.BOTTOM
           );
-          console.log('Error: ', error);
         });
     }
   };
+
+  const getMyOrdersList = async () => {
+    await api
+      .get('/buyer/storesAndOrders/me', {
+        headers: {
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWEwY2VkNjc5ZGJkMzAwMDRhMzIwYWEiLCJpYXQiOjE2MzgyNzc2ODcsImV4cCI6MTYzODg4MjQ4N30.X10zzmzEiBTouVT2I7KVfaDstKmFEkJlOPNN748TplE`
+        }
+      })
+      .then((res) => {
+        const orderList = res.data.data.orders;
+
+        var temp = [];
+        orderList.map((el) => {
+          temp.push({
+            label: el.orderId,
+            value: {
+              orderId: el.orderId,
+              storeId: el.storeId,
+              storeName: el.storeName
+            }
+          });
+        });
+        setMyOrderList(temp);
+      })
+      .catch((error) => {
+        ToastAndroid.show(
+          `Error: ${JSON.stringify(error.response.data.error.message)}`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      });
+  };
+
+  useEffect(() => {
+    getMyOrdersList();
+  }, []);
 
   return (
     <ScrollView>
@@ -234,13 +260,18 @@ const Support = ({ navigation }) => {
             </Text>
           </View>
 
-          <TextInput
-            label="Order ID"
-            mode="outlined"
-            onChangeText={(text) => setOrderId(text)}
-            value={orderId}
-            style={styles.userInput}
-          />
+          <SafeAreaView style={styles.userInput}>
+            <DropDown
+              label="Select Your Order"
+              mode="outlined"
+              visible={showDropDown}
+              showDropDown={() => setShowDropDown(true)}
+              onDismiss={() => setShowDropDown(false)}
+              value={JSON.stringify(storeDetails.orderId)}
+              setValue={setStoreDetails}
+              list={MyOrderList}
+            />
+          </SafeAreaView>
           <HelperText
             type="error"
             visible={IFerrors.orderIdError.length > 0 ? true : false}
@@ -249,44 +280,28 @@ const Support = ({ navigation }) => {
             {IFerrors.orderIdError}
           </HelperText>
 
-          <SafeAreaView style={styles.userInput}>
-            <DropDown
-              label={'Store Name'}
-              mode={'outlined'}
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={storeName}
-              setValue={setStoreName}
-              list={[
-                {
-                  label: 'ABC Store',
-                  value: 'AAA'
-                },
-                {
-                  label: 'Google Inc.',
-                  value: 'Google Inc.'
-                },
-                {
-                  label: 'Apple Inc.',
-                  value: 'Apple Inc.'
-                }
-              ]}
-            />
-          </SafeAreaView>
-          <HelperText
-            type="error"
-            visible={IFerrors.storeNameError.length > 0 ? true : false}
-            style={styles.errorText}
-          >
-            {IFerrors.storeNameError}
-          </HelperText>
+          <TextInput
+            label="Store Name"
+            mode="outlined"
+            value={storeDetails.orderId}
+            disabled
+            style={{ marginHorizontal: 20, marginBottom: 20 }}
+          />
+
+          <TextInput
+            label="Store Name"
+            mode="outlined"
+            value={storeDetails.storeName}
+            disabled
+            style={{ marginHorizontal: 20, marginBottom: 20 }}
+          />
 
           <TextInput
             label="Subject of Issue"
             mode="outlined"
             style={styles.userInput}
             value={subject}
+            placeholder="Subject of Issue"
             onChangeText={(text) => setSubject(text)}
           />
           <HelperText
@@ -303,6 +318,7 @@ const Support = ({ navigation }) => {
             multiline
             style={styles.userInput}
             value={description}
+            placeholder="Description"
             onChangeText={(text) => setDescription(text)}
           />
           <HelperText

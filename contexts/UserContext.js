@@ -12,16 +12,16 @@ const Context = createContext({});
 export const UserContext = () => useContext(Context);
 
 const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({
-    _id: '611901cf64d4413bd480b247',
-    token:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTE5MDFjZjY0ZDQ0MTNiZDQ4MGIyNDciLCJpYXQiOjE2MzczMzY2OTcsImV4cCI6MTYzNzk0MTQ5N30.QsmvABh2K21gB03KsLjtl8c6d4oFIiv2thCU67EpiHI'
-  });
-
   // const [user, setUser] = useState({
-  //   _id: '',
-  //   token: ''
+  //   _id: '611901cf64d4413bd480b247',
+  //   token:
+  //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWEwY2VkNjc5ZGJkMzAwMDRhMzIwYWEiLCJpYXQiOjE2Mzg1MjMwMDMsImV4cCI6MTYzOTEyNzgwM30.6mbIGgWBMk_BwfTmrznK5mnG0-mYisUqUwNDJ2ILTJU'
   // });
+
+  const [user, setUser] = useState({
+    _id: '',
+    token: ''
+  });
 
   // Manipulation functions
   const ADD_USER = (id, token) => {

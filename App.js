@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, LogBox } from 'react-native';
 import {
   configureFonts,
   DefaultTheme,
@@ -41,6 +41,8 @@ const theme = {
 };
 
 const App = () => {
+  LogBox.ignoreAllLogs(); //Ignore all warning log notifications
+
   return (
     <UserProvider>
       <CartProvider>

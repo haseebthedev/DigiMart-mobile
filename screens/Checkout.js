@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  KeyboardAvoidingView,
   Modal,
   TouchableNativeFeedback,
   StatusBar,
@@ -31,6 +30,7 @@ import backIcon from '../assets/icons/backIcon.png';
 import directionIcon from '../assets/icons/directionIcon.png';
 import dollarIcon from '../assets/icons/dollarIcon.png';
 import paymentAccIcon from '../assets/icons/paymentAccIcon.png';
+import unfollowStoreIcon from '../assets/icons/unfollowStoreIcon.png';
 
 const Cart = ({ route, navigation }) => {
   const { user } = UserContext();
@@ -51,6 +51,7 @@ const Cart = ({ route, navigation }) => {
   const [CheckOutModal, setCheckOutModal] = useState(false);
   const [ChangeDeliveryMethod, setChangeDeliveryMethod] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('Cash On Delivery');
+  const [orderId, setOrderId] = useState('');
 
   const getUserInfo = async () => {
     await api
@@ -96,6 +97,10 @@ const Cart = ({ route, navigation }) => {
 
     for (let i = 0; i < AllStores.length; i++) {
       const products = [];
+      let subTotal = 0;
+      let shipping = 0;
+      let quantity = 0;
+
       for (let j = 0; j < cartList.length; j++) {
         if (AllStores[i] === cartList[j].storeName) {
           products.push({
@@ -107,6 +112,12 @@ const Cart = ({ route, navigation }) => {
             quantity: cartList[j].quantity,
             color: cartList[j].color
           });
+          subTotal +=
+            cartList[j].discountedPrice > 0
+              ? cartList[j].discountedPrice * cartList[j].quantity
+              : cartList[j].salePrice * cartList[j].quantity;
+          shipping += cartList[j].shippingCost;
+          quantity += cartList[j].quantity;
         }
       }
 
@@ -116,27 +127,28 @@ const Cart = ({ route, navigation }) => {
           {
             products: products,
             name: 'Haseeb Ahmed',
-            email: 'sheikh.ameen252@gmail.com',
+            email: 'sheikhameen252@gmail.com',
             contactNumber: '+923359425690',
             deliveryAddress: 'B1339, rawalpindi',
             city: 'rawalpindi',
-            subTotalPrice: subTotalPrice,
-            totalPrice: totalPrice,
-            shippingFee: shippingFee,
+            subTotalPrice: subTotal,
+            totalPrice: subTotal + shipping,
+            shippingFee: shipping,
             deliveryInstructions: 'Please wear mask while delivery.',
             deliveryDate: '2021-11-24T07:03:11.212+00:00',
-            totalQuantity: totalQuantity,
+            totalQuantity: quantity,
             paymentMethod: 'Cash on delivery'
           },
           { headers: { Authorization: `Bearer ${user.token}` } }
         )
         .then((res) => {
-          ADD_ITEM([]);
+          setOrderId(res.data.data.order._id);
         })
         .catch((error) => {
           console.log('ERROR: ', error);
         });
     }
+    ADD_ITEM([]);
 
     ToastAndroid.show(
       'Order has been placed!',
@@ -197,11 +209,20 @@ const Cart = ({ route, navigation }) => {
         }}
       >
         <View style={{ marginBottom: 20 }}>
-          <View style={{ flexDirection: 'row' }}>
-            <Image source={addressIcon} style={{ width: 20, height: 20 }} />
-            <Text style={{ fontFamily: FONTS.PoppinsBold, marginLeft: 10 }}>
-              Delivery Address
-            </Text>
+          <View
+            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+          >
+            <View style={{ flexDirection: 'row' }}>
+              <Image source={addressIcon} style={{ width: 20, height: 20 }} />
+              <Text style={{ fontFamily: FONTS.PoppinsBold, marginLeft: 10 }}>
+                Delivery Address
+              </Text>
+            </View>
+            <TouchableOpacity onPress={() => setChangeAddressModal(true)}>
+              <Text style={{ color: '#407BFF', fontFamily: FONTS.Poppins }}>
+                EDIT
+              </Text>
+            </TouchableOpacity>
           </View>
           <Text
             style={{
@@ -214,9 +235,6 @@ const Cart = ({ route, navigation }) => {
           </Text>
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
               marginTop: 5
             }}
           >
@@ -225,11 +243,6 @@ const Cart = ({ route, navigation }) => {
             >
               Bill to the same details
             </Text>
-            <TouchableOpacity onPress={() => setChangeAddressModal(true)}>
-              <Text style={{ color: '#407BFF', fontFamily: FONTS.Poppins }}>
-                EDIT
-              </Text>
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -409,6 +422,7 @@ const Cart = ({ route, navigation }) => {
             borderRadius: 8
           }}
           onPress={placeOrder}
+          disabled={profileData.address.length === 0 ? true : false}
         >
           <Text
             style={{
@@ -550,6 +564,22 @@ const Cart = ({ route, navigation }) => {
               borderRadius: 4
             }}
           >
+            <TouchableOpacity
+              onPress={() => setChangeDeliveryMethod(false)}
+              style={{
+                position: 'absolute',
+                top: 15,
+                right: 15
+              }}
+            >
+              <Image
+                source={unfollowStoreIcon}
+                style={{
+                  width: 20,
+                  height: 20
+                }}
+              />
+            </TouchableOpacity>
             <Image
               source={paymentIcon}
               style={{
@@ -692,7 +722,7 @@ const Cart = ({ route, navigation }) => {
                 color: '#fff'
               }}
             >
-              DM-23234
+              {orderId}
             </Text>
             .
           </Text>

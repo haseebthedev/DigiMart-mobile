@@ -14,6 +14,7 @@ import {
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
 import { UserContext } from '../../contexts/UserContext';
+import { CartContext } from '../../contexts/CartContext';
 
 // Icons...
 import menu from '../../assets/icons/menuIcon.png';
@@ -38,12 +39,14 @@ const Tab = createMaterialBottomTabNavigator();
 
 const Layout = ({ navigation }) => {
   const { user } = UserContext();
+  const { cartList } = CartContext();
   const [UserProfile, setUserProfile] = useState(undefined);
   const [Username, setUsername] = useState('');
   const [UserEmail, setUserEmail] = useState('');
   const [currentTab, setCurrentTab] = useState('Homepage');
   const [showMenu, setShowMenu] = useState(false);
   const [MessageCount, setMessageCount] = useState(0);
+  const [CartCount, setCartCount] = useState(0);
 
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
@@ -76,6 +79,10 @@ const Layout = ({ navigation }) => {
       })
       .then((res) => {
         setMessageCount(res.data.recentConversation.length);
+        console.log(
+          'res.data.recentConversation.length',
+          res.data.recentConversation.length
+        );
       })
       .catch((error) => console.log(error));
   };
@@ -100,6 +107,10 @@ const Layout = ({ navigation }) => {
     retriveUserData();
     retriveMessageCount();
   }, []);
+
+  useEffect(() => {
+    setCartCount(cartList.length);
+  }, [cartList]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -170,7 +181,7 @@ const Layout = ({ navigation }) => {
           {TabButton(
             currentTab,
             setCurrentTab,
-            'Login',
+            'Logout',
             logoutIcon,
             navigation
           )}
@@ -239,15 +250,7 @@ const Layout = ({ navigation }) => {
                   left: 10
                 }}
               />
-              {/* <TextInput
-                placeholder="Search in Digimart"
-                style={{
-                  fontSize: 12,
-                  marginTop: -5,
-                  marginBottom: -10,
-                  fontFamily: FONTS.Poppins
-                }}
-              /> */}
+
               <Text
                 style={{
                   fontSize: 13,
@@ -315,7 +318,7 @@ const Layout = ({ navigation }) => {
                   style={{ width: 25, height: 25, tintColor: color }}
                 />
               ),
-              tabBarBadge: 2
+              tabBarBadge: CartCount
             }}
           />
           <Tab.Screen
@@ -341,7 +344,7 @@ const TabButton = (currentTab, setCurrentTab, title, image, navigation) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        if (title === 'Login') {
+        if (title === 'Logout') {
           navigation.navigate('Login');
           // deletingUserToken();
         } else {

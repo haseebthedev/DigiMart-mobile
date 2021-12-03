@@ -12,8 +12,9 @@ import {
 } from 'react-native';
 import { FONTS, COLORS, IMAGES } from '../constants/index';
 const { width, height } = Dimensions.get('screen');
-import api from '../axios/api';
 import { UserContext } from '../contexts/UserContext';
+import noConversation from '../assets/images/noConversation.png';
+import api from '../axios/api';
 
 // socket io
 import io from 'socket.io-client';
@@ -24,6 +25,7 @@ import startChatIcon from '../assets/icons/startChatIcon.png';
 import accountIcon from '../assets/icons/accountIcon.png';
 import mailIcon from '../assets/icons/mailIcon.png';
 import unfollowStoreIcon from '../assets/icons/unfollowStoreIcon.png';
+import ImageNotAvailable from '../assets/images/imageNotAvailable.png';
 
 const Messages = ({ navigation }) => {
   const { user } = UserContext();
@@ -163,9 +165,11 @@ const Messages = ({ navigation }) => {
       >
         <View>
           <Image
-            source={{
-              uri: item.conversationUser.profilePic
-            }}
+            source={
+              item.conversationUser.profilePic
+                ? { uri: item.conversationUser.profilePic }
+                : ImageNotAvailable
+            }
             style={{
               width: 50,
               height: 50,
@@ -253,12 +257,28 @@ const Messages = ({ navigation }) => {
         </View>
       </View>
 
+      {conversations.length > 0 ? (
+        <FlatList
+          data={conversations}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+        />
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <Image source={noConversation} style={{ width: 180, height: 180 }} />
+          <Text style={{ fontFamily: FONTS.Poppins, marginTop: 0 }}>
+            No messages yet!
+          </Text>
+        </View>
+      )}
+
       {/* List of Messages */}
-      <FlatList
-        data={conversations}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-      />
 
       {/* Search Users for Chat Button */}
       <View style={{ flex: 1, position: 'absolute', bottom: 20, right: 20 }}>

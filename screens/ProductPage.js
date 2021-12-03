@@ -431,7 +431,7 @@ const ProductPage = ({ route, navigation }) => {
                   Reviews:
                 </Text>
                 <Text style={{ fontFamily: FONTS.Poppins, color: 'grey' }}>
-                  View All
+                  Add Review
                 </Text>
               </View>
 
