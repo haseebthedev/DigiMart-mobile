@@ -63,8 +63,8 @@ const SearchAndFilter = ({ navigation }) => {
 
   function trimProdName(name) {
     let res = '';
-    if (name.length > 14) {
-      res = name.toString().substring(0, 14) + '...';
+    if (name.length > 18) {
+      res = name.toString().substring(0, 18) + '...';
     } else {
       res = name;
     }
@@ -217,7 +217,12 @@ const SearchAndFilter = ({ navigation }) => {
         <ScrollView style={{ paddingHorizontal: 20, marginBottom: 280 }}>
           {productList.map((item, index) => {
             return (
-              <View style={{ marginVertical: 10 }} key={index}>
+              <View
+                style={{
+                  marginVertical: 10
+                }}
+                key={index}
+              >
                 <View
                   style={{
                     flexDirection: 'row',
@@ -226,57 +231,35 @@ const SearchAndFilter = ({ navigation }) => {
                   }}
                 >
                   <View>
-                    <View style={{ flexDirection: 'row', marginBottom: -5 }}>
-                      <Text
-                        style={{
-                          fontFamily: FONTS.Poppins,
-                          color: 'grey'
-                        }}
-                      >
-                        {item.category}
-                      </Text>
-                      <Text
-                        style={{ fontFamily: FONTS.Poppins, color: 'grey' }}
-                      >
-                        {' >> '}
-                      </Text>
-                      <Text
-                        style={{ fontFamily: FONTS.Poppins, color: 'grey' }}
-                      >
-                        {item.subCategory}
-                      </Text>
-                    </View>
-                    <View>
-                      <Text
-                        style={{
-                          fontFamily: FONTS.PoppinsBold,
-                          fontSize: 20,
-                          color: '#407BFF',
-                          marginBottom: -5
-                        }}
-                      >
-                        {trimProdName(item.name)}
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: FONTS.Poppins,
-                          fontSize: 14,
-                          color: 'black'
-                        }}
-                      >
-                        {'Store: ' + item.storeName}
-                      </Text>
-                    </View>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.Poppins,
+                        fontSize: 12,
+                        color: 'grey'
+                      }}
+                    >
+                      {item.category + ' >> ' + item.subCategory}
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.PoppinsBold,
+                        fontSize: 20,
+                        color: '#407BFF'
+                      }}
+                    >
+                      {trimProdName(item.name)}
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.Poppins,
+                        fontSize: 14,
+                        color: 'black'
+                      }}
+                    >
+                      {'Store: ' + item.storeName}
+                    </Text>
                   </View>
                   <TouchableOpacity
-                    style={
-                      {
-                        // paddingHorizontal: 8,
-                        // paddingVertical: 4,
-                        // backgroundColor: '#407BFF',
-                        // borderRadius: 2
-                      }
-                    }
                     onPress={() =>
                       navigation.navigate('ProductPage', { prodId: item._id })
                     }
@@ -329,11 +312,11 @@ const SearchAndFilter = ({ navigation }) => {
                       <Text
                         style={{
                           fontFamily: FONTS.Poppins,
-                          color: 'grey',
-                          marginBottom: -5
+                          fontSize: 12,
+                          color: 'grey'
                         }}
                       >
-                        {item.category}
+                        {'Category: ' + item.category}
                       </Text>
                       <View>
                         <Text

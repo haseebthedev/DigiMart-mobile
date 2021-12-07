@@ -1,18 +1,39 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView
-} from 'react-native';
-import { Rating } from 'react-native-ratings';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { FONTS } from '../../constants/index';
-import laptopImage from '../../assets/images/laptop-image.png';
-import addIcon from '../../assets/icons/addIcon.png';
+import api from '../../axios/api';
 
-const About = ({ navigation }) => {
+const About = ({ route, navigation }) => {
+  const { storeId } = route.params;
+  const [storeInfo, setStoreInfo] = useState({
+    name: '',
+    biography: '',
+    category: '',
+    warehouseAddress: '',
+    city: '',
+    country: ''
+  });
+
+  useEffect(() => {
+    api
+      .get(`/buyer/data/store/${storeId}`)
+      .then((res) => {
+        let { country, biography, name, category, warehouseAddress, city } =
+          res.data.data.storeDetails;
+
+        setStoreInfo({
+          ...storeInfo,
+          country,
+          biography,
+          name,
+          category,
+          warehouseAddress,
+          city
+        });
+      })
+      .catch((error) => console.log('Error: ', error));
+  }, []);
+
   return (
     <View>
       <ScrollView>
@@ -31,20 +52,19 @@ const About = ({ navigation }) => {
           >
             About Us
           </Text>
-          <Text style={styles.heading}>Description:</Text>
-          <Text style={styles.content}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged.
-          </Text>
+          <Text style={styles.heading}>Store Name:</Text>
+          <Text style={styles.content}>{storeInfo.name}</Text>
+
+          <Text style={styles.heading}>biography:</Text>
+          <Text style={styles.content}>{storeInfo.biography}</Text>
+
           <Text style={styles.heading}>Location:</Text>
-          <Text style={styles.content}>Islamabad, Pakistan</Text>
-          <Text style={styles.heading}>Contact:</Text>
-          <Text style={styles.content}>Phone: +923455488210</Text>
-          <Text style={styles.content}>Email: google@google.com</Text>
+          <Text style={styles.content}>
+            {storeInfo.city + ', ' + storeInfo.country}
+          </Text>
+
+          <Text style={styles.heading}>Address:</Text>
+          <Text style={styles.content}>{storeInfo.warehouseAddress}</Text>
         </View>
       </ScrollView>
     </View>

@@ -178,7 +178,7 @@ const Support = ({ navigation }) => {
     await api
       .get('/buyer/storesAndOrders/me', {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWEwY2VkNjc5ZGJkMzAwMDRhMzIwYWEiLCJpYXQiOjE2MzgyNzc2ODcsImV4cCI6MTYzODg4MjQ4N30.X10zzmzEiBTouVT2I7KVfaDstKmFEkJlOPNN748TplE`
+          Authorization: `Bearer ${user.token}`
         }
       })
       .then((res) => {

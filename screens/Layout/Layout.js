@@ -79,10 +79,6 @@ const Layout = ({ navigation }) => {
       })
       .then((res) => {
         setMessageCount(res.data.recentConversation.length);
-        console.log(
-          'res.data.recentConversation.length',
-          res.data.recentConversation.length
-        );
       })
       .catch((error) => console.log(error));
   };

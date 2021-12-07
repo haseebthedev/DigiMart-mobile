@@ -17,8 +17,6 @@ import api from '../../axios/api';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
 import backIcon from '../../assets/icons/backIcon.png';
 
-const { width, height } = Dimensions.get('screen');
-
 const SubCategories = ({ route, navigation }) => {
   const { category } = route.params;
   const [token, setToken] = useState('');

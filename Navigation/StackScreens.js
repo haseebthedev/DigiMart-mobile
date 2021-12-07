@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { UserContext } from '../contexts/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Screens
 import Register from '.././screens/Register';
@@ -10,7 +11,7 @@ import Layout from '.././screens/Layout/Layout';
 import ProductPage from '.././screens/ProductPage';
 import Messages from '.././screens/Messages';
 // import Cart from '.././screens/Cart';
-import Checkout from '.././screens/Checkout';
+import Checkout from '.././screens/Checkout/Checkout';
 import Chat from '.././screens/Messages/Chat';
 import Store from '.././screens/Store/Store';
 
@@ -45,7 +46,7 @@ import SearchAndFilter from '.././screens/SearchAndFilter/SearchAndFilter';
 const Stack = createNativeStackNavigator();
 
 const StackScreens = () => {
-  // const { user } = UserContext();
+  const { user } = UserContext();
 
   useEffect(() => {
     SplashScreen.hide();
@@ -53,8 +54,7 @@ const StackScreens = () => {
 
   return (
     <Stack.Navigator
-      initialRouteName={'Login'}
-      // initialRouteName={user.token === null ? 'Login' : 'Layout'}
+      initialRouteName={!user.token ? 'Login' : 'Layout'}
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Login" component={Login} />

@@ -13,14 +13,14 @@ export const UserContext = () => useContext(Context);
 
 const UserProvider = ({ children }) => {
   // const [user, setUser] = useState({
-  //   _id: '611901cf64d4413bd480b247',
+  //   _id: '61a0ced679dbd30004a320aa',
   //   token:
-  //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWEwY2VkNjc5ZGJkMzAwMDRhMzIwYWEiLCJpYXQiOjE2Mzg1MjMwMDMsImV4cCI6MTYzOTEyNzgwM30.6mbIGgWBMk_BwfTmrznK5mnG0-mYisUqUwNDJ2ILTJU'
+  //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWEwY2VkNjc5ZGJkMzAwMDRhMzIwYWEiLCJpYXQiOjE2Mzg4OTc3ODUsImV4cCI6MTYzOTUwMjU4NX0.1UuDCtJtJWocfTuZgT6XMtF5L9YefMAauw0-xNIEW7E'
   // });
 
   const [user, setUser] = useState({
-    _id: '',
-    token: ''
+    _id: null,
+    token: null
   });
 
   // Manipulation functions
