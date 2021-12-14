@@ -19,8 +19,8 @@ const UserProvider = ({ children }) => {
   // });
 
   const [user, setUser] = useState({
-    _id: null,
-    token: null
+    _id: '',
+    token: ''
   });
 
   // Manipulation functions
@@ -29,7 +29,7 @@ const UserProvider = ({ children }) => {
   };
 
   const SIGN_OUT = () => {
-    setUser({ _id: null, token: null });
+    setUser({ _id: '', token: '' });
   };
 
   async function fetchData() {

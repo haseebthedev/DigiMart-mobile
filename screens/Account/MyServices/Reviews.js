@@ -10,14 +10,14 @@ import {
   Modal,
   ScrollView
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Rating } from 'react-native-ratings';
 import { FONTS, COLORS, IMAGES } from '../../../constants/index';
 import api from '../../../axios/api';
 import backIcon from '../../../assets/icons/backIcon.png';
-import editIcon from '../../../assets/icons/editIcon.png';
+// import editIcon from '../../../assets/icons/editIcon.png';
 import deleteIcon from '../../../assets/icons/deleteIcon.png';
-import productImage from '../../../assets/images/laptop-image.png';
+import productImage from '../../../assets/images/imageNotAvailable.png';
 import { UserContext } from '../../../contexts/UserContext';
 
 const { width, height } = Dimensions.get('screen');
@@ -130,7 +130,11 @@ const Reviews = ({ navigation }) => {
               >
                 <View style={{ padding: 10 }}>
                   <Image
-                    source={productImage}
+                    source={
+                      item.pictures.length > 0
+                        ? { uri: item.pictures[0] }
+                        : productImage
+                    }
                     style={{ width: 50, height: 50, margin: 8 }}
                   />
                 </View>
@@ -192,7 +196,7 @@ const Reviews = ({ navigation }) => {
               {/* Buttons */}
               <View>
                 {/* Edit Icon */}
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={{
                     width: 30,
                     height: 30,
@@ -208,7 +212,7 @@ const Reviews = ({ navigation }) => {
                     source={editIcon}
                     style={{ width: 15, height: 15, tintColor: '#FFF' }}
                   />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 {/* Delete Icon */}
                 <TouchableOpacity
                   style={{

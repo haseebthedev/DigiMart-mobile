@@ -279,10 +279,7 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', {
-              type: 'Category',
-              params: 'Tech'
-            })
+            navigation.navigate('SearchedProducts', { type: 'Tech' })
           }
         >
           <View
@@ -311,10 +308,7 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', {
-              type: 'Category',
-              params: 'Music'
-            })
+            navigation.navigate('SearchedProducts', { type: 'Music' })
           }
         >
           <View
@@ -346,10 +340,7 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', {
-              type: 'Category',
-              params: 'Households'
-            })
+            navigation.navigate('SearchedProducts', { type: 'HouseHolds' })
           }
         >
           <View
@@ -381,10 +372,7 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', {
-              type: 'Category',
-              params: 'Fashion'
-            })
+            navigation.navigate('SearchedProducts', { type: 'Fashion' })
           }
         >
           <View
@@ -413,10 +401,7 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() =>
-            navigation.navigate('SearchedProducts', {
-              type: 'Category',
-              params: 'Sports'
-            })
+            navigation.navigate('SearchedProducts', { type: 'Sports' })
           }
         >
           <View

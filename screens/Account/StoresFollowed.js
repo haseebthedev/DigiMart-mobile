@@ -14,7 +14,7 @@ import api from '../../axios/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONTS, COLORS, IMAGES } from '../../constants/index';
 import unfollowStoreIcon from '../../assets/icons/unfollowStoreIcon.png';
-import productImage from '../../assets/images/laptop-image.png';
+import imageNotAvailable from '../../assets/images/imageNotAvailable.png';
 import backIcon from '../../assets/icons/backIcon.png';
 import { UserContext } from '../../contexts/UserContext';
 
@@ -81,8 +81,9 @@ const StoresFollowed = ({ navigation }) => {
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {/* Product Image */}
           <View style={{ padding: 10 }}>
+            {console.log('item', item)}
             <Image
-              source={productImage}
+              source={item.logo ? { uri: item.logo } : imageNotAvailable}
               style={{ width: 50, height: 50, margin: 8 }}
             />
           </View>

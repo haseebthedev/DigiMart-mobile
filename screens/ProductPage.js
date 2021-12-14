@@ -430,9 +430,9 @@ const ProductPage = ({ route, navigation }) => {
                 <Text style={{ fontFamily: FONTS.PoppinsBold, color: 'grey' }}>
                   Reviews:
                 </Text>
-                <Text style={{ fontFamily: FONTS.Poppins, color: 'grey' }}>
+                {/* <Text style={{ fontFamily: FONTS.Poppins, color: 'grey' }}>
                   Add Review
-                </Text>
+                </Text> */}
               </View>
 
               {Reviews.length > 0 ? (

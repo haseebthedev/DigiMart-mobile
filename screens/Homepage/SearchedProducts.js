@@ -59,6 +59,29 @@ const SearchedProducts = ({ route, navigation }) => {
     } else if (type === 'lowCost') {
       reqURL = '/buyer/products';
       setHeading('Searched term: Low Cost');
+    } else if (type === 'Tech') {
+      reqURL = `/buyer/products/category/${encodeURIComponent(
+        'Electronics & Home Appliances'
+      )}`;
+      setHeading('Searched term: Tech');
+    } else if (type === 'Music') {
+      reqURL = `/buyer/products/subCategory/${encodeURIComponent(
+        'Audio Devices'
+      )}`;
+      setHeading('Searched term: Music');
+    } else if (type === 'HouseHolds') {
+      reqURL = `/buyer/products/subCategory/${encodeURIComponent(
+        'Washing Machines'
+      )}`;
+      setHeading('Searched term: HouseHolds');
+    } else if (type === 'Fashion') {
+      reqURL = `/buyer/products/category/Clothes`;
+      setHeading('Searched term: Fashion');
+    } else if (type === 'Sports') {
+      reqURL = `/buyer/products/subCategory/${encodeURIComponent(
+        'Sports Equipment'
+      )}`;
+      setHeading('Searched term: Sports');
     } else if (type === 'Category') {
       reqURL = `/buyer/products/category/${params}`;
       setHeading('Searched term: ' + params);
@@ -78,6 +101,7 @@ const SearchedProducts = ({ route, navigation }) => {
             return dateB - dateA;
           });
         }
+        // console.log('res', res.data.data);
         setProductList(products);
       })
       .catch((error) => console.log('ERROR :: ', error));
